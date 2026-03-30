@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PICO CTRL</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+:root{
+  --red:#ff2233;--green:#00ff88;--purple:#cc44ff;--black:#000;
+  --bg:#050508;--panel:#0a0a10;--panel2:#0d0d16;
+  --border:#1a1a2e;--bord2:#252540;
+  --text:#c0c0d0;--dim:#404055;--act:#fff;
+  --gr:rgba(255,34,51,.4);--gg:rgba(0,255,136,.4);--gp:rgba(204,68,255,.4);--gw:rgba(255,255,255,.15);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px 16px 60px;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.07) 2px,rgba(0,0,0,.07) 4px);pointer-events:none;z-index:9999;}
+body::after{content:'';position:fixed;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--green),transparent);z-index:9998;opacity:.5;}
+.w{width:100%;max-width:500px;}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.logo{font-family:'Orbitron',sans-serif;font-weight:900;font-size:20px;letter-spacing:8px;color:var(--act);}
+.logo span{color:var(--green);text-shadow:0 0 16px var(--gg);}
+.spill{display:flex;align-items:center;gap:7px;font-size:10px;letter-spacing:2px;color:var(--dim);}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--dim);transition:all .4s;flex-shrink:0;}
+.sdot.on{background:var(--green);box-shadow:0 0 10px var(--gg);animation:pulse 2s infinite;}
+.sdot.err{background:var(--red);box-shadow:0 0 10px var(--gr);}
+.sdot.bsy{background:var(--purple);box-shadow:0 0 10px var(--gp);animation:pulse .5s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.ip-row{display:flex;gap:6px;margin-bottom:18px;}
+.ip-inp{flex:1;background:var(--panel);border:1px solid var(--border);color:var(--act);font-family:'Share Tech Mono',monospace;font-size:13px;padding:9px 13px;outline:none;letter-spacing:1px;transition:border-color .2s,box-shadow .2s;}
+.ip-inp:focus{border-color:var(--green);box-shadow:0 0 0 1px var(--green);}
+.ip-inp::placeholder{color:var(--dim);}
+.bxs{background:transparent;border:1px solid var(--bord2);color:var(--dim);font-family:'Orbitron',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;padding:9px 12px;cursor:pointer;transition:all .2s;}
+.bxs:hover,.bxs.ap{border-color:var(--green);color:var(--green);}
+.bxs.ap{box-shadow:0 0 8px var(--gg);}
+.bping{background:transparent;border:1px solid var(--green);color:var(--green);font-family:'Orbitron',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;padding:9px 14px;cursor:pointer;transition:all .2s;}
+.bping:hover{background:var(--green);color:var(--black);box-shadow:0 0 20px var(--gg);}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--border);margin-bottom:18px;background:var(--panel);}
+.tab{background:transparent;border:none;color:var(--dim);font-family:'Orbitron',sans-serif;font-size:8px;font-weight:700;letter-spacing:1px;padding:12px 2px;cursor:pointer;transition:all .2s;border-bottom:2px solid transparent;}
+.tab:not(:last-child){border-right:1px solid var(--border);}
+.tab.on{color:var(--act);border-bottom-color:var(--act);background:rgba(255,255,255,.02);}
+.tab-panel{display:none;}.tab-panel.on{display:block;}
+.lbl{font-size:9px;letter-spacing:4px;color:var(--dim);margin-bottom:8px;display:flex;align-items:center;gap:10px;}
+.lbl::after{content:'';flex:1;height:1px;background:var(--border);}
+/* LCD */
+.lcd-wrap{display:flex;justify-content:center;margin-bottom:22px;}
+.lcd-bez{width:210px;height:210px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#1a1a2e,#050508);border:3px solid #111122;box-shadow:0 0 0 1px #0a0a18,0 20px 60px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;position:relative;}
+.lcd-bez::before{content:'';position:absolute;inset:6px;border-radius:50%;border:1px solid rgba(255,255,255,.04);pointer-events:none;}
+.lcd-scr{width:186px;height:186px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .5s,box-shadow .5s;overflow:hidden;background:#080810;}
+.lcd-scr.cr{background:#bb0010;box-shadow:0 0 40px rgba(187,0,16,.5);}
+.lcd-scr.cg{background:#005522;box-shadow:0 0 40px rgba(0,160,80,.4);}
+.lcd-scr.cp{background:#550077;box-shadow:0 0 40px rgba(140,0,200,.4);}
+.lcd-scr.rr{background:radial-gradient(circle,#0a0a14 52%,#bb0010 52%);}
+.lcd-scr.rg{background:radial-gradient(circle,#0a0a14 52%,#005522 52%);}
+.lcd-scr.rp{background:radial-gradient(circle,#0a0a14 52%,#550077 52%);}
+.lcd-cnt{font-family:'Orbitron',sans-serif;font-weight:900;font-size:12px;letter-spacing:1px;text-align:center;padding:10px;line-height:1.35;color:white;z-index:2;}
+.lcd-fng{font-size:44px;animation:fbnc 1.6s ease-in-out infinite;}
+@keyframes fbnc{0%,100%{transform:translateY(10px)}50%{transform:translateY(-10px)}}
+/* Grids */
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:18px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:18px;}
+/* State / mode / display buttons */
+.sbtn{background:var(--panel);border:1px solid var(--border);color:var(--dim);font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;padding:13px 6px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.sbtn::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:currentColor;transform:scaleX(0);transition:transform .25s;}
+.sbtn:hover::after,.sbtn.on::after{transform:scaleX(1);}
+.sbtn.sr.on,.sbtn.sr:hover{color:var(--red);border-color:var(--red);box-shadow:0 0 18px var(--gr);}
+.sbtn.sg.on,.sbtn.sg:hover{color:var(--green);border-color:var(--green);box-shadow:0 0 18px var(--gg);}
+.sbtn.sp.on,.sbtn.sp:hover{color:var(--purple);border-color:var(--purple);box-shadow:0 0 18px var(--gp);}
+.mbtn{background:var(--panel);border:1px solid var(--border);color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;padding:11px 6px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:5px;}
+.mico{font-size:17px;line-height:1;}
+.mbtn.on,.mbtn:hover{color:var(--act);border-color:var(--act);background:rgba(255,255,255,.02);}
+.dbtn{background:var(--panel);border:1px solid var(--border);color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;padding:14px 6px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:7px;}
+.dbtn .ico{font-size:22px;}
+.dbtn.on,.dbtn:hover{color:var(--act);border-color:var(--act);background:rgba(255,255,255,.02);}
+.dbtn.dp.on,.dbtn.dp:hover{color:var(--green);border-color:var(--green);box-shadow:0 0 14px var(--gg);}
+.dbtn.df.on,.dbtn.df:hover{color:var(--red);border-color:var(--red);box-shadow:0 0 14px var(--gr);}
+.dbtn.dm.on,.dbtn.dm:hover{color:var(--purple);border-color:var(--purple);box-shadow:0 0 14px var(--gp);}
+/* Message */
+.msgp{overflow:hidden;transition:max-height .3s,opacity .3s;max-height:0;opacity:0;}
+.msgp.op{max-height:130px;opacity:1;margin-bottom:18px;}
+.msgi{width:100%;background:var(--panel);border:1px solid var(--border);border-bottom:none;color:var(--act);font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;padding:12px 14px;outline:none;text-transform:uppercase;transition:border-color .2s;}
+.msgi:focus{border-color:var(--purple);}
+.msgh{background:var(--panel);border:1px solid var(--border);padding:5px 14px;font-size:9px;letter-spacing:2px;color:var(--dim);display:flex;justify-content:space-between;}
+.cc{transition:color .2s;}.cc.w{color:var(--red);}
+/* Transmit */
+.txbtn{width:100%;background:transparent;border:1px solid var(--act);color:var(--act);font-family:'Orbitron',sans-serif;font-size:12px;font-weight:900;letter-spacing:7px;padding:15px;cursor:pointer;transition:all .25s;margin-bottom:18px;position:relative;overflow:hidden;}
+.txbtn::before{content:'';position:absolute;inset:0;background:var(--act);transform:scaleX(0);transform-origin:left;transition:transform .3s;z-index:0;}
+.txbtn:hover::before{transform:scaleX(1);}
+.txbtn:hover{color:var(--black);}
+.txbtn span{position:relative;z-index:1;}
+.txbtn:disabled{border-color:var(--dim);color:var(--dim);cursor:not-allowed;}
+.txbtn:disabled::before{display:none;}
+/* Cards */
+.card{background:var(--panel);border:1px solid var(--border);padding:14px;margin-bottom:18px;}
+.ctitle{font-family:'Orbitron',sans-serif;font-size:9px;font-weight:700;letter-spacing:4px;color:var(--dim);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.ctitle::after{content:'';flex:1;height:1px;background:var(--border);}
+/* Forms */
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.fgrp{display:flex;flex-direction:column;gap:4px;}
+.flbl{font-size:9px;letter-spacing:3px;color:var(--dim);}
+.fi,.fsel{background:#060609;border:1px solid var(--border);color:var(--act);font-family:'Share Tech Mono',monospace;font-size:12px;padding:8px 10px;outline:none;width:100%;transition:border-color .2s;appearance:none;}
+.fi:focus,.fsel:focus{border-color:var(--green);}
+.fi::placeholder{color:var(--dim);}
+/* Sliders */
+.srow{display:flex;flex-direction:column;gap:3px;margin-bottom:8px;}
+.slbl{font-size:9px;letter-spacing:3px;color:var(--dim);display:flex;justify-content:space-between;}
+input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer;background:var(--border);outline:none;border:none;-webkit-appearance:none;appearance:none;border-radius:0;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;background:var(--green);box-shadow:0 0 6px var(--gg);cursor:pointer;}
+/* Days */
+.drow{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:10px;}
+.dbtn2{background:#060609;border:1px solid var(--border);color:var(--dim);font-size:9px;letter-spacing:1px;padding:7px 2px;cursor:pointer;transition:all .15s;text-align:center;font-family:'Share Tech Mono',monospace;}
+.dbtn2.on{color:var(--green);border-color:var(--green);background:rgba(0,255,136,.04);}
+/* Small buttons */
+.smbtn{background:#060609;border:1px solid var(--border);color:var(--dim);font-size:10px;letter-spacing:1px;padding:8px 4px;cursor:pointer;transition:all .15s;text-align:center;font-family:'Share Tech Mono',monospace;width:100%;}
+.smbtn:hover,.smbtn.on{color:var(--act);border-color:var(--act);}
+.badd{background:transparent;border:1px solid var(--green);color:var(--green);font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;padding:11px;cursor:pointer;transition:all .2s;width:100%;}
+.badd:hover{background:var(--green);color:var(--black);box-shadow:0 0 20px var(--gg);}
+.bdng{background:transparent;border:1px solid var(--red);color:var(--red);font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;padding:11px;cursor:pointer;transition:all .2s;width:100%;}
+.bdng:hover{background:var(--red);color:var(--black);box-shadow:0 0 20px var(--gr);}
+.brow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+/* Status */
+.sline{font-size:10px;letter-spacing:2px;min-height:18px;margin-top:8px;transition:color .2s;}
+.sline.ok{color:var(--green);}.sline.err{color:var(--red);}.sline.inf{color:var(--dim);}
+/* Progress */
+.prog{width:100%;height:3px;background:var(--border);margin-top:6px;display:none;}
+.prog.sh{display:block;}
+.pfill{height:100%;background:var(--green);transition:width .15s;width:0%;box-shadow:0 0 6px var(--gg);}
+/* Drop zone */
+.dz{border:2px dashed var(--bord2);padding:28px 16px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:12px;}
+.dz:hover,.dz.ov{border-color:var(--green);background:rgba(0,255,136,.02);}
+.dzi{font-size:30px;margin-bottom:8px;}.dzt{font-size:10px;letter-spacing:3px;color:var(--dim);}.dzs{font-size:9px;letter-spacing:2px;color:var(--dim);margin-top:4px;}
+/* Image controls */
+.imgc{display:none;flex-direction:column;gap:10px;}.imgc.sh{display:flex;}
+.pvrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:center;}
+.pvlbl{font-size:9px;letter-spacing:3px;color:var(--dim);text-align:center;margin-bottom:5px;}
+.srcpv{width:100%;aspect-ratio:1;object-fit:contain;border:1px solid var(--border);background:#000;display:block;}
+.rclip{width:100px;height:100px;border-radius:50%;overflow:hidden;border:2px solid var(--bord2);box-shadow:0 0 20px rgba(0,0,0,.6);margin:0 auto;}
+.rclip canvas{display:block;}
+/* Draw canvas */
+.draw-outer{display:flex;justify-content:center;background:#000;border:1px solid var(--border);padding:10px;position:relative;margin-bottom:8px;overflow:hidden;}
+#drawCanvas{display:block;cursor:crosshair;image-rendering:pixelated;touch-action:none;}
+.ring-ov{position:absolute;pointer-events:none;z-index:10;border-radius:50%;box-shadow:0 0 0 9999px rgba(5,5,8,.72);}
+.dtrow{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px;}
+.dcsrow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center;}
+.csw{width:28px;height:28px;border:2px solid transparent;cursor:pointer;transition:all .15s;flex-shrink:0;}
+.csw.on{border-color:var(--act);box-shadow:0 0 8px rgba(255,255,255,.4);}
+.ccinp{width:28px;height:28px;cursor:pointer;border:1px solid var(--border);background:transparent;padding:0;}
+.dsz{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.dszpv{width:28px;height:28px;border:1px solid var(--border);background:#000;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.dacrow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;}
+/* Saved drawings grid */
+.saves-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.save-card{background:#060609;border:1px solid var(--border);cursor:pointer;transition:all .2s;position:relative;aspect-ratio:1;overflow:hidden;}
+.save-card:hover{border-color:var(--green);box-shadow:0 0 10px var(--gg);}
+.save-card canvas{display:block;width:100%;height:100%;}
+.save-card .save-name{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.8);font-size:8px;letter-spacing:1px;color:var(--dim);padding:3px 4px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;}
+.save-card .save-del{position:absolute;top:3px;right:3px;background:rgba(255,34,51,.8);color:white;border:none;font-size:9px;width:16px;height:16px;cursor:pointer;display:none;align-items:center;justify-content:center;line-height:1;}
+.save-card:hover .save-del{display:flex;}
+.save-card.selected{border-color:var(--green);box-shadow:0 0 12px var(--gg);}
+.no-saves{color:var(--dim);font-size:11px;letter-spacing:2px;text-align:center;padding:20px;border:1px dashed var(--border);}
+/* Button config */
+.btn-seq{display:flex;flex-direction:column;gap:6px;margin-bottom:12px;}
+.seq-item{background:#060609;border:1px solid var(--border);padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:grab;}
+.seq-item:active{cursor:grabbing;}
+.seq-drag{color:var(--dim);font-size:14px;flex-shrink:0;}
+.seq-preview{width:32px;height:32px;border-radius:50%;flex-shrink:0;border:1px solid var(--bord2);}
+.seq-info{flex:1;}
+.seq-label{font-size:10px;letter-spacing:1px;color:var(--act);}
+.seq-sub{font-size:9px;letter-spacing:1px;color:var(--dim);margin-top:2px;}
+.seq-del{background:transparent;border:1px solid var(--border);color:var(--dim);font-size:10px;padding:4px 8px;cursor:pointer;transition:all .15s;font-family:'Share Tech Mono',monospace;}
+.seq-del:hover{color:var(--red);border-color:var(--red);}
+.no-seq{color:var(--dim);font-size:11px;letter-spacing:2px;text-align:center;padding:20px;border:1px dashed var(--border);margin-bottom:12px;}
+/* Add screen picker */
+.screen-type-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px;}
+.stbtn{background:#060609;border:1px solid var(--border);color:var(--dim);font-size:9px;letter-spacing:1px;padding:8px 4px;cursor:pointer;transition:all .15s;text-align:center;font-family:'Share Tech Mono',monospace;}
+.stbtn.on{color:var(--act);border-color:var(--act);}
+/* Job list */
+.jlist{display:flex;flex-direction:column;gap:6px;margin-bottom:18px;}
+.jcard{background:var(--panel);border:1px solid var(--border);padding:11px 13px;display:flex;align-items:center;gap:11px;transition:border-color .2s,opacity .2s;}
+.jcard.off{opacity:.35;}
+.jtime{font-family:'Orbitron',sans-serif;font-weight:700;font-size:15px;color:var(--act);min-width:48px;}
+.jinfo{flex:1;}
+.jmeta{font-size:10px;letter-spacing:1px;display:flex;align-items:center;gap:6px;}
+.jdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.jr{background:var(--red);box-shadow:0 0 5px var(--gr);}
+.jg{background:var(--green);box-shadow:0 0 5px var(--gg);}
+.jp{background:var(--purple);box-shadow:0 0 5px var(--gp);}
+.jdays{font-size:9px;letter-spacing:1px;color:var(--dim);margin-top:2px;}
+.jacts{display:flex;gap:5px;}
+.jb{background:transparent;border:1px solid var(--border);color:var(--dim);font-size:10px;padding:4px 7px;cursor:pointer;transition:all .15s;font-family:'Share Tech Mono',monospace;}
+.jb:hover{color:var(--act);border-color:var(--act);}
+.jb.del:hover{color:var(--red);border-color:var(--red);}
+.jb.tog:hover{color:var(--green);border-color:var(--green);}
+.nojobs{color:var(--dim);font-size:11px;letter-spacing:2px;text-align:center;padding:28px 16px;border:1px dashed var(--border);}
+/* Colour picker row */
+.colour-pick-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.cpick{width:28px;height:28px;border:2px solid transparent;cursor:pointer;transition:all .15s;flex-shrink:0;}
+.cpick.on{border-color:var(--act);box-shadow:0 0 8px rgba(255,255,255,.4);}
+/* Log */
+.logw{margin-top:4px;}
+.log{background:var(--panel);border:1px solid var(--border);padding:10px;height:110px;overflow-y:auto;font-size:10px;line-height:1.9;letter-spacing:1px;}
+.log::-webkit-scrollbar{width:3px;}
+.log::-webkit-scrollbar-thumb{background:var(--border);}
+.lr{display:flex;gap:10px;}
+.lt{color:var(--dim);flex-shrink:0;}
+.lm.ok{color:var(--green);}.lm.err{color:var(--red);}.lm.inf{color:var(--text);}
+.spin{display:inline-block;width:10px;height:10px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:sp .6s linear infinite;vertical-align:middle;margin-right:5px;}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="w">
+
+<header>
+  <div class="logo">PICO<span>CTRL</span></div>
+  <div class="spill"><div class="sdot" id="sDot"></div><span id="sTxt">OFFLINE</span></div>
+</header>
+
+<div class="ip-row">
+  <input class="ip-inp" id="ipIn" type="text" placeholder="192.168.1.52" value="192.168.1.52"/>
+  <button class="bping" onclick="ping()">PING</button>
+  <button class="bxs" id="pollBtn" onclick="togglePoll()">POLL</button>
+  <button class="bxs" onclick="rebootPico()" style="border-color:var(--red);color:var(--red)">REBOOT</button>
+</div>
+
+<div class="tabs">
+  <button class="tab on"  onclick="switchTab('ctrl')">CTRL</button>
+  <button class="tab"     onclick="switchTab('media')">MEDIA</button>
+  <button class="tab"     onclick="switchTab('draw')">DRAW</button>
+  <button class="tab"     onclick="switchTab('btn')">BTN</button>
+  <button class="tab"     onclick="switchTab('sched')">SCHED</button>
+</div>
+
+<!-- ═══════════ CONTROL ═══════════ -->
+<div class="tab-panel on" id="tab-ctrl">
+  <div class="lcd-wrap">
+    <div class="lcd-bez">
+      <div class="lcd-scr cg" id="lcdScr"><div class="lcd-cnt" id="lcdCnt"></div></div>
+    </div>
+  </div>
+  <div class="lbl">Colour State</div>
+  <div class="g3">
+    <button class="sbtn sr"    onclick="selSt('red')">RED</button>
+    <button class="sbtn sg on" onclick="selSt('green')">GREEN</button>
+    <button class="sbtn sp"    onclick="selSt('purple')">PURPLE</button>
+  </div>
+  <div class="lbl">Display Mode</div>
+  <div class="g3">
+    <button class="mbtn on" data-m="solid" onclick="selMd('solid')"><span class="mico">◼</span>SOLID</button>
+    <button class="mbtn" data-m="ring"     onclick="selMd('ring')"><span class="mico">◯</span>RING</button>
+    <button class="mbtn" data-m="flash"    onclick="selMd('flash')"><span class="mico">⚡</span>FLASH</button>
+  </div>
+  <div class="lbl">Display Type</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:18px">
+    <button class="dbtn dp on" onclick="selDp('plain')"><span class="ico">🎨</span>PLAIN</button>
+    <button class="dbtn df"    onclick="selDp('finger')"><span class="ico">🖕</span>FINGER</button>
+    <button class="dbtn dm"    onclick="selDp('message')" style="grid-column:span 2"><span class="ico">💬</span>MESSAGE</button>
+  </div>
+  <div class="msgp" id="msgP">
+    <input class="msgi" id="msgI" type="text" maxlength="28" placeholder="TYPE YOUR MESSAGE..." oninput="onMsg()"/>
+    <div class="msgh"><span>MAX 28 · AUTO SIZED</span><span class="cc" id="cc">0 / 28</span></div>
+  </div>
+  <button class="txbtn" id="txBtn" onclick="transmit()"><span id="txLbl">TRANSMIT</span></button>
+</div>
+
+<!-- ═══════════ MEDIA ═══════════ -->
+<div class="tab-panel" id="tab-media">
+  <div class="card">
+    <div class="ctitle">GIF565 FROM PICO FLASH</div>
+    <div style="font-size:9px;letter-spacing:2px;color:var(--dim);margin-bottom:10px;line-height:1.8">
+      CONVERT: python gif_converter.py anim.gif out.gif565<br>
+      UPLOAD: mpremote cp out.gif565 :out.gif565
+    </div>
+    <div class="fgrp" style="margin-bottom:10px">
+      <label class="flbl">FILE PATH ON PICO</label>
+      <input class="fi" id="gif565P" type="text" placeholder="output.gif565"/>
+    </div>
+    <div class="brow">
+      <button class="badd" onclick="playGif565()">▶ PLAY</button>
+      <button class="bdng" onclick="clearMedia()">✕ CLEAR</button>
+    </div>
+    <div class="sline inf" id="gif565St"></div>
+  </div>
+  <div class="card">
+    <div class="ctitle">IMAGE FROM URL</div>
+    <div class="fgrp" style="margin-bottom:8px">
+      <label class="flbl">URL (.bmp or .bin)</label>
+      <input class="fi" id="imgUrlI" type="text" placeholder="http://192.168.1.x:8080/photo.bmp"/>
+    </div>
+    <div class="brow">
+      <button class="badd" onclick="loadImgUrl()">▶ LOAD</button>
+      <button class="bdng" onclick="clearMedia()">✕ CLEAR</button>
+    </div>
+    <div class="sline inf" id="imgUrlSt"></div>
+  </div>
+  <div class="card">
+    <div class="ctitle">UPLOAD &amp; FORMAT IMAGE</div>
+    <div class="dz" id="dz" onclick="document.getElementById('fIn').click()" ondragover="onDragOv(event)" ondragleave="onDragLv(event)" ondrop="onDrop(event)">
+      <div class="dzi">🖼</div><div class="dzt">DROP IMAGE OR CLICK TO BROWSE</div><div class="dzs">PNG · JPG · GIF · WEBP · BMP</div>
+      <input type="file" id="fIn" accept="image/*" style="display:none" onchange="onFSel(event)"/>
+    </div>
+    <div class="imgc" id="imgC">
+      <div class="pvrow">
+        <div><div class="pvlbl">SOURCE</div><canvas id="srcC" class="srcpv"></canvas></div>
+        <div><div class="pvlbl">PREVIEW</div><div class="rclip"><canvas id="pvC" width="100" height="100"></canvas></div></div>
+      </div>
+      <div><div class="flbl" style="margin-bottom:5px">FIT MODE</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+          <button class="smbtn on" id="fitFill"    onclick="setFit('fill')">⬛ FILL</button>
+          <button class="smbtn"    id="fitFit"     onclick="setFit('fit')">🔲 FIT</button>
+          <button class="smbtn"    id="fitStretch" onclick="setFit('stretch')">↔ STRETCH</button>
+        </div>
+      </div>
+      <div class="srow"><div class="slbl"><span>BRIGHTNESS</span><span id="brV">100</span></div><input type="range" id="brS" min="20" max="200" value="100" oninput="onAdj()"/></div>
+      <div class="srow"><div class="slbl"><span>CONTRAST</span><span id="coV">100</span></div><input type="range" id="coS" min="20" max="200" value="100" oninput="onAdj()"/></div>
+      <div class="srow"><div class="slbl"><span>SATURATION</span><span id="saV">100</span></div><input type="range" id="saS" min="0" max="200" value="100" oninput="onAdj()"/></div>
+      <div><div class="flbl" style="margin-bottom:5px">ROTATION</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
+          <button class="smbtn on" id="rot0"   onclick="setRot(0)">0°</button>
+          <button class="smbtn"    id="rot90"  onclick="setRot(90)">90°</button>
+          <button class="smbtn"    id="rot180" onclick="setRot(180)">180°</button>
+          <button class="smbtn"    id="rot270" onclick="setRot(270)">270°</button>
+        </div>
+      </div>
+      <div><div class="flbl" style="margin-bottom:5px">FLIP</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <button class="smbtn" id="flipH" onclick="toggleFlip('h')">↔ FLIP H</button>
+          <button class="smbtn" id="flipV" onclick="toggleFlip('v')">↕ FLIP V</button>
+        </div>
+      </div>
+      <div class="brow">
+        <button class="badd" onclick="sendUpload()">▶ SEND TO PICO</button>
+        <button class="bdng" onclick="clearUpload()">✕ CLEAR</button>
+      </div>
+      <div class="prog" id="upProg"><div class="pfill" id="upFill"></div></div>
+      <div class="sline inf" id="upSt"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ DRAW ═══════════ -->
+<div class="tab-panel" id="tab-draw">
+  <div class="card">
+    <div class="ctitle">DRAW FOR DISPLAY</div>
+    <div class="draw-outer">
+      <canvas id="drawCanvas" width="240" height="240" style="width:240px;height:240px;"></canvas>
+      <div class="ring-ov" id="ringOv" style="width:240px;height:240px;top:10px;left:50%;transform:translateX(-50%);"></div>
+    </div>
+    <div style="font-size:9px;letter-spacing:2px;color:var(--dim);text-align:center;margin-bottom:10px">240×240 · ROUND DISPLAY PREVIEW</div>
+
+    <div class="lbl">Tool</div>
+    <div class="dtrow">
+      <button class="smbtn on" id="tPen"     onclick="setTool('pen')">✏ PEN</button>
+      <button class="smbtn"    id="tLine"    onclick="setTool('line')">╱ LINE</button>
+      <button class="smbtn"    id="tRect"    onclick="setTool('rect')">▭ RECT</button>
+      <button class="smbtn"    id="tCircle"  onclick="setTool('circle')">○ CIRC</button>
+      <button class="smbtn"    id="tFill"    onclick="setTool('fill')">🪣 FILL</button>
+      <button class="smbtn"    id="tEraser"  onclick="setTool('eraser')">◻ ERASE</button>
+      <button class="smbtn"    id="tEyedrop" onclick="setTool('eyedrop')">💉 PICK</button>
+      <button class="smbtn"    id="tText"    onclick="setTool('text')">T TEXT</button>
+    </div>
+
+    <div class="lbl">Colour</div>
+    <div class="dcsrow" id="palette">
+      <div class="csw on" style="background:#fff"    onclick="setCol('#ffffff')" data-c="#ffffff"></div>
+      <div class="csw"    style="background:#ff2233" onclick="setCol('#ff2233')" data-c="#ff2233"></div>
+      <div class="csw"    style="background:#00ff88" onclick="setCol('#00ff88')" data-c="#00ff88"></div>
+      <div class="csw"    style="background:#cc44ff" onclick="setCol('#cc44ff')" data-c="#cc44ff"></div>
+      <div class="csw"    style="background:#ffee00" onclick="setCol('#ffee00')" data-c="#ffee00"></div>
+      <div class="csw"    style="background:#00ccff" onclick="setCol('#00ccff')" data-c="#00ccff"></div>
+      <div class="csw"    style="background:#ff8800" onclick="setCol('#ff8800')" data-c="#ff8800"></div>
+      <div class="csw"    style="background:#000;border-color:#333" onclick="setCol('#000000')" data-c="#000000"></div>
+      <input type="color" class="ccinp" id="custCol" value="#ffffff" oninput="setCol(this.value)"/>
+    </div>
+
+    <div class="lbl">Brush Size</div>
+    <div class="dsz">
+      <div class="dszpv"><div id="szDot" style="border-radius:50%;background:white;width:4px;height:4px;"></div></div>
+      <input type="range" id="szS" min="1" max="40" value="4" oninput="onSz()" style="flex:1"/>
+      <span style="font-size:11px;color:var(--dim);min-width:24px" id="szV">4</span>
+    </div>
+
+    <div id="txtPanel" style="display:none;margin-bottom:8px">
+      <div class="flbl" style="margin-bottom:4px">TEXT TO STAMP</div>
+      <input class="fi" id="drawTxt" type="text" placeholder="Type then click canvas..."/>
+    </div>
+
+    <div class="lbl">Canvas Actions</div>
+    <div class="dacrow">
+      <button class="smbtn" onclick="undoDr()">↩ UNDO</button>
+      <button class="smbtn" onclick="clearDr()">🗑 CLEAR</button>
+      <button class="smbtn" onclick="fillBg()">■ FILL BG</button>
+    </div>
+
+    <div class="frow">
+      <div class="fgrp">
+        <label class="flbl">BACKGROUND</label>
+        <input type="color" id="bgCol" value="#000000" class="fi" style="height:36px;padding:2px 6px;cursor:pointer"/>
+      </div>
+      <div class="fgrp">
+        <label class="flbl">RING GUIDE</label>
+        <button class="smbtn on" id="rgBtn" onclick="toggleRing()" style="height:36px">◯ ON</button>
+      </div>
+    </div>
+
+    <div class="brow" style="margin-bottom:10px">
+      <button class="badd" onclick="sendDraw()">▶ SEND TO PICO</button>
+      <button class="badd" style="border-color:var(--purple);color:var(--purple)" onclick="openSaveDialog()">💾 SAVE</button>
+    </div>
+    <div class="prog" id="drProg"><div class="pfill" id="drFill"></div></div>
+    <div class="sline inf" id="drSt"></div>
+  </div>
+
+  <!-- Save dialog -->
+  <div class="card" id="saveDialog" style="display:none">
+    <div class="ctitle">SAVE DRAWING</div>
+    <div class="fgrp" style="margin-bottom:10px">
+      <label class="flbl">NAME</label>
+      <input class="fi" id="saveNameI" type="text" placeholder="MY DRAWING" maxlength="20"/>
+    </div>
+    <div class="brow">
+      <button class="badd" onclick="confirmSave()">💾 SAVE</button>
+      <button class="bdng" onclick="closeSaveDialog()">✕ CANCEL</button>
+    </div>
+  </div>
+
+  <!-- Saved drawings -->
+  <div class="card">
+    <div class="ctitle">SAVED DRAWINGS</div>
+    <div id="savesGrid" class="saves-grid"><div class="no-saves" style="grid-column:span 3">NO SAVED DRAWINGS</div></div>
+    <div class="sline inf" id="savesSt"></div>
+  </div>
+</div>
+
+<!-- ═══════════ BUTTON CONFIG ═══════════ -->
+<div class="tab-panel" id="tab-btn">
+  <div class="card">
+    <div class="ctitle">BUTTON SEQUENCE</div>
+    <div style="font-size:9px;letter-spacing:2px;color:var(--dim);margin-bottom:12px;line-height:1.8">
+      CLICKING THE BUTTON CYCLES THROUGH THIS LIST IN ORDER.
+      DRAG ITEMS TO REORDER.
+    </div>
+    <div id="btnSeq" class="btn-seq"><div class="no-seq">NO SCREENS IN SEQUENCE</div></div>
+    <div class="brow" style="margin-bottom:0">
+      <button class="badd" onclick="pushSeqToPico()">▶ APPLY TO PICO</button>
+      <button class="bdng" onclick="clearSeq()">✕ CLEAR ALL</button>
+    </div>
+    <div class="sline inf" id="seqSt"></div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">ADD SCREEN</div>
+    <div class="screen-type-row">
+      <button class="stbtn on" id="stColour"  onclick="setScreenType('colour')">🎨 COLOUR</button>
+      <button class="stbtn"    id="stFinger"  onclick="setScreenType('finger')">🖕 FINGER</button>
+      <button class="stbtn"    id="stMessage" onclick="setScreenType('message')">💬 MSG</button>
+      <button class="stbtn"    id="stSaved"   onclick="setScreenType('saved')">🖼 SAVED</button>
+    </div>
+
+    <!-- Colour picker -->
+    <div id="addColourPanel">
+      <div class="flbl" style="margin-bottom:6px">COLOUR</div>
+      <div class="colour-pick-row">
+        <div class="cpick on" style="background:#bb0010" data-col="red"    onclick="setAddCol('red')"></div>
+        <div class="cpick"    style="background:#005522" data-col="green"  onclick="setAddCol('green')"></div>
+        <div class="cpick"    style="background:#550077" data-col="purple" onclick="setAddCol('purple')"></div>
+      </div>
+      <div class="flbl" style="margin-bottom:6px">MODE</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px">
+        <button class="smbtn on" id="addMdSolid" onclick="setAddMode('solid')">◼ SOLID</button>
+        <button class="smbtn"    id="addMdRing"  onclick="setAddMode('ring')">◯ RING</button>
+        <button class="smbtn"    id="addMdFlash" onclick="setAddMode('flash')">⚡ FLASH</button>
+      </div>
+    </div>
+
+    <!-- Message panel -->
+    <div id="addMsgPanel" style="display:none">
+      <div class="flbl" style="margin-bottom:6px">COLOUR</div>
+      <div class="colour-pick-row">
+        <div class="cpick on" style="background:#bb0010" data-col="red"    onclick="setAddCol('red')"></div>
+        <div class="cpick"    style="background:#005522" data-col="green"  onclick="setAddCol('green')"></div>
+        <div class="cpick"    style="background:#550077" data-col="purple" onclick="setAddCol('purple')"></div>
+      </div>
+      <div class="fgrp" style="margin-bottom:10px">
+        <label class="flbl">MESSAGE TEXT</label>
+        <input class="fi" id="addMsgTxt" type="text" maxlength="28" placeholder="YOUR MESSAGE..." style="text-transform:uppercase"/>
+      </div>
+    </div>
+
+    <!-- Saved drawings panel -->
+    <div id="addSavedPanel" style="display:none">
+      <div class="flbl" style="margin-bottom:6px">SELECT SAVED DRAWING</div>
+      <div id="addSavedGrid" class="saves-grid" style="margin-bottom:10px">
+        <div class="no-saves" style="grid-column:span 3">NO SAVED DRAWINGS</div>
+      </div>
+    </div>
+
+    <button class="badd" onclick="addToSeq()">+ ADD TO SEQUENCE</button>
+    <div class="sline inf" id="addSt"></div>
+  </div>
+</div>
+
+<!-- ═══════════ SCHEDULE ═══════════ -->
+<div class="tab-panel" id="tab-sched">
+  <div class="card">
+  <div class="ctitle">DEVICE SETTINGS</div>
+
+  <div class="fgrp" style="margin-bottom:10px">
+    <label class="flbl">HOSTNAME</label>
+    <input class="fi" id="cfgHostname" type="text" maxlength="32"
+           placeholder="picoctrl"
+           style="text-transform:lowercase;letter-spacing:2px"/>
+    <div style="font-size:9px;letter-spacing:2px;color:var(--dim);margin-top:4px">
+      DEVICE WILL BE REACHABLE AT &lt;HOSTNAME&gt;.LOCAL AFTER REBOOT
+    </div>
+  </div>
+
+  <div class="fgrp" style="margin-bottom:10px">
+    <label class="flbl">WIFI SSID</label>
+    <input class="fi" id="cfgSsid" type="text" maxlength="64" placeholder="Network name"/>
+  </div>
+
+  <div class="fgrp" style="margin-bottom:10px">
+    <label class="flbl">WIFI PASSWORD</label>
+    <input class="fi" id="cfgPass" type="password" maxlength="64" placeholder="Leave blank to keep current"/>
+  </div>
+
+  <div class="brow">
+    <button class="badd"  onclick="saveDeviceConfig()">💾 SAVE</button>
+    <button class="bxs"   onclick="loadDeviceConfig()" style="width:100%">↓ LOAD CURRENT</button>
+  </div>
+  <div class="sline inf" id="cfgSt"></div>
+</div>
+  <div class="card">
+  <div class="ctitle">CLOCK SYNC</div>
+  <div style="font-size:9px;letter-spacing:2px;color:var(--dim);margin-bottom:10px;line-height:1.8">
+    PICO HAS NO BATTERY — CLOCK RESETS ON REBOOT.<br>
+    SYNC FROM BROWSER OR USE NTP ON BOOT.
+  </div>
+  <div class="brow">
+    <button class="badd" onclick="syncTime()">⏱ SYNC FROM BROWSER</button>
+    <button class="bxs" style="width:100%" onclick="getTime()">? CHECK TIME</button>
+  </div>
+  <div class="sline inf" id="timeSt"></div>
+</div>
+
+  <div class="card">
+    <div class="ctitle">NEW JOB</div>
+    <div class="frow">
+      <div class="fgrp"><label class="flbl">HOUR (0–23)</label><input class="fi" id="sHr" type="number" min="0" max="23" value="9"/></div>
+      <div class="fgrp"><label class="flbl">MINUTE (0–59)</label><input class="fi" id="sMn" type="number" min="0" max="59" value="0"/></div>
+    </div>
+    <div class="flbl" style="margin-bottom:5px">DAYS (empty = every day)</div>
+    <div class="drow" id="dRow">
+      <button class="dbtn2" data-d="0" onclick="togDay(0)">MON</button>
+      <button class="dbtn2" data-d="1" onclick="togDay(1)">TUE</button>
+      <button class="dbtn2" data-d="2" onclick="togDay(2)">WED</button>
+      <button class="dbtn2" data-d="3" onclick="togDay(3)">THU</button>
+      <button class="dbtn2" data-d="4" onclick="togDay(4)">FRI</button>
+      <button class="dbtn2" data-d="5" onclick="togDay(5)">SAT</button>
+      <button class="dbtn2" data-d="6" onclick="togDay(6)">SUN</button>
+    </div>
+    <div class="frow">
+      <div class="fgrp"><label class="flbl">COLOUR</label>
+        <select class="fsel" id="sSt"><option value="red">RED</option><option value="green" selected>GREEN</option><option value="purple">PURPLE</option></select>
+      </div>
+      <div class="fgrp"><label class="flbl">MODE</label>
+        <select class="fsel" id="sMo"><option value="solid" selected>SOLID</option><option value="ring">RING</option><option value="flash">FLASH</option></select>
+      </div>
+    </div>
+    <div class="fgrp" style="margin-bottom:10px">
+      <label class="flbl">DISPLAY TYPE</label>
+      <select class="fsel" id="sDp" onchange="onScDisp()"><option value="plain">PLAIN</option><option value="finger">FINGER 🖕</option><option value="message">MESSAGE 💬</option></select>
+    </div>
+    <div id="sMsgW" style="display:none" class="fgrp" style="margin-bottom:10px">
+      <label class="flbl">MESSAGE</label>
+      <input class="fi" id="sMsg" type="text" maxlength="28" placeholder="YOUR MESSAGE..." style="text-transform:uppercase"/>
+    </div>
+    <button class="badd" onclick="addJob()">+ ADD JOB</button>
+    <div class="sline inf" id="scSt"></div>
+  </div>
+  <div class="lbl">Scheduled Jobs</div>
+  <div class="jlist" id="jList"><div class="nojobs">NO JOBS SCHEDULED</div></div>
+</div>
+
+<!-- Log -->
+<div class="logw">
+  <div class="lbl" style="margin-top:6px">Activity Log</div>
+  <div class="log" id="log"></div>
+</div>
+
+</div>
+<script>
+// ════════════════════════════════════
+// CORE
+// ════════════════════════════════════
+let curSt='green',curMd='solid',curDp='plain',pollT=null,schedDays=[];
+const DAYS=['MON','TUE','WED','THU','FRI','SAT','SUN'];
+function ip(){return document.getElementById('ipIn').value.trim()||'192.168.1.52';}
+
+async function loadDeviceConfig() {
+  const st = document.getElementById('cfgSt');
+  try {
+    const r = await fetch(`http://${ip()}/config/device`,
+                          { signal: AbortSignal.timeout(3000) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error);
+    document.getElementById('cfgHostname').value = d.hostname || '';
+    document.getElementById('cfgSsid').value     = d.wifi_ssid || '';
+    document.getElementById('cfgPass').value      = '';
+    st.className   = 'sline ok';
+    st.textContent = `✓ HOSTNAME: ${d.hostname}.local`;
+    lg(`Device config loaded: ${d.hostname}`, 'ok');
+  } catch(e) {
+    st.className   = 'sline err';
+    st.textContent = `✗ ${e.message}`;
+  }
+}
+
+async function saveDeviceConfig() {
+  const st       = document.getElementById('cfgSt');
+  const hostname = document.getElementById('cfgHostname').value.trim().toLowerCase();
+  const ssid     = document.getElementById('cfgSsid').value.trim();
+  const pass     = document.getElementById('cfgPass').value;
+
+  if (!hostname) { st.className='sline err'; st.textContent='Hostname required'; return; }
+
+  const body = { hostname };
+  if (ssid) body.wifi_ssid = ssid;
+  if (pass) body.wifi_password = pass;
+
+  st.className   = 'sline inf';
+  st.textContent = 'SAVING...';
+
+  try {
+    const r = await fetch(`http://${ip()}/config/device`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(body),
+      signal:  AbortSignal.timeout(5000)
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error);
+
+    st.className   = 'sline ok';
+    st.textContent = `✓ SAVED · ${d.hostname}.local · REBOOT TO APPLY`;
+    lg(`✓ Hostname: ${d.hostname}`, 'ok');
+
+    // Update the IP input hint
+    document.getElementById('ipIn').placeholder = `${d.hostname}.local or IP`;
+
+  } catch(e) {
+    st.className   = 'sline err';
+    st.textContent = `✗ ${e.message}`;
+    lg(`✗ Config: ${e.message}`, 'err');
+  }
+}
+function lg(m,t='inf'){
+  const el=document.getElementById('log'),n=new Date().toTimeString().slice(0,8);
+  const r=document.createElement('div');r.className='lr';
+  r.innerHTML=`<span class="lt">${n}</span><span class="lm ${t}">${m}</span>`;
+  el.appendChild(r);el.scrollTop=el.scrollHeight;
+}
+
+async function syncTime() {
+  const st = document.getElementById('timeSt');
+  const now = new Date();
+  // JS weekday: 0=Sun, MicroPython: 0=Mon — convert
+  const weekday = (now.getDay() + 6) % 7;
+  const body = {
+    year: now.getFullYear(), month: now.getMonth() + 1,
+    day: now.getDate(), weekday,
+    hour: now.getHours(), minute: now.getMinutes(),
+    second: now.getSeconds()
+  };
+  try {
+    const r = await fetch(`http://${ip()}/time`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(body), signal: AbortSignal.timeout(5000)
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error);
+    st.className = 'sline ok';
+    st.textContent = `✓ SYNCED ${String(d.hour).padStart(2,'0')}:${String(d.minute).padStart(2,'0')}`;
+    lg('✓ Clock synced', 'ok');
+  } catch(e) {
+    st.className = 'sline err'; st.textContent = `✗ ${e.message}`;
+  }
+}
+
+async function getTime() {
+  const st = document.getElementById('timeSt');
+  try {
+    const r = await fetch(`http://${ip()}/time`, {signal: AbortSignal.timeout(3000)});
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error);
+    st.className = 'sline ok';
+    st.textContent = `${d.year}-${String(d.month).padStart(2,'0')}-${String(d.day).padStart(2,'0')} ${String(d.hour).padStart(2,'0')}:${String(d.minute).padStart(2,'0')}:${String(d.second).padStart(2,'0')}`;
+  } catch(e) {
+    st.className = 'sline err'; st.textContent = `✗ ${e.message}`;
+  }
+}
+
+function switchTab(t){
+  const names=['ctrl','media','draw','btn','sched'];
+  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('on',names[i]===t));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('on',p.id===`tab-${t}`));
+  if(t==='sched')loadJobs();
+  if(t==='btn'){renderSeq();renderAddSavedGrid();}
+  if(t==='draw')renderSavesGrid();
+}
+
+function setSt(s){
+  const d=document.getElementById('sDot'),tx=document.getElementById('sTxt');
+  d.className='sdot';
+  if(s==='online'){d.classList.add('on');tx.textContent='ONLINE';}
+  else if(s==='error'){d.classList.add('err');tx.textContent='ERROR';}
+  else if(s==='busy'){d.classList.add('bsy');tx.textContent='BUSY';}
+  else tx.textContent='OFFLINE';
+}
+
+async function rebootPico() {
+  if (!confirm('Reboot the Pico?')) return;
+  try {
+    await fetch(`http://${ip()}/reboot`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({}), signal: AbortSignal.timeout(3000)
+    });
+    setSt('error');
+    stopPoll();
+    lg('Pico rebooting — wait 5s then ping', 'inf');
+    // Auto-ping after 6 seconds
+    setTimeout(() => ping(), 6000);
+  } catch(e) {
+    lg(`Reboot: ${e.message}`, 'inf');
+  }
+}
+
+// ════════════════════════════════════
+// CONTROL TAB
+// ════════════════════════════════════
+function selSt(s){curSt=s;document.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('on'));document.querySelector(`.sbtn.s${s[0]}`).classList.add('on');updLCD();}
+function selMd(m){curMd=m;document.querySelectorAll('.mbtn').forEach(b=>b.classList.remove('on'));document.querySelector(`[data-m="${m}"]`).classList.add('on');updLCD();}
+function selDp(d){
+  curDp=d;
+  document.querySelectorAll('.dbtn').forEach(b=>b.classList.remove('on'));
+  const cls=d==='plain'?'.dp':d==='finger'?'.df':'.dm';
+  document.querySelector(`.dbtn${cls}`).classList.add('on');
+  const mp=document.getElementById('msgP');
+  if(d==='message'){mp.classList.add('op');document.getElementById('msgI').focus();}
+  else mp.classList.remove('op');
+  updLCD();
+}
+function onMsg(){const v=document.getElementById('msgI').value,cc=document.getElementById('cc');cc.textContent=`${v.length} / 28`;cc.classList.toggle('w',v.length>20);updLCD();}
+function updLCD(){
+  const scr=document.getElementById('lcdScr'),cnt=document.getElementById('lcdCnt');
+  scr.className='lcd-scr';scr.classList.add((curMd==='ring'?'r':'c')+curSt[0]);
+  if(curDp==='finger')cnt.innerHTML='<div class="lcd-fng">🖕</div>';
+  else if(curDp==='message'){const t=document.getElementById('msgI').value||'...';cnt.innerHTML=`<div style="font-family:Orbitron,sans-serif;font-weight:900;font-size:${t.length>7?'10px':'14px'};color:white;text-align:center;padding:6px;line-height:1.3">${t.toUpperCase()}</div>`;}
+  else cnt.innerHTML='';
+}
+async function transmit(){
+  const btn=document.getElementById('txBtn'),lbl=document.getElementById('txLbl');
+  btn.disabled=true;lbl.innerHTML='<span class="spin"></span>SENDING';
+  const pay={state:curSt};
+  if(curDp==='finger')pay.show_middle_finger=true;
+  if(curDp==='message'){const m=document.getElementById('msgI').value.trim();if(!m){lg('Message empty','err');btn.disabled=false;lbl.textContent='TRANSMIT';return;}pay.message=m;}
+  lg(`→ ${JSON.stringify(pay)}`,'inf');
+  try{
+    const r1=await fetch(`http://${ip()}/state`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(pay),signal:AbortSignal.timeout(5000)});
+    const d1=await r1.json();if(!r1.ok)throw new Error(d1.error||`HTTP ${r1.status}`);
+    const r2=await fetch(`http://${ip()}/config`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:curMd}),signal:AbortSignal.timeout(5000)});
+    if(!r2.ok){const d2=await r2.json();throw new Error(d2.error||`HTTP ${r2.status}`);}
+    setSt('online');lg(`✓ ${curSt}/${curMd}/${curDp}`,'ok');
+  }catch(e){setSt('error');lg(`✗ ${e.message}`,'err');}
+  finally{btn.disabled=false;lbl.textContent='TRANSMIT';}
+}
+function startPoll(){
+  if(pollT)return;document.getElementById('pollBtn').classList.add('ap');
+  pollT=setInterval(async()=>{try{const r1=await fetch(`http://${ip()}/state`,{signal:AbortSignal.timeout(1000)});const d1=await r1.json();const r2=await fetch(`http://${ip()}/config`,{signal:AbortSignal.timeout(1000)});const d2=await r2.json();syncDev(d1,d2.mode);setSt('online');}catch{setSt('error');}},600);
+  lg('Polling started','inf');
+}
+function stopPoll(){if(!pollT)return;clearInterval(pollT);pollT=null;document.getElementById('pollBtn').classList.remove('ap');lg('Polling stopped','inf');}
+function togglePoll(){pollT?stopPoll():startPoll();}
+function syncDev(d,mode){
+  if(curSt!==d.state)selSt(d.state);if(curMd!==mode)selMd(mode);
+  const nd=d.show_middle_finger?'finger':d.message?'message':'plain';
+  if(curDp!==nd){selDp(nd);if(nd==='message'&&d.message){document.getElementById('msgI').value=d.message;onMsg();}}
+}
+async function ping() {
+  lg(`Pinging ${ip()}...`, 'inf');
+  setSt('busy');
+  try {
+    const r = await fetch(`http://${ip()}/health`, { signal: AbortSignal.timeout(3000) });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const d = await r.json();
+    setSt('online');
+    lg(`Online · uptime ${(d.uptime_ms/1000).toFixed(1)}s · RAM ${d.free_ram||'?'}B`, 'ok');
+
+    // Load device config to show hostname
+    try {
+      const rc = await fetch(`http://${ip()}/config/device`,
+                             { signal: AbortSignal.timeout(2000) });
+      const dc = await rc.json();
+      if (dc.hostname) {
+        document.getElementById('cfgHostname').value = dc.hostname;
+        lg(`Hostname: ${dc.hostname}.local`, 'inf');
+      }
+    } catch {}
+
+    const rs = await fetch(`http://${ip()}/state`,  { signal: AbortSignal.timeout(2000) });
+    const ds = await rs.json();
+    const rconf = await fetch(`http://${ip()}/config`, { signal: AbortSignal.timeout(2000) });
+    const dc2 = await rconf.json();
+    syncDev(ds, dc2.mode);
+    startPoll();
+  } catch(e) {
+    setSt('error'); stopPoll(); lg(`Ping failed: ${e.message}`, 'err');
+  }
+}
+
+// ════════════════════════════════════
+// MEDIA TAB
+// ════════════════════════════════════
+async function clearMedia(){
+  try{await fetch(`http://${ip()}/image`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:'clear'}),signal:AbortSignal.timeout(5000)});lg('Media cleared','ok');updLCD();}
+  catch(e){lg(`✗ ${e.message}`,'err');}
+}
+async function playGif565(){
+  const path=document.getElementById('gif565P').value.trim(),st=document.getElementById('gif565St');
+  if(!path){lg('No path','err');return;}
+  st.className='sline inf';st.textContent='LOADING...';
+  try{
+    const r=await fetch(`http://${ip()}/gif565`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path}),signal:AbortSignal.timeout(5000)});
+    const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);
+    st.className='sline ok';st.textContent=`✓ ${d.frames} FRAMES · ${d.delay_ms}ms/FRAME`;lg(`✓ Playing ${path}`,'ok');
+  }catch(e){st.className='sline err';st.textContent=`✗ ${e.message}`;lg(`✗ gif565: ${e.message}`,'err');}
+}
+async function loadImgUrl(){
+  const url=document.getElementById('imgUrlI').value.trim(),st=document.getElementById('imgUrlSt');
+  if(!url){lg('Image URL empty','err');return;}st.className='sline inf';st.textContent='LOADING...';
+  try{
+    const r=await fetch(`http://${ip()}/image`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url}),signal:AbortSignal.timeout(60000)});
+    const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);
+    st.className='sline ok';st.textContent='✓ DISPLAYED';lg('✓ Image displayed','ok');
+  }catch(e){st.className='sline err';st.textContent=`✗ ${e.message}`;lg(`✗ Image: ${e.message}`,'err');}
+}
+let srcImg=null,fitMd='fill',rot=0,fH=false,fV=false,pvCvs=null;
+function onDragOv(e){e.preventDefault();document.getElementById('dz').classList.add('ov');}
+function onDragLv(){document.getElementById('dz').classList.remove('ov');}
+function onDrop(e){e.preventDefault();onDragLv();const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))loadFile(f);}
+function onFSel(e){const f=e.target.files[0];if(f)loadFile(f);}
+function loadFile(file){
+  const rd=new FileReader();rd.onload=e=>{const img=new Image();img.onload=()=>{
+    srcImg=img;rot=0;fH=false;fV=false;
+    ['brS','coS','saS'].forEach(id=>document.getElementById(id).value=100);
+    ['brV','coV','saV'].forEach(id=>document.getElementById(id).textContent=100);
+    const sc=document.getElementById('srcC');sc.width=img.width;sc.height=img.height;sc.getContext('2d').drawImage(img,0,0);
+    document.getElementById('imgC').classList.add('sh');document.getElementById('dz').style.display='none';
+    rendPv();lg(`Image: ${img.width}×${img.height}`,'ok');};img.src=e.target.result;};rd.readAsDataURL(file);
+}
+function setFit(m){fitMd=m;['Fill','Fit','Stretch'].forEach(n=>document.getElementById(`fit${n}`).classList.toggle('on',n.toLowerCase()===m));rendPv();}
+function onAdj(){['br','co','sa'].forEach(k=>{document.getElementById(`${k}V`).textContent=document.getElementById(`${k}S`).value;});rendPv();}
+function setRot(r){rot=r;[0,90,180,270].forEach(d=>document.getElementById(`rot${d}`).classList.toggle('on',d===r));rendPv();}
+function toggleFlip(ax){if(ax==='h')fH=!fH;else fV=!fV;document.getElementById('flipH').classList.toggle('on',fH);document.getElementById('flipV').classList.toggle('on',fV);rendPv();}
+function rendPv(){
+  if(!srcImg)return;
+  const S=240,off=document.createElement('canvas');off.width=S;off.height=S;
+  const cx=off.getContext('2d');cx.fillStyle='#000';cx.fillRect(0,0,S,S);cx.save();
+  cx.translate(S/2,S/2);if(fH)cx.scale(-1,1);if(fV)cx.scale(1,-1);cx.rotate(rot*Math.PI/180);
+  const iw=srcImg.width,ih=srcImg.height;let dw,dh,dx,dy;
+  if(fitMd==='stretch'){dw=S;dh=S;dx=-S/2;dy=-S/2;}
+  else if(fitMd==='fit'){const sc=Math.min(S/iw,S/ih);dw=iw*sc;dh=ih*sc;dx=-dw/2;dy=-dh/2;}
+  else{const sc=Math.max(S/iw,S/ih);dw=iw*sc;dh=ih*sc;dx=-dw/2;dy=-dh/2;}
+  cx.filter=`brightness(${document.getElementById('brS').value}%) contrast(${document.getElementById('coS').value}%) saturate(${document.getElementById('saS').value}%)`;
+  cx.drawImage(srcImg,dx,dy,dw,dh);cx.restore();pvCvs=off;
+  document.getElementById('pvC').getContext('2d').drawImage(off,0,0,100,100);
+}
+// ── Corrected RGB565 conversion ──
+function cvs2b64(canvas){
+  const cx=canvas.getContext('2d'),px=cx.getImageData(0,0,240,240).data,buf=new Uint8Array(240*240*2);
+  let i=0;
+  for(let p=0;p<px.length;p+=4){
+    const r=px[p],g=px[p+1],b=px[p+2];
+    const c=((r&0xF8)<<8)|((g&0xFC)<<3)|(b>>3);
+    // Correct byte order for framebuf
+    buf[i++]=(c>>8)&0xFF;
+    buf[i++]=c&0xFF;
+  }
+  let s='';for(let j=0;j<buf.length;j++)s+=String.fromCharCode(buf[j]);return btoa(s);
+}
+async function sendChunks(canvas, progId, fillId, stId) {
+  const st=document.getElementById(stId),pr=document.getElementById(progId),fi=document.getElementById(fillId);
+  st.className='sline inf'; st.textContent='CLEARING RAM...';
+
+  try {
+    await fetch(`http://${ip()}/clear`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({}), signal:AbortSignal.timeout(8000)  // longer timeout for defrag
+    });
+  } catch(e) { lg(`Clear: ${e.message}`, 'inf'); }
+
+  // Wait for defrag to settle
+  await new Promise(r => setTimeout(r, 500));
+
+  st.textContent='CONVERTING...';
+  await new Promise(r=>setTimeout(r,30));
+  const b64=cvs2b64(canvas), CH=2000, tot=Math.ceil(b64.length/CH);
+  pr.classList.add('sh');
+  lg(`Sending ${tot} chunks`, 'inf');
+  try {
+    for(let i=0;i<tot;i++){
+      fi.style.width=Math.round((i/tot)*100)+'%';
+      st.textContent=`SENDING ${i+1} / ${tot}...`;
+      const r=await fetch(`http://${ip()}/upload_chunk`,{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({chunk:b64.slice(i*CH,(i+1)*CH),index:i,total:tot}),
+        signal:AbortSignal.timeout(15000)
+      });
+      const d=await r.json();
+      if(!r.ok) throw new Error(d.error||`HTTP ${r.status}`);
+    }
+    fi.style.width='100%';
+    st.className='sline ok'; st.textContent='✓ SENT';
+    lg('✓ Sent to Pico','ok');
+  } catch(e) {
+    // If alloc fails, auto-retry once after a reboot suggestion
+    if (e.message.includes('Alloc failed') || e.message.includes('reboot')) {
+      st.className='sline err';
+      st.textContent='⚠ FRAGMENTATION — REBOOTING PICO...';
+      lg('Heap fragmented — auto rebooting Pico', 'inf');
+      try {
+        await fetch(`http://${ip()}/reboot`, {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({}), signal:AbortSignal.timeout(3000)
+        });
+        // Wait for reboot then retry
+        st.textContent='WAITING FOR REBOOT...';
+        await new Promise(r => setTimeout(r, 7000));
+        st.textContent='RETRYING...';
+        await sendChunks(canvas, progId, fillId, stId);
+      } catch(re) {
+        st.className='sline err';
+        st.textContent=`✗ Reboot failed: ${re.message}`;
+        lg(`✗ Reboot: ${re.message}`, 'err');
+      }
+    } else {
+      st.className='sline err'; st.textContent=`✗ ${e.message}`;
+      lg(`✗ ${e.message}`, 'err');
+    }
+  } finally {
+    setTimeout(()=>{pr.classList.remove('sh');fi.style.width='0%';},1500);
+  }
+}
+async function sendUpload(){if(!pvCvs){lg('No image','err');return;}await sendChunks(pvCvs,'upProg','upFill','upSt');}
+function clearUpload(){srcImg=null;pvCvs=null;document.getElementById('imgC').classList.remove('sh');document.getElementById('dz').style.display='block';document.getElementById('fIn').value='';document.getElementById('upSt').textContent='';}
+
+// ════════════════════════════════════
+// DRAW TAB
+// ════════════════════════════════════
+const DC=document.getElementById('drawCanvas'),DX=DC.getContext('2d');
+let dTool='pen',dCol='#ffffff',dSz=4,drawing=false,lastX=0,lastY=0,snapSt=null,hist=[],showRing=true,bgC='#000000';
+
+// Init canvas black
+DX.fillStyle='#000000';DX.fillRect(0,0,240,240);hist.push(DX.getImageData(0,0,240,240));
+
+function savHist(){hist.push(DX.getImageData(0,0,240,240));if(hist.length>30)hist.shift();}
+function undoDr(){if(hist.length>1){hist.pop();DX.putImageData(hist[hist.length-1],0,0);}}
+function clearDr(){DX.fillStyle=bgC;DX.fillRect(0,0,240,240);savHist();}
+function fillBg(){bgC=document.getElementById('bgCol').value;clearDr();}
+function toggleRing(){
+  showRing=!showRing;
+  const b=document.getElementById('rgBtn');b.textContent=showRing?'◯ ON':'◯ OFF';b.classList.toggle('on',showRing);
+  document.getElementById('ringOv').style.display=showRing?'block':'none';
+}
+function setTool(t){
+  dTool=t;
+  // Only update the tool buttons — do NOT touch the canvas
+  document.querySelectorAll('.dtrow .smbtn').forEach(b=>b.classList.remove('on'));
+  const tid='t'+t.charAt(0).toUpperCase()+t.slice(1);
+  const el=document.getElementById(tid);if(el)el.classList.add('on');
+  document.getElementById('txtPanel').style.display=t==='text'?'block':'none';
+  DC.style.cursor=t==='eyedrop'?'crosshair':t==='fill'?'cell':t==='text'?'text':'crosshair';
+}
+function setCol(c){
+  dCol=c;
+  document.querySelectorAll('.csw').forEach(s=>s.classList.toggle('on',s.dataset.c===c));
+  document.getElementById('custCol').value=c;
+}
+function onSz(){dSz=parseInt(document.getElementById('szS').value);document.getElementById('szV').textContent=dSz;const d=document.getElementById('szDot'),sz=Math.min(dSz,24);d.style.width=sz+'px';d.style.height=sz+'px';}
+function getPos(e){
+  const r=DC.getBoundingClientRect(),sx=240/r.width,sy=240/r.height;
+  const cx=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
+  const cy=(e.touches?e.touches[0].clientY:e.clientY)-r.top;
+  return[cx*sx,cy*sy];
+}
+function floodFill(sx,sy,fc){
+  sx=Math.floor(sx);sy=Math.floor(sy);
+  const id=DX.getImageData(0,0,240,240),d=id.data,idx=(sy*240+sx)*4;
+  const tr=d[idx],tg=d[idx+1],tb=d[idx+2];
+  const fr=parseInt(fc.slice(1,3),16),fg=parseInt(fc.slice(3,5),16),fb=parseInt(fc.slice(5,7),16);
+  if(tr===fr&&tg===fg&&tb===fb)return;
+  const st=[[sx,sy]];
+  while(st.length){const[x,y]=st.pop();if(x<0||x>=240||y<0||y>=240)continue;const i=(y*240+x)*4;if(d[i]!==tr||d[i+1]!==tg||d[i+2]!==tb)continue;d[i]=fr;d[i+1]=fg;d[i+2]=fb;d[i+3]=255;st.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);}
+  DX.putImageData(id,0,0);
+}
+function pickCol(x,y){const px=DX.getImageData(Math.floor(x),Math.floor(y),1,1).data;const h='#'+[px[0],px[1],px[2]].map(v=>v.toString(16).padStart(2,'0')).join('');setCol(h);document.getElementById('custCol').value=h;setTool('pen');}
+function stampTxt(x,y){const t=document.getElementById('drawTxt').value;if(!t)return;DX.save();DX.fillStyle=dCol;DX.font=`bold ${dSz*4+8}px Orbitron,monospace`;DX.textAlign='left';DX.fillText(t,x,y);DX.restore();savHist();}
+function onDrStart(e){
+  e.preventDefault();drawing=true;const[x,y]=getPos(e);lastX=x;lastY=y;
+  if(dTool==='fill'){floodFill(x,y,dCol);savHist();return;}
+  if(dTool==='eyedrop'){pickCol(x,y);return;}
+  if(dTool==='text'){stampTxt(x,y);return;}
+  if(['line','rect','circle'].includes(dTool)){snapSt=[x,y];return;}
+  DX.beginPath();DX.arc(x,y,dSz/2,0,Math.PI*2);DX.fillStyle=dTool==='eraser'?bgC:dCol;DX.fill();
+}
+function onDrMove(e){
+  e.preventDefault();if(!drawing)return;const[x,y]=getPos(e);
+  if(dTool==='pen'||dTool==='eraser'){
+    DX.beginPath();DX.moveTo(lastX,lastY);DX.lineTo(x,y);DX.strokeStyle=dTool==='eraser'?bgC:dCol;DX.lineWidth=dSz;DX.lineCap='round';DX.lineJoin='round';DX.stroke();lastX=x;lastY=y;
+  }else if(snapSt&&['line','rect','circle'].includes(dTool)){
+    DX.putImageData(hist[hist.length-1],0,0);
+    DX.strokeStyle=dCol;DX.lineWidth=dSz;DX.lineCap='round';
+    const[sx,sy]=snapSt;
+    if(dTool==='line'){DX.beginPath();DX.moveTo(sx,sy);DX.lineTo(x,y);DX.stroke();}
+    else if(dTool==='rect'){DX.strokeRect(sx,sy,x-sx,y-sy);}
+    else{const rx=Math.abs(x-sx)/2,ry=Math.abs(y-sy)/2,cx=(sx+x)/2,cy=(sy+y)/2;DX.beginPath();DX.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);DX.stroke();}
+  }
+}
+function onDrEnd(){if(!drawing)return;drawing=false;snapSt=null;savHist();}
+DC.addEventListener('mousedown',onDrStart);DC.addEventListener('mousemove',onDrMove);DC.addEventListener('mouseup',onDrEnd);DC.addEventListener('mouseleave',onDrEnd);
+DC.addEventListener('touchstart',onDrStart,{passive:false});DC.addEventListener('touchmove',onDrMove,{passive:false});DC.addEventListener('touchend',onDrEnd);
+
+async function sendDraw(){await sendChunks(DC,'drProg','drFill','drSt');}
+
+// ════════════════════════════════════
+// SAVED DRAWINGS
+// ════════════════════════════════════
+// Stored as { id, name, dataUrl } in localStorage
+function getSaves(){try{return JSON.parse(localStorage.getItem('picoDrawings')||'[]');}catch{return[];}}
+function putSaves(arr){localStorage.setItem('picoDrawings',JSON.stringify(arr));}
+
+function openSaveDialog(){
+  document.getElementById('saveNameI').value='';
+  document.getElementById('saveDialog').style.display='block';
+  document.getElementById('saveNameI').focus();
+}
+function closeSaveDialog(){document.getElementById('saveDialog').style.display='none';}
+
+function confirmSave(){
+  const name=document.getElementById('saveNameI').value.trim()||'DRAWING '+Date.now();
+  const dataUrl=DC.toDataURL('image/png');
+  const saves=getSaves();
+  saves.push({id:Date.now(),name:name.toUpperCase(),dataUrl});
+  putSaves(saves);
+  closeSaveDialog();
+  renderSavesGrid();
+  lg(`Saved: ${name}`,'ok');
+}
+
+function deleteSave(id){
+  const saves=getSaves().filter(s=>s.id!==id);
+  putSaves(saves);renderSavesGrid();renderAddSavedGrid();
+  // Also remove from button sequence if present
+  btnSequence=btnSequence.filter(s=>!(s.type==='saved'&&s.saveId===id));
+  renderSeq();
+}
+
+function loadSaveToCanvas(save){
+  const img=new Image();
+  img.onload=()=>{DX.clearRect(0,0,240,240);DX.drawImage(img,0,0,240,240);savHist();lg(`Loaded: ${save.name}`,'ok');};
+  img.src=save.dataUrl;
+}
+
+function renderSavesGrid(){
+  const saves=getSaves(),grid=document.getElementById('savesGrid');
+  if(!saves.length){grid.innerHTML='<div class="no-saves" style="grid-column:span 3">NO SAVED DRAWINGS</div>';return;}
+  grid.innerHTML=saves.map(s=>`
+    <div class="save-card" onclick="loadSaveToCanvas(getSaves().find(x=>x.id===${s.id}))">
+      <img src="${s.dataUrl}" style="width:100%;height:100%;object-fit:cover;display:block;"/>
+      <div class="save-name">${s.name}</div>
+      <button class="save-del" onclick="event.stopPropagation();deleteSave(${s.id})">✕</button>
+    </div>`).join('');
+}
+
+function renderAddSavedGrid(){
+  const saves=getSaves(),grid=document.getElementById('addSavedGrid');
+  if(!saves.length){grid.innerHTML='<div class="no-saves" style="grid-column:span 3">NO SAVED DRAWINGS</div>';return;}
+  grid.innerHTML=saves.map(s=>`
+    <div class="save-card" id="addSave_${s.id}" onclick="selectAddSave(${s.id})">
+      <img src="${s.dataUrl}" style="width:100%;height:100%;object-fit:cover;display:block;"/>
+      <div class="save-name">${s.name}</div>
+    </div>`).join('');
+}
+
+let selectedAddSave=null;
+function selectAddSave(id){
+  selectedAddSave=id;
+  document.querySelectorAll('[id^="addSave_"]').forEach(el=>el.classList.remove('selected'));
+  document.getElementById(`addSave_${id}`).classList.add('selected');
+}
+
+// ════════════════════════════════════
+// BUTTON CONFIG
+// ════════════════════════════════════
+// btnSequence: array of screen descriptors
+// { type:'colour'|'finger'|'message'|'saved', state, mode, message, saveId, name }
+let btnSequence=[];
+try{btnSequence=JSON.parse(localStorage.getItem('picoBtnSeq')||'[]');}catch{}
+
+let addScreenType='colour',addColour='red',addMode='solid';
+
+function setScreenType(t){
+  addScreenType=t;
+  document.querySelectorAll('.stbtn').forEach(b=>b.classList.remove('on'));
+  document.getElementById(`st${t.charAt(0).toUpperCase()+t.slice(1)}`).classList.add('on');
+  document.getElementById('addColourPanel').style.display=t==='colour'?'block':'none';
+  document.getElementById('addMsgPanel').style.display=t==='message'?'block':'none';
+  document.getElementById('addSavedPanel').style.display=t==='saved'?'block':'none';
+}
+
+function setAddCol(c){
+  addColour=c;
+  // Update both colour pick rows
+  document.querySelectorAll('.cpick').forEach(el=>el.classList.toggle('on',el.dataset.col===c));
+}
+function setAddMode(m){
+  addMode=m;
+  ['Solid','Ring','Flash'].forEach(n=>document.getElementById(`addMd${n}`).classList.toggle('on',n.toLowerCase()===m));
+}
+
+function addToSeq(){
+  const st=document.getElementById('addSt');
+  let item={};
+
+  if(addScreenType==='colour'){
+    item={type:'colour',state:addColour,mode:addMode,name:`${addColour.toUpperCase()} ${addMode.toUpperCase()}`};
+  } else if(addScreenType==='finger'){
+    item={type:'finger',state:'red',mode:'solid',name:'MIDDLE FINGER'};
+  } else if(addScreenType==='message'){
+    const msg=document.getElementById('addMsgTxt').value.trim();
+    if(!msg){st.className='sline err';st.textContent='Message required';return;}
+    item={type:'message',state:addColour,mode:'solid',message:msg,name:`MSG: ${msg.toUpperCase()}`};
+  } else if(addScreenType==='saved'){
+    if(!selectedAddSave){st.className='sline err';st.textContent='Select a drawing';return;}
+    const save=getSaves().find(s=>s.id===selectedAddSave);
+    if(!save){st.className='sline err';st.textContent='Drawing not found';return;}
+    item={type:'saved',saveId:selectedAddSave,name:save.name,dataUrl:save.dataUrl};
+  }
+
+  item.id=Date.now();
+  btnSequence.push(item);
+  localStorage.setItem('picoBtnSeq',JSON.stringify(btnSequence));
+  renderSeq();
+  st.className='sline ok';st.textContent=`✓ Added: ${item.name}`;
+  lg(`Seq: added ${item.name}`,'ok');
+}
+
+function removeFromSeq(id){
+  btnSequence=btnSequence.filter(s=>s.id!==id);
+  localStorage.setItem('picoBtnSeq',JSON.stringify(btnSequence));
+  renderSeq();
+}
+
+function clearSeq(){
+  btnSequence=[];localStorage.removeItem('picoBtnSeq');renderSeq();
+  document.getElementById('seqSt').textContent='';
+}
+
+function renderSeq(){
+  const el=document.getElementById('btnSeq');
+  if(!btnSequence.length){el.innerHTML='<div class="no-seq">NO SCREENS IN SEQUENCE</div>';return;}
+
+  el.innerHTML=btnSequence.map((s,i)=>{
+    const preview=s.type==='saved'
+      ?`<img src="${s.dataUrl}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid var(--bord2);"/>`
+      :`<div class="seq-preview" style="background:${s.state==='red'?'#bb0010':s.state==='green'?'#005522':'#550077'}"></div>`;
+    return`<div class="seq-item" draggable="true" data-idx="${i}"
+      ondragstart="onSeqDragStart(event,${i})"
+      ondragover="onSeqDragOver(event)"
+      ondrop="onSeqDrop(event,${i})">
+      <span class="seq-drag">⠿</span>
+      ${preview}
+      <div class="seq-info">
+        <div class="seq-label">${i+1}. ${s.name}</div>
+        <div class="seq-sub">${s.type.toUpperCase()}${s.message?' · '+s.message.toUpperCase():''}</div>
+      </div>
+      <button class="seq-del" onclick="removeFromSeq(${s.id})">✕</button>
+    </div>`;
+  }).join('');
+}
+
+// Drag to reorder
+let dragIdx=null;
+function onSeqDragStart(e,i){dragIdx=i;e.dataTransfer.effectAllowed='move';}
+function onSeqDragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';}
+function onSeqDrop(e,targetIdx){
+  e.preventDefault();
+  if(dragIdx===null||dragIdx===targetIdx)return;
+  const item=btnSequence.splice(dragIdx,1)[0];
+  btnSequence.splice(targetIdx,0,item);
+  dragIdx=null;
+  localStorage.setItem('picoBtnSeq',JSON.stringify(btnSequence));
+  renderSeq();
+}
+
+async function pushSeqToPico() {
+  const st = document.getElementById('seqSt');
+  if (!btnSequence.length) {
+    st.className = 'sline err'; st.textContent = 'Sequence is empty'; return;
+  }
+  st.className = 'sline inf'; st.textContent = 'APPLYING...';
+  lg(`Applying sequence (${btnSequence.length} items)`, 'inf');
+
+  try {
+    // Step 1 — upload saved drawings as named slots
+    for (let i = 0; i < btnSequence.length; i++) {
+      const s = btnSequence[i];
+      if (s.type !== 'saved' || !s.dataUrl) continue;
+
+      st.textContent = `UPLOADING DRAWING ${i+1}/${btnSequence.length}...`;
+      lg(`Uploading drawing to slot ${i}`, 'inf');
+
+      // Render drawing onto 240x240 canvas
+      const canvas = document.createElement('canvas');
+      canvas.width = 240; canvas.height = 240;
+      const ctx = canvas.getContext('2d');
+      await new Promise(res => {
+        const img = new Image();
+        img.onload = () => { ctx.drawImage(img, 0, 0, 240, 240); res(); };
+        img.src = s.dataUrl;
+      });
+
+      // Clear RAM before each drawing upload
+      try {
+        await fetch(`http://${ip()}/clear`, {
+          method: 'POST', headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({}), signal: AbortSignal.timeout(5000)
+        });
+      } catch(e) { lg(`Clear warn: ${e.message}`, 'inf'); }
+      await new Promise(r => setTimeout(r, 300));
+
+      // Upload in chunks — pass slot index so Pico stores not displays
+      const b64 = cvs2b64(canvas);
+      const CH  = 2000;
+      const tot = Math.ceil(b64.length / CH);
+
+      for (let c = 0; c < tot; c++) {
+        st.textContent = `SLOT ${i} · CHUNK ${c+1}/${tot}`;
+        const r = await fetch(`http://${ip()}/upload_chunk`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chunk: b64.slice(c * CH, (c+1) * CH),
+            index: c,
+            total: tot,
+            slot:  i,        // ← tells Pico to store, not display
+          }),
+          signal: AbortSignal.timeout(15000)
+        });
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
+
+        // Last chunk confirms slot stored
+        if (c === tot - 1) {
+          lg(`✓ Slot ${i} stored (${d.free_ram || '?'}B free)`, 'ok');
+        }
+      }
+    }
+
+    // Step 2 — send sequence metadata
+    st.textContent = 'SENDING SEQUENCE...';
+    const seqMeta = btnSequence.map((s, i) => ({
+      index:    i,
+      type:     s.type,
+      state:    s.state   || 'green',
+      mode:     s.mode    || 'solid',
+      message:  s.message || null,
+      hasSaved: s.type === 'saved',
+    }));
+
+    const r = await fetch(`http://${ip()}/button_sequence`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body:   JSON.stringify({ sequence: seqMeta }),
+      signal: AbortSignal.timeout(5000)
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
+
+    st.className  = 'sline ok';
+    st.textContent = `✓ ${d.count} SCREENS APPLIED`;
+    lg('✓ Button sequence applied', 'ok');
+
+  } catch(e) {
+    st.className  = 'sline err';
+    st.textContent = `✗ ${e.message}`;
+    lg(`✗ Seq: ${e.message}`, 'err');
+  }
+}
+
+async function sendChunksToSlot(canvas,slotIndex){
+  // Pre-clear RAM
+  try{await fetch(`http://${ip()}/clear`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({}),signal:AbortSignal.timeout(5000)});}catch{}
+  await new Promise(r=>setTimeout(r,200));
+  const b64=cvs2b64(canvas),CH=2000,tot=Math.ceil(b64.length/CH);
+  for(let i=0;i<tot;i++){
+    const r=await fetch(`http://${ip()}/upload_chunk`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({chunk:b64.slice(i*CH,(i+1)*CH),index:i,total:tot,slot:slotIndex}),
+      signal:AbortSignal.timeout(15000)
+    });
+    const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);
+  }
+}
+
+// ════════════════════════════════════
+// SCHEDULE TAB
+// ════════════════════════════════════
+function togDay(d){const i=schedDays.indexOf(d);if(i===-1)schedDays.push(d);else schedDays.splice(i,1);document.querySelectorAll('.dbtn2').forEach(b=>b.classList.toggle('on',schedDays.includes(parseInt(b.dataset.d))));}
+function onScDisp(){document.getElementById('sMsgW').style.display=document.getElementById('sDp').value==='message'?'block':'none';}
+async function addJob(){
+  const h=parseInt(document.getElementById('sHr').value),m=parseInt(document.getElementById('sMn').value);
+  const st=document.getElementById('sSt').value,mo=document.getElementById('sMo').value;
+  const di=document.getElementById('sDp').value,msg=document.getElementById('sMsg').value.trim()||null;
+  const ss=document.getElementById('scSt');
+  if(isNaN(h)||isNaN(m)){ss.className='sline err';ss.textContent='Invalid time';return;}
+  const pay={hour:h,minute:m,days:schedDays.slice(),state:st,mode:mo,show_middle_finger:di==='finger',message:di==='message'?msg:null};
+  try{
+    const r=await fetch(`http://${ip()}/schedule`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(pay),signal:AbortSignal.timeout(5000)});
+    const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);
+    ss.className='sline ok';ss.textContent=`✓ Job #${d.id}`;lg(`✓ Job #${d.id}`,'ok');loadJobs();
+  }catch(e){ss.className='sline err';ss.textContent=`✗ ${e.message}`;lg(`✗ ${e.message}`,'err');}
+}
+async function loadJobs(){try{const r=await fetch(`http://${ip()}/schedule`,{signal:AbortSignal.timeout(3000)});const d=await r.json();rendJobs(d.jobs||[]);}catch(e){lg(`Jobs: ${e.message}`,'err');}}
+function rendJobs(jobs){
+  const el=document.getElementById('jList');
+  if(!jobs.length){el.innerHTML='<div class="nojobs">NO JOBS SCHEDULED</div>';return;}
+  el.innerHTML=jobs.map(j=>{
+    const h=String(j.hour).padStart(2,'0'),m=String(j.minute).padStart(2,'0');
+    const days=j.days&&j.days.length?j.days.map(d=>DAYS[d]).join(' '):'EVERY DAY';
+    const dp=j.show_middle_finger?'🖕':j.message?`💬 ${j.message.toUpperCase()}`:'🎨';
+    const dc=j.state==='red'?'r':j.state==='green'?'g':'p';
+    return`<div class="jcard ${j.enabled?'':'off'}">
+      <div class="jtime">${h}:${m}</div>
+      <div class="jinfo"><div class="jmeta"><span class="jdot j${dc}"></span>${j.state.toUpperCase()}·${j.mode.toUpperCase()}·${dp}</div><div class="jdays">${days}</div></div>
+      <div class="jacts"><button class="jb tog" onclick="togJob(${j.id})">${j.enabled?'OFF':'ON'}</button><button class="jb del" onclick="delJob(${j.id})">DEL</button></div>
+    </div>`;
+  }).join('');
+}
+async function togJob(id){try{const r=await fetch(`http://${ip()}/schedule/${id}/toggle`,{method:'POST',signal:AbortSignal.timeout(3000)});const d=await r.json();if(!r.ok)throw new Error(d.error);lg(`Job #${id} ${d.enabled?'on':'off'}`,'ok');loadJobs();}catch(e){lg(`✗ ${e.message}`,'err');}}
+async function delJob(id){try{const r=await fetch(`http://${ip()}/schedule/${id}`,{method:'DELETE',signal:AbortSignal.timeout(3000)});if(!r.ok){const d=await r.json();throw new Error(d.error);}lg(`Job #${id} deleted`,'ok');loadJobs();}catch(e){lg(`✗ ${e.message}`,'err');}}
+
+// Init
+updLCD();
+renderSavesGrid();
+lg('Ready · enter IP and ping','inf');
+</script>
+</body>
+</html>
