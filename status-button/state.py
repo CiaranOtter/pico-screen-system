@@ -484,11 +484,17 @@ def render_state():
     _msg_colour        = None
     _msg_mode          = None
     mem.collect()
-    
+
     try:
         import image_loader
         if image_loader.active:
             image_loader.clear()
+    except Exception:
+        pass
+
+    try:                        # ← add this
+        import gif_player
+        gif_player.clear()
     except Exception:
         pass
 
@@ -507,5 +513,3 @@ def render_state():
             fb.fill(colour)
             _fill_circle_fb(120, 120, 90, BLACK)
             _push()
-
-render_state()

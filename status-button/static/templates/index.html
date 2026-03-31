@@ -221,7 +221,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
     <span id="userBadge" style="font-size:9px;letter-spacing:2px;color:var(--dim);"></span>
     <div class="spill"><div class="sdot" id="sDot"></div><span id="sTxt">OFFLINE</span></div>
     <a class="navbtn" href="/local">LOCAL</a>
-    <a class="navbtn" href="/settings">SETTINGS</a>
+    <a class="navbtn" id="settingsNavBtn" href="/settings">SETTINGS</a>
     <button class="navbtn exit" onclick="doLogout()">EXIT</button>
   </div>
 </header>
@@ -230,8 +230,23 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
   <input class="ip-inp" id="ipIn" type="text" placeholder="192.168.1.52" value="192.168.1.52"/>
   <button class="bping" onclick="ping()">PING</button>
   <button class="bxs" id="pollBtn" onclick="togglePoll()">POLL</button>
-  <button class="bxs" onclick="rebootPico()" style="border-color:var(--red);color:var(--red)">REBOOT</button>
+  <button id="rebootBtn" class="bxs" onclick="rebootPico()" style="border-color:var(--red);color:var(--red)">REBOOT</button>
 </div>
+
+<!-- LCD Preview — always visible regardless of role -->
+<div class="lcd-wrap" style="margin:16px 0;">
+  <div class="lcd-bez">
+    <div class="lcd-scr cg" id="lcdScr"><div class="lcd-cnt" id="lcdCnt"></div></div>
+  </div>
+</div>
+
+<!-- Viewer mode notice -->
+<div id="viewerNote" style="display:none;text-align:center;padding:20px;font-size:9px;letter-spacing:3px;color:var(--dim);border:1px dashed var(--border);margin-bottom:18px;">
+  VIEW ONLY MODE · PING TO SYNC DISPLAY STATE
+</div>
+
+<!-- Admin-only content -->
+<div id="adminContent">
 
 <div class="tabs">
   <button class="tab on"  onclick="switchTab('ctrl')">CTRL</button>
@@ -243,11 +258,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
 
 <!-- ═══════════ CONTROL ═══════════ -->
 <div class="tab-panel on" id="tab-ctrl">
-  <div class="lcd-wrap">
-    <div class="lcd-bez">
-      <div class="lcd-scr cg" id="lcdScr"><div class="lcd-cnt" id="lcdCnt"></div></div>
-    </div>
-  </div>
   <div class="lbl">Colour State</div>
   <div class="g3">
     <button class="sbtn sr"    onclick="selSt('red')">RED</button>
@@ -338,12 +348,25 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
           <button class="smbtn" id="flipV" onclick="toggleFlip('v')">↕ FLIP V</button>
         </div>
       </div>
-      <div class="brow">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
         <button class="badd" onclick="sendUpload()">▶ SEND TO PICO</button>
-        <button class="bdng" onclick="clearUpload()">✕ CLEAR</button>
+        <button class="badd" style="border-color:var(--purple);color:var(--purple)" onclick="openPhotoSaveDialog()">💾 SAVE</button>
       </div>
+      <button class="bdng" onclick="clearUpload()" style="width:100%;margin-bottom:8px">✕ CLEAR</button>
       <div class="prog" id="upProg"><div class="pfill" id="upFill"></div></div>
       <div class="sline inf" id="upSt"></div>
+    </div>
+  </div>
+  <!-- Photo save dialog -->
+  <div class="card" id="photoSaveDialog" style="display:none">
+    <div class="ctitle">SAVE IMAGE</div>
+    <div class="fgrp" style="margin-bottom:10px">
+      <label class="flbl">NAME</label>
+      <input class="fi" id="photoSaveNameI" type="text" placeholder="MY PHOTO" maxlength="20"/>
+    </div>
+    <div class="brow">
+      <button class="badd" onclick="confirmPhotoSave()">💾 SAVE</button>
+      <button class="bdng" onclick="closePhotoSaveDialog()">✕ CANCEL</button>
     </div>
   </div>
 </div>
@@ -513,35 +536,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
 <!-- ═══════════ SCHEDULE ═══════════ -->
 <div class="tab-panel" id="tab-sched">
   <div class="card">
-  <div class="ctitle">DEVICE SETTINGS</div>
-
-  <div class="fgrp" style="margin-bottom:10px">
-    <label class="flbl">HOSTNAME</label>
-    <input class="fi" id="cfgHostname" type="text" maxlength="32"
-           placeholder="picoctrl"
-           style="text-transform:lowercase;letter-spacing:2px"/>
-    <div style="font-size:9px;letter-spacing:2px;color:var(--dim);margin-top:4px">
-      DEVICE WILL BE REACHABLE AT &lt;HOSTNAME&gt;.LOCAL AFTER REBOOT
-    </div>
-  </div>
-
-  <div class="fgrp" style="margin-bottom:10px">
-    <label class="flbl">WIFI SSID</label>
-    <input class="fi" id="cfgSsid" type="text" maxlength="64" placeholder="Network name"/>
-  </div>
-
-  <div class="fgrp" style="margin-bottom:10px">
-    <label class="flbl">WIFI PASSWORD</label>
-    <input class="fi" id="cfgPass" type="password" maxlength="64" placeholder="Leave blank to keep current"/>
-  </div>
-
-  <div class="brow">
-    <button class="badd"  onclick="saveDeviceConfig()">💾 SAVE</button>
-    <button class="bxs"   onclick="loadDeviceConfig()" style="width:100%">↓ LOAD CURRENT</button>
-  </div>
-  <div class="sline inf" id="cfgSt"></div>
-</div>
-  <div class="card">
   <div class="ctitle">CLOCK SYNC</div>
   <div style="font-size:9px;letter-spacing:2px;color:var(--dim);margin-bottom:10px;line-height:1.8">
     PICO HAS NO BATTERY — CLOCK RESETS ON REBOOT.<br>
@@ -593,6 +587,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
   <div class="jlist" id="jList"><div class="nojobs">NO JOBS SCHEDULED</div></div>
 </div>
 
+</div><!-- /adminContent -->
+
 <!-- Log -->
 <div class="logw">
   <div class="lbl" style="margin-top:6px">Activity Log</div>
@@ -634,63 +630,6 @@ let curSt='green',curMd='solid',curDp='plain',pollT=null,schedDays=[];
 const DAYS=['MON','TUE','WED','THU','FRI','SAT','SUN'];
 function ip(){return document.getElementById('ipIn').value.trim()||'192.168.1.52';}
 
-async function loadDeviceConfig() {
-  const st = document.getElementById('cfgSt');
-  try {
-    const r = await fetch(`http://${ip()}/config/device`,
-                          { signal: AbortSignal.timeout(3000) });
-    const d = await r.json();
-    if (!r.ok) throw new Error(d.error);
-    document.getElementById('cfgHostname').value = d.hostname || '';
-    document.getElementById('cfgSsid').value     = d.wifi_ssid || '';
-    document.getElementById('cfgPass').value      = '';
-    st.className   = 'sline ok';
-    st.textContent = `✓ HOSTNAME: ${d.hostname}.local`;
-    lg(`Device config loaded: ${d.hostname}`, 'ok');
-  } catch(e) {
-    st.className   = 'sline err';
-    st.textContent = `✗ ${e.message}`;
-  }
-}
-
-async function saveDeviceConfig() {
-  const st       = document.getElementById('cfgSt');
-  const hostname = document.getElementById('cfgHostname').value.trim().toLowerCase();
-  const ssid     = document.getElementById('cfgSsid').value.trim();
-  const pass     = document.getElementById('cfgPass').value;
-
-  if (!hostname) { st.className='sline err'; st.textContent='Hostname required'; return; }
-
-  const body = { hostname };
-  if (ssid) body.wifi_ssid = ssid;
-  if (pass) body.wifi_password = pass;
-
-  st.className   = 'sline inf';
-  st.textContent = 'SAVING...';
-
-  try {
-    const r = await fetch(`http://${ip()}/config/device`, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(body),
-      signal:  AbortSignal.timeout(5000)
-    });
-    const d = await r.json();
-    if (!r.ok) throw new Error(d.error);
-
-    st.className   = 'sline ok';
-    st.textContent = `✓ SAVED · ${d.hostname}.local · REBOOT TO APPLY`;
-    lg(`✓ Hostname: ${d.hostname}`, 'ok');
-
-    // Update the IP input hint
-    document.getElementById('ipIn').placeholder = `${d.hostname}.local or IP`;
-
-  } catch(e) {
-    st.className   = 'sline err';
-    st.textContent = `✗ ${e.message}`;
-    lg(`✗ Config: ${e.message}`, 'err');
-  }
-}
 function lg(m,t='inf'){
   const el=document.getElementById('log'),n=new Date().toTimeString().slice(0,8);
   const r=document.createElement('div');r.className='lr';
@@ -789,11 +728,31 @@ function selDp(d){
 }
 function onMsg(){const v=document.getElementById('msgI').value,cc=document.getElementById('cc');cc.textContent=`${v.length} / 28`;cc.classList.toggle('w',v.length>20);updLCD();}
 function updLCD(){
+  if(_lcdImageMode) return; // image is showing — don't overwrite
   const scr=document.getElementById('lcdScr'),cnt=document.getElementById('lcdCnt');
   scr.className='lcd-scr';scr.classList.add((curMd==='ring'?'r':'c')+curSt[0]);
+  scr.style.backgroundImage='';scr.style.backgroundSize='';
   if(curDp==='finger')cnt.innerHTML='<div class="lcd-fng">🖕</div>';
   else if(curDp==='message'){const t=document.getElementById('msgI').value||'...';cnt.innerHTML=`<div style="font-family:Orbitron,sans-serif;font-weight:900;font-size:${t.length>7?'10px':'14px'};color:white;text-align:center;padding:6px;line-height:1.3">${t.toUpperCase()}</div>`;}
   else cnt.innerHTML='';
+}
+function showLCDImage(canvas){
+  // Render the canvas into the LCD preview circle
+  const scr=document.getElementById('lcdScr'),cnt=document.getElementById('lcdCnt');
+  const dataUrl=canvas.toDataURL('image/png');
+  scr.className='lcd-scr'; // remove colour classes
+  scr.style.backgroundImage=`url(${dataUrl})`;
+  scr.style.backgroundSize='cover';
+  scr.style.backgroundPosition='center';
+  cnt.innerHTML='';
+  _lcdImageMode=true;
+}
+function clearLCDImage(){
+  const scr=document.getElementById('lcdScr');
+  scr.style.backgroundImage='';
+  scr.style.backgroundSize='';
+  _lcdImageMode=false;
+  updLCD();
 }
 async function transmit(){
   if(_picoAuth.role!=='admin'){lg('Admin access required','err');return;}
@@ -834,17 +793,6 @@ async function ping() {
     setSt('online');
     lg(`Online · uptime ${(d.uptime_ms/1000).toFixed(1)}s · RAM ${d.free_ram||'?'}B`, 'ok');
 
-    // Load device config to show hostname
-    try {
-      const rc = await fetch(`http://${ip()}/config/device`,
-                             { signal: AbortSignal.timeout(2000) });
-      const dc = await rc.json();
-      if (dc.hostname) {
-        document.getElementById('cfgHostname').value = dc.hostname;
-        lg(`Hostname: ${dc.hostname}.local`, 'inf');
-      }
-    } catch {}
-
     const rs = await fetch(`http://${ip()}/state`,  { signal: AbortSignal.timeout(2000) });
     const ds = await rs.json();
     const rconf = await fetch(`http://${ip()}/config`, { signal: AbortSignal.timeout(2000) });
@@ -860,7 +808,11 @@ async function ping() {
 // MEDIA TAB
 // ════════════════════════════════════
 async function clearMedia(){
-  try{await fetch(`http://${ip()}/image`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:'clear'}),signal:AbortSignal.timeout(5000)});lg('Media cleared','ok');updLCD();}
+  try{
+    await fetch(`http://${ip()}/image`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:'clear'}),signal:AbortSignal.timeout(5000)});
+    lg('Media cleared','ok');
+    clearLCDImage();
+  }
   catch(e){lg(`✗ ${e.message}`,'err');}
 }
 async function playGif565(){
@@ -871,6 +823,10 @@ async function playGif565(){
     const r=await fetch(`http://${ip()}/gif565`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path}),signal:AbortSignal.timeout(5000)});
     const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);
     st.className='sline ok';st.textContent=`✓ ${d.frames} FRAMES · ${d.delay_ms}ms/FRAME`;lg(`✓ Playing ${path}`,'ok');
+    // Show GIF indicator on LCD preview
+    const scr=document.getElementById('lcdScr'),cnt=document.getElementById('lcdCnt');
+    scr.className='lcd-scr';scr.style.backgroundImage='';_lcdImageMode=true;
+    cnt.innerHTML='<div style="font-family:Orbitron,sans-serif;font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.6)">GIF</div>';
   }catch(e){st.className='sline err';st.textContent=`✗ ${e.message}`;lg(`✗ gif565: ${e.message}`,'err');}
 }
 async function loadImgUrl(){
@@ -883,6 +839,8 @@ async function loadImgUrl(){
   }catch(e){st.className='sline err';st.textContent=`✗ ${e.message}`;lg(`✗ Image: ${e.message}`,'err');}
 }
 let srcImg=null,fitMd='fill',rot=0,fH=false,fV=false,pvCvs=null;
+let _lcdImageMode=false; // true when an image/drawing is on the LCD
+
 function onDragOv(e){e.preventDefault();document.getElementById('dz').classList.add('ov');}
 function onDragLv(){document.getElementById('dz').classList.remove('ov');}
 function onDrop(e){e.preventDefault();onDragLv();const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))loadFile(f);}
@@ -959,6 +917,8 @@ async function sendChunks(canvas, progId, fillId, stId, _attempt=0) {
     fi.style.width='100%';
     st.className='sline ok'; st.textContent='✓ SENT';
     lg('✓ Sent to Pico','ok');
+    // Update LCD preview with the image that was just sent
+    if(canvas) showLCDImage(canvas);
   } catch(e) {
     const isMemErr = e.message.includes('Alloc failed') || e.message.includes('Not enough RAM');
     if (_attempt === 0 && isMemErr) {
@@ -979,14 +939,13 @@ async function sendChunks(canvas, progId, fillId, stId, _attempt=0) {
     } else {
       st.className='sline err'; st.textContent=`✗ ${e.message}`;
       lg(`✗ ${e.message}`, 'err');
-    }
+    }Playing
   } finally {
     setTimeout(()=>{pr.classList.remove('sh');fi.style.width='0%';},1500);
   }
 }
 async function sendUpload(){if(!pvCvs){lg('No image','err');return;}await sendChunks(pvCvs,'upProg','upFill','upSt');}
-function clearUpload(){srcImg=null;pvCvs=null;document.getElementById('imgC').classList.remove('sh');document.getElementById('dz').style.display='block';document.getElementById('fIn').value='';document.getElementById('upSt').textContent='';}
-
+function clearUpload(){srcImg=null;pvCvs=null;document.getElementById('imgC').classList.remove('sh');document.getElementById('dz').style.display='block';document.getElementById('fIn').value='';document.getElementById('upSt').textContent='';clearLCDImage();}
 // ════════════════════════════════════
 // DRAW TAB
 // ════════════════════════════════════
@@ -1245,15 +1204,20 @@ async function pushSeqToPico() {
   lg(`Applying sequence (${btnSequence.length} items)`, 'inf');
 
   try {
-    // Step 1 — upload saved drawings as named slots
-    for (let i = 0; i < btnSequence.length; i++) {
-      const s = btnSequence[i];
+    // Pre-assign a slot index to every saved item
+    let slotIdx = 0;
+    const withSlots = btnSequence.map(s => ({
+      ...s,
+      _slot: s.type === 'saved' ? slotIdx++ : null,
+    }));
+
+    // Step 1 — upload each saved drawing to its assigned slot
+    for (const s of withSlots) {
       if (s.type !== 'saved' || !s.dataUrl) continue;
 
-      st.textContent = `UPLOADING DRAWING ${i+1}/${btnSequence.length}...`;
-      lg(`Uploading drawing to slot ${i}`, 'inf');
+      st.textContent = `UPLOADING DRAWING TO SLOT ${s._slot}...`;
+      lg(`Uploading drawing to slot ${s._slot}`, 'inf');
 
-      // Render drawing onto 240x240 canvas
       const canvas = document.createElement('canvas');
       canvas.width = 240; canvas.height = 240;
       const ctx = canvas.getContext('2d');
@@ -1263,7 +1227,6 @@ async function pushSeqToPico() {
         img.src = s.dataUrl;
       });
 
-      // Clear RAM before each drawing upload
       try {
         await fetch(`http://${ip()}/clear`, {
           method: 'POST', headers: {'Content-Type': 'application/json'},
@@ -1272,13 +1235,12 @@ async function pushSeqToPico() {
       } catch(e) { lg(`Clear warn: ${e.message}`, 'inf'); }
       await new Promise(r => setTimeout(r, 300));
 
-      // Upload in chunks — pass slot index so Pico stores not displays
       const b64 = cvs2b64(canvas);
       const CH  = 2000;
       const tot = Math.ceil(b64.length / CH);
 
       for (let c = 0; c < tot; c++) {
-        st.textContent = `SLOT ${i} · CHUNK ${c+1}/${tot}`;
+        st.textContent = `SLOT ${s._slot} · CHUNK ${c+1}/${tot}`;
         const r = await fetch(`http://${ip()}/upload_chunk`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1286,30 +1248,30 @@ async function pushSeqToPico() {
             chunk: b64.slice(c * CH, (c+1) * CH),
             index: c,
             total: tot,
-            slot:  i,        // ← tells Pico to store, not display
+            slot:  s._slot,
           }),
           signal: AbortSignal.timeout(15000)
         });
         const d = await r.json();
         if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
-
-        // Last chunk confirms slot stored
         if (c === tot - 1) {
-          lg(`✓ Slot ${i} stored (${d.free_ram || '?'}B free)`, 'ok');
+          lg(`✓ Slot ${s._slot} stored (${d.free_ram || '?'}B free)`, 'ok');
         }
       }
     }
 
-    // Step 2 — send sequence metadata
+    // Step 2 — send sequence metadata using the same pre-assigned slot indices
     st.textContent = 'SENDING SEQUENCE...';
-    const seqMeta = btnSequence.map((s, i) => ({
-      index:    i,
+    const seqMeta = withSlots.map(s => ({
+      index:    s._slot !== null ? s._slot : 0,
       type:     s.type,
       state:    s.state   || 'green',
       mode:     s.mode    || 'solid',
       message:  s.message || null,
       hasSaved: s.type === 'saved',
     }));
+
+    console.log('Sending seqMeta:', JSON.stringify(seqMeta));
 
     const r = await fetch(`http://${ip()}/button_sequence`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -1329,7 +1291,6 @@ async function pushSeqToPico() {
     lg(`✗ Seq: ${e.message}`, 'err');
   }
 }
-
 async function sendChunksToSlot(canvas,slotIndex){
   // Pre-clear RAM
   try{await fetch(`http://${ip()}/clear`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({}),signal:AbortSignal.timeout(5000)});}catch{}
@@ -1379,13 +1340,48 @@ function rendJobs(jobs){
     </div>`;
   }).join('');
 }
-async function togJob(id){try{const r=await fetch(`http://${ip()}/schedule/${id}/toggle`,{method:'POST',signal:AbortSignal.timeout(3000)});const d=await r.json();if(!r.ok)throw new Error(d.error);lg(`Job #${id} ${d.enabled?'on':'off'}`,'ok');loadJobs();}catch(e){lg(`✗ ${e.message}`,'err');}}
+async function togJob(id){try{const r=await fetch(`http://${ip()}/schedule/${id}/toggle`,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}',signal:AbortSignal.timeout(3000)});const d=await r.json();if(!r.ok)throw new Error(d.error);lg(`Job #${id} ${d.enabled?'on':'off'}`,'ok');loadJobs();}catch(e){lg(`✗ ${e.message}`,'err');}}
 async function delJob(id){try{const r=await fetch(`http://${ip()}/schedule/${id}`,{method:'DELETE',signal:AbortSignal.timeout(3000)});if(!r.ok){const d=await r.json();throw new Error(d.error);}lg(`Job #${id} deleted`,'ok');loadJobs();}catch(e){lg(`✗ ${e.message}`,'err');}}
+
+// ════════════════════════════════════
+// PHOTO SAVE (MEDIA TAB)
+// ════════════════════════════════════
+function openPhotoSaveDialog() {
+  if (!pvCvs) { lg('No image loaded', 'err'); return; }
+  document.getElementById('photoSaveNameI').value = '';
+  document.getElementById('photoSaveDialog').style.display = 'block';
+  document.getElementById('photoSaveNameI').focus();
+}
+function closePhotoSaveDialog() {
+  document.getElementById('photoSaveDialog').style.display = 'none';
+}
+function confirmPhotoSave() {
+  const name = document.getElementById('photoSaveNameI').value.trim() || 'PHOTO ' + Date.now();
+  const dataUrl = pvCvs.toDataURL('image/png');
+  const saves = getSaves();
+  saves.push({id: Date.now(), name: name.toUpperCase(), dataUrl});
+  putSaves(saves);
+  closePhotoSaveDialog();
+  renderSavesGrid();
+  renderAddSavedGrid();
+  lg(`Saved: ${name}`, 'ok');
+}
 
 // Init
 updLCD();
 renderSavesGrid();
 lg('Ready · enter IP and ping','inf');
+
+// Apply role-based UI
+if (_picoAuth.role !== 'admin') {
+  document.getElementById('adminContent').style.display = 'none';
+  document.getElementById('viewerNote').style.display = 'block';
+  document.getElementById('rebootBtn').style.display = 'none';
+  const sLink = document.getElementById('settingsNavBtn');
+  if (sLink) sLink.style.display = 'none';
+  // Auto-connect so viewer sees current state
+  setTimeout(() => ping(), 400);
+}
 </script>
 </body>
 </html>

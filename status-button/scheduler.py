@@ -41,12 +41,9 @@ def toggle_job(job_id):
 def get_jobs():
     return jobs
 
+_last_fired = {}  # track {job_id: (hour, minute)} to avoid double-firing
 
 def check_jobs(current_state):
-    """
-    Call periodically. Fires any job whose time matches now.
-    Returns the job that fired, or None.
-    """
     try:
         now     = time.localtime()
         hour    = now[3]
@@ -61,23 +58,25 @@ def check_jobs(current_state):
             if not job['enabled']:
                 continue
             if job['hour'] != hour or job['minute'] != minute:
+                # reset fired flag when time moves on
+                _last_fired.pop(job['id'], None)
                 continue
             if job['days'] and weekday not in job['days']:
                 continue
+            # already fired this minute?
+            if _last_fired.get(job['id']) == (hour, minute):
+                continue
 
-            # Fire
+            _last_fired[job['id']] = (hour, minute)
             current_state['state']              = job['state']
+            current_state['mode']               = job['mode']
             current_state['show_middle_finger'] = job['show_middle_finger']
             current_state['message']            = job['message']
             print(f"Scheduler fired job {job['id']} at {hour:02d}:{minute:02d}")
             return job
-
         except Exception as e:
             print(f"Scheduler job {job.get('id','?')} error: {e}")
-            continue
-
     return None
-
 
 def set_time(year, month, day, hour, minute, second, weekday=0):
     """

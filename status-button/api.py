@@ -80,7 +80,7 @@ async def auth_guard(request):
         return {'error': 'Forbidden'}, 403, CORS_HEADERS
     return None
 
-SLOT_PATH = '/seq_slot_{}.bin'
+SLOT_PATH = '/static/sequence_slots/seq_slot_{}.bin'
 
 def _slot_path(slot):
     return SLOT_PATH.format(slot)

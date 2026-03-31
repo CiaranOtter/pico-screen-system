@@ -2,13 +2,13 @@ import asyncio
 import network
 import machine
 from machine import Pin
-import lib.config as config
-import lib.scheduler as scheduler
-import lib.state as state
-import lib.mem as mem
-import lib.gif_player as gif_player
-import lib.image_loader as image_loader
-from lib.api import app
+import config
+import scheduler
+import state
+import mem
+import gif_player
+import image_loader
+from api import app
 
 WIFI_TIMEOUT_S = config.get('wifi_timeout', 20)
 
@@ -75,12 +75,17 @@ async def button_task():
     last_btn = 1
     while True:
         btn = button.value()
-        if btn == 0 and last_btn == 1:
+        if btn == 0 and last_btn == 1:  # button just pressed
             if state.btn_sequence:
-                state.btn_index = (state.btn_index + 1) % len(state.btn_sequence)
-                item     = state.btn_sequence[state.btn_index]
-                old      = state.current['state']
-                new      = item.get('state', 'green')
+                new_index = (state.btn_index + 1) % len(state.btn_sequence)
+                if new_index >= len(state.btn_sequence):
+                    last_btn = btn
+                    await asyncio.sleep_ms(10)
+                    continue
+                state.btn_index = new_index
+                item = state.btn_sequence[state.btn_index]
+                old  = state.current['state']
+                new  = item.get('state', 'green')
 
                 if item.get('hasSaved'):
                     try:
@@ -91,31 +96,46 @@ async def button_task():
                         mem.collect()
                         mem.collect()
 
-                        slot_idx  = item.get('index', 0)
-                        path      = f'/seq_slot_{slot_idx}.bin'
+                        slot_idx = item.get('index', 0)
+                        path     = f'/static/sequence_slots/seq_slot_{slot_idx}.bin'
                         print(f"Loading slot {slot_idx} from {path}, RAM: {mem.free()}")
+                        print(f"Item: {item}")  # ← add this to see what the Pico received
 
-                        # Stream from flash in 8-row chunks — no 115KB allocation
-                        ROW_BYTES = 240 * 2
-                        BLIT_ROWS = 8
-                        row_buf   = bytearray(BLIT_ROWS * ROW_BYTES)
-                        mv        = memoryview(row_buf)
                         try:
+                            # Stream directly to display in small row chunks
+                            # — never allocates more than ROWS * 480 bytes at once
+                            ROWS      = 8
+                            row_bytes = 240 * 2
+                            buf       = bytearray(ROWS * row_bytes)
+                            mv        = memoryview(buf)
+
                             with open(path, 'rb') as f:
                                 y = 0
                                 while y < 240:
-                                    rows = min(BLIT_ROWS, 240 - y)
-                                    n    = f.readinto(mv[:rows * ROW_BYTES])
+                                    rows  = min(ROWS, 240 - y)
+                                    n     = f.readinto(mv[:rows * row_bytes])
                                     if not n:
                                         break
-                                    actual_rows = n // ROW_BYTES
-                                    state.tft.blit_buffer(mv[:actual_rows * ROW_BYTES], 0, y, 240, actual_rows)
-                                    y += actual_rows
-                            row_buf = None; mv = None; mem.collect()
+                                    actual = n // row_bytes
+                                    state.tft.blit_buffer(mv[:actual * row_bytes], 0, y, 240, actual)
+                                    y += actual
+
+                            buf = None
+                            mv  = None
+                            mem.collect()
                             image_loader.active = True
+
                         except OSError:
                             print(f"{path} not found")
-                            row_buf = None; mv = None; mem.collect()
+                            buf = None
+                            mem.collect()
+                            state.render_state()
+                            await asyncio.sleep_ms(50)
+                            last_btn = btn
+                            continue
+                        except MemoryError as e:
+                            print(f"Cannot alloc row buffer: {e}")
+                            mem.collect()
                             state.render_state()
                             await asyncio.sleep_ms(50)
                             last_btn = btn
@@ -126,8 +146,8 @@ async def button_task():
                         mem.collect()
                         state.render_state()
                 else:
-                    image_loader.image_data = None
-                    image_loader.active     = False
+                    image_loader.image_data             = None
+                    image_loader.active                 = False
                     gif_player.clear()
                     mem.collect()
                     state.current['state']              = new
@@ -140,6 +160,7 @@ async def button_task():
                     else:
                         state.render_state()
             else:
+                # no sequence — cycle through states manually
                 old = state.current['state']
                 idx = list(state.STATES).index(old)
                 new = state.STATES[(idx + 1) % len(state.STATES)]
@@ -152,11 +173,10 @@ async def button_task():
                 gif_player.clear()
                 mem.collect()
                 state.start_transition(old, new)
-            await asyncio.sleep_ms(50)
+                await asyncio.sleep_ms(50)
+
         last_btn = btn
         await asyncio.sleep_ms(10)
-
-
 async def flash_task():
     """Smooth sine-wave background pulse with stable text overlay."""
     import math, time
@@ -170,10 +190,10 @@ async def flash_task():
                 and not gif_player.active
                 and not image_loader.active):
 
-            # Kill any pending transition — flash uses live colour directly
+            # Wait for any active transition to finish before flashing
             if state.transition['active']:
-                state.transition['active']   = False
-                state.transition['progress'] = 1.0
+                await asyncio.sleep_ms(33)
+                continue
 
             t0      = time.ticks_ms()
             cur_st  = state.current['state']
@@ -294,28 +314,19 @@ async def gif_task():
 
 async def scheduler_task():
     import time
-    last_min = -1
     while True:
         try:
             now = time.localtime()
-            if now[4] != last_min:
-                last_min = now[4]
-                fired = scheduler.check_jobs(state.current)
-                if fired:
-                    old = state.current['state']
-                    mem.collect()
-                    if old != fired['state']:
-                        state.start_transition(old, fired['state'])
-                    else:
-                        state.render_state()
+            scheduler.check_jobs(state.current)
         except Exception as e:
             print(f"Scheduler error: {e}")
-        await asyncio.sleep(30)
+        await asyncio.sleep(20)
 
 
 async def main():
     mem.report('boot')
     await connect_wifi()
+    state.render_state()  # ← render once here, after boot
     mem.report('pre-gather')
     await asyncio.gather(
         app.start_server(host='0.0.0.0', port=80, debug=False),
@@ -326,6 +337,5 @@ async def main():
         gif_task(),
         scheduler_task(),
     )
-
 
 asyncio.run(main())
