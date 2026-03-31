@@ -1,0 +1,34 @@
+# VS Code specific files
+.vscode/
+.history/
+
+# Version control
+.git/
+.gitignore
+
+# Python leftovers (The Pico doesn't need these)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Documentation and Project files
+README.md
+LICENSE
+.micropicoignore
+.python-version
+requirements.txt
+
+# Upload scripts
+upload.py
+upload.sh
+
+# Large assets you haven't optimized yet
+assets/raw_images/
+
+lib/gc9a01py/truetype
+lib/gc9a01py/README
+lib/gc9a01py/examples
+lib/gc9a01py/.gitignore
+lib/gc9a01py/LICENSE
+lib/gc9a01py/docs

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PICO CTRL — SETTINGS</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+:root{
+  --red:#ff2233;--amber:#ff9900;
+  --bg:#03030a;--panel:#080810;--border:#1a1a2e;--bord2:#252540;
+  --text:#c0a060;--dim:#504030;--act:#ffcc66;
+  --gr:rgba(255,34,51,.4);--ga:rgba(255,153,0,.4);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Share Tech Mono',monospace;
+  display:flex;flex-direction:column;align-items:center;
+  min-height:100vh;overflow-x:hidden;padding:20px 16px 60px;
+}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.1) 2px,rgba(0,0,0,.1) 4px);pointer-events:none;z-index:9999;}
+.w{width:100%;max-width:420px;}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.logo{font-family:'Orbitron',sans-serif;font-weight:900;font-size:18px;letter-spacing:8px;color:var(--act);}
+.logo span{color:var(--amber);}
+.user-info{font-size:9px;letter-spacing:2px;color:var(--dim);display:flex;align-items:center;gap:8px;}
+.navbtn{background:transparent;border:1px solid var(--border);color:var(--dim);font-family:'Orbitron',sans-serif;font-size:8px;letter-spacing:2px;padding:5px 9px;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block;}
+.navbtn:hover{border-color:var(--amber);color:var(--amber);}
+.navbtn.exit:hover{border-color:var(--red);color:var(--red);}
+.card{background:var(--panel);border:1px solid var(--border);padding:18px;margin-bottom:16px;}
+.ctitle{font-family:'Orbitron',sans-serif;font-size:8px;font-weight:700;letter-spacing:5px;color:var(--dim);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.ctitle::after{content:'';flex:1;height:1px;background:var(--border);}
+.fgrp{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.flbl{font-size:9px;letter-spacing:3px;color:var(--dim);}
+.fhint{font-size:9px;letter-spacing:2px;color:var(--dim);margin-top:3px;opacity:.7;}
+.fi{
+  background:#060609;border:1px solid var(--border);color:var(--act);
+  font-family:'Share Tech Mono',monospace;font-size:13px;padding:11px 13px;
+  outline:none;width:100%;transition:border-color .2s,box-shadow .2s;letter-spacing:2px;
+}
+.fi:focus{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber);}
+.fi::placeholder{color:var(--dim);}
+.btn{
+  width:100%;background:transparent;border:1px solid var(--amber);
+  color:var(--amber);font-family:'Orbitron',sans-serif;font-size:10px;
+  font-weight:900;letter-spacing:5px;padding:13px;cursor:pointer;
+  transition:all .25s;position:relative;overflow:hidden;
+}
+.btn::before{content:'';position:absolute;inset:0;background:var(--amber);transform:scaleX(0);transform-origin:left;transition:transform .3s;z-index:0;}
+.btn:hover::before{transform:scaleX(1);}
+.btn:hover{color:#000;}
+.btn span{position:relative;z-index:1;}
+.btn.danger{border-color:var(--red);color:var(--red);}
+.btn.danger::before{background:var(--red);}
+.btn.danger:hover{color:#fff;}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+.btn:disabled::before{display:none;}
+.brow{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.sline{font-size:10px;letter-spacing:2px;min-height:18px;margin-top:10px;transition:color .2s;}
+.sline.ok{color:#00cc66;}.sline.err{color:var(--red);}.sline.inf{color:var(--dim);}
+.info-grid{display:flex;flex-direction:column;gap:0;}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:10px;letter-spacing:2px;}
+.info-row:last-child{border-bottom:none;}
+.info-key{color:var(--dim);}
+.info-val{color:var(--act);}
+</style>
+</head>
+<body>
+<div class="w">
+
+<header>
+  <div class="logo">PICO<span>CTRL</span></div>
+  <div class="user-info">
+    <span id="userBadge"></span>
+    <a class="navbtn" href="/">CTRL</a>
+    <a class="navbtn" href="/local">LOCAL</a>
+    <button class="navbtn exit" onclick="doLogout()">EXIT</button>
+  </div>
+</header>
+
+<div class="card">
+  <div class="ctitle">DEVICE INFO</div>
+  <div class="info-grid">
+    <div class="info-row"><span class="info-key">STATUS</span><span class="info-val" id="infoStatus">CHECKING...</span></div>
+    <div class="info-row"><span class="info-key">HOSTNAME</span><span class="info-val" id="infoHost">—</span></div>
+    <div class="info-row"><span class="info-key">UPTIME</span><span class="info-val" id="infoUptime">—</span></div>
+    <div class="info-row"><span class="info-key">FREE RAM</span><span class="info-val" id="infoRam">—</span></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="ctitle">NETWORK</div>
+  <div class="fgrp">
+    <label class="flbl">HOSTNAME</label>
+    <input class="fi" id="cfgHostname" type="text" maxlength="32" placeholder="picoctrl" style="text-transform:lowercase;letter-spacing:2px"/>
+    <div class="fhint">REACHABLE AT &lt;HOSTNAME&gt;.LOCAL AFTER REBOOT</div>
+  </div>
+  <div class="fgrp">
+    <label class="flbl">WIFI SSID</label>
+    <input class="fi" id="cfgSsid" type="text" maxlength="64" placeholder="Network name"/>
+  </div>
+  <div class="fgrp">
+    <label class="flbl">WIFI PASSWORD</label>
+    <input class="fi" id="cfgWifi" type="password" maxlength="64" placeholder="Leave blank to keep current"/>
+  </div>
+  <div class="brow">
+    <button class="btn" onclick="saveNetwork()"><span>SAVE</span></button>
+    <button class="btn" onclick="loadNetwork()"><span>LOAD</span></button>
+  </div>
+  <div class="sline inf" id="netSt"></div>
+</div>
+
+<div class="card">
+  <div class="ctitle">ACCESS CODES</div>
+  <div class="fgrp">
+    <label class="flbl">NEW ADMIN PASSWORD</label>
+    <input class="fi" id="newAdmin" type="password" placeholder="Leave blank to keep current"/>
+  </div>
+  <div class="fgrp">
+    <label class="flbl">NEW VIEWER PASSWORD</label>
+    <input class="fi" id="newViewer" type="password" placeholder="Leave blank to keep current"/>
+  </div>
+  <div class="fgrp">
+    <label class="flbl">CONFIRM WITH CURRENT ADMIN PASSWORD</label>
+    <input class="fi" id="curAdmin" type="password" placeholder="Current admin password"/>
+  </div>
+  <button class="btn" onclick="savePasswords()"><span>UPDATE CODES</span></button>
+  <div class="sline inf" id="passSt"></div>
+</div>
+
+<div class="card">
+  <div class="ctitle">SYSTEM</div>
+  <div class="brow">
+    <button class="btn danger" onclick="doReboot()"><span>REBOOT</span></button>
+    <button class="btn" onclick="navBack()"><span>← BACK</span></button>
+  </div>
+  <div class="sline inf" id="sysSt"></div>
+</div>
+
+</div>
+<script>
+// ── Auth ──
+const _auth = (function(){
+  try { return JSON.parse(sessionStorage.getItem('pico_auth') || 'null'); } catch { return null; }
+})();
+if (!_auth || _auth.role !== 'admin') {
+  window.location.href = '/login?next=/settings';
+  throw new Error('unauthenticated');
+}
+document.getElementById('userBadge').textContent = (_auth.name || '').toUpperCase() + ' · ADMIN';
+
+function hdrs() {
+  return {'Content-Type':'application/json','Authorization':'Bearer '+_auth.token};
+}
+
+function navBack() {
+  window.history.length > 1 ? window.history.back() : window.location.href = '/';
+}
+
+async function doLogout() {
+  try {
+    await fetch('/logout', {method:'POST',headers:hdrs(),body:'{}',signal:AbortSignal.timeout(3000)});
+  } catch {}
+  sessionStorage.removeItem('pico_auth');
+  window.location.href = '/login';
+}
+
+// ── Device Info ──
+async function loadDeviceInfo() {
+  try {
+    const r = await fetch('/health', {signal:AbortSignal.timeout(3000)});
+    const d = await r.json();
+    document.getElementById('infoStatus').textContent  = 'ONLINE';
+    document.getElementById('infoUptime').textContent  = (d.uptime_ms/1000).toFixed(0) + 's';
+    document.getElementById('infoRam').textContent     = (d.free_ram || '?') + ' B';
+  } catch {
+    document.getElementById('infoStatus').textContent = 'OFFLINE';
+  }
+}
+
+// ── Network ──
+async function loadNetwork() {
+  const st = document.getElementById('netSt');
+  st.className = 'sline inf'; st.textContent = 'LOADING...';
+  try {
+    const r = await fetch('/config/device', {signal:AbortSignal.timeout(3000)});
+    const d = await r.json();
+    document.getElementById('cfgHostname').value  = d.hostname  || '';
+    document.getElementById('cfgSsid').value      = d.wifi_ssid || '';
+    document.getElementById('cfgWifi').value      = '';
+    document.getElementById('infoHost').textContent = (d.hostname || '?') + '.local';
+    st.className = 'sline ok'; st.textContent = '✓ LOADED';
+  } catch(e) {
+    st.className = 'sline err'; st.textContent = '✗ ' + e.message;
+  }
+}
+
+async function saveNetwork() {
+  const st       = document.getElementById('netSt');
+  const hostname = document.getElementById('cfgHostname').value.trim().toLowerCase();
+  const ssid     = document.getElementById('cfgSsid').value.trim();
+  const wpass    = document.getElementById('cfgWifi').value;
+  if (!hostname) { st.className = 'sline err'; st.textContent = 'Hostname required'; return; }
+  const body = {hostname};
+  if (ssid)  body.wifi_ssid     = ssid;
+  if (wpass) body.wifi_password = wpass;
+  st.className = 'sline inf'; st.textContent = 'SAVING...';
+  try {
+    const r = await fetch('/config/device', {
+      method:'POST', headers:hdrs(), body:JSON.stringify(body),
+      signal:AbortSignal.timeout(5000)
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error);
+    document.getElementById('infoHost').textContent = d.hostname + '.local';
+    st.className = 'sline ok';
+    st.textContent = '✓ SAVED · REBOOT TO APPLY WIFI CHANGES';
+  } catch(e) {
+    st.className = 'sline err'; st.textContent = '✗ ' + e.message;
+  }
+}
+
+// ── Passwords ──
+async function savePasswords() {
+  const st        = document.getElementById('passSt');
+  const newAdmin  = document.getElementById('newAdmin').value;
+  const newViewer = document.getElementById('newViewer').value;
+  const curAdmin  = document.getElementById('curAdmin').value;
+  if (!curAdmin) {
+    st.className = 'sline err'; st.textContent = 'Current admin password required'; return;
+  }
+  if (!newAdmin && !newViewer) {
+    st.className = 'sline err'; st.textContent = 'Enter at least one new password'; return;
+  }
+  const body = {current_admin: curAdmin};
+  if (newAdmin)  body.admin_pass  = newAdmin;
+  if (newViewer) body.viewer_pass = newViewer;
+  st.className = 'sline inf'; st.textContent = 'UPDATING...';
+  try {
+    const r = await fetch('/config/passwords', {
+      method:'POST', headers:hdrs(), body:JSON.stringify(body),
+      signal:AbortSignal.timeout(5000)
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error);
+    st.className = 'sline ok'; st.textContent = '✓ CODES UPDATED';
+    document.getElementById('newAdmin').value  = '';
+    document.getElementById('newViewer').value = '';
+    document.getElementById('curAdmin').value  = '';
+    if (newAdmin) {
+      st.textContent += ' · RE-LOGIN REQUIRED';
+      setTimeout(() => {
+        sessionStorage.removeItem('pico_auth');
+        window.location.href = '/login';
+      }, 2000);
+    }
+  } catch(e) {
+    st.className = 'sline err'; st.textContent = '✗ ' + e.message;
+  }
+}
+
+// ── Reboot ──
+async function doReboot() {
+  if (!confirm('Reboot the Pico?')) return;
+  const st = document.getElementById('sysSt');
+  try {
+    await fetch('/reboot', {
+      method:'POST', headers:hdrs(), body:'{}', signal:AbortSignal.timeout(3000)
+    });
+  } catch {}
+  st.className = 'sline inf'; st.textContent = 'REBOOTING — RECONNECTING IN 10s...';
+  setTimeout(() => { st.textContent = ''; loadDeviceInfo(); }, 10000);
+}
+
+// Init
+loadDeviceInfo();
+loadNetwork();
+</script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+    "wifi_password": "R73C7P8LAT", 
+    "wifi_ssid": "ZyXEL_C26D", 
+    "hostname": "pico_ctrl",
+    "wifi_timeout": 20
+}

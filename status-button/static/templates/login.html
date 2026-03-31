@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PICO CTRL — IDENTIFY</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+:root{
+  --red:#ff2233;--amber:#ff9900;--dark-amber:#cc7700;
+  --bg:#03030a;--panel:#080810;--border:#1a1a2e;--bord2:#252540;
+  --text:#c0a060;--dim:#504030;--act:#ffcc66;
+  --gr:rgba(255,34,51,.4);--ga:rgba(255,153,0,.4);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Share Tech Mono',monospace;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100vh;overflow-x:hidden;padding:20px;
+}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.1) 2px,rgba(0,0,0,.1) 4px);pointer-events:none;z-index:9999;}
+
+.container{width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;gap:0;}
+
+/* HAL EYE */
+.hal-eye-wrap{margin-bottom:32px;position:relative;display:flex;align-items:center;justify-content:center;}
+.hal-outer{
+  width:140px;height:140px;border-radius:50%;
+  background:radial-gradient(circle at 40% 38%, #1a0808, #000);
+  border:3px solid #1a0808;
+  box-shadow:0 0 0 1px #0a0005, 0 0 60px rgba(180,0,0,.3), inset 0 2px 0 rgba(255,255,255,.04);
+  display:flex;align-items:center;justify-content:center;position:relative;
+}
+.hal-outer::before{content:'';position:absolute;inset:6px;border-radius:50%;border:1px solid rgba(200,0,0,.1);}
+.hal-iris{
+  width:80px;height:80px;border-radius:50%;
+  background:radial-gradient(circle at 38% 35%,#cc1100 0%,#880000 40%,#440000 70%,#1a0000 100%);
+  box-shadow:0 0 0 3px #1a0000,0 0 30px rgba(200,0,0,.6),0 0 80px rgba(180,0,0,.3);
+  animation:hal-pulse 3s ease-in-out infinite;
+  position:relative;display:flex;align-items:center;justify-content:center;
+}
+.hal-iris::before{
+  content:'';position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle at 30% 25%,rgba(255,100,80,.3),transparent 60%);
+}
+.hal-pupil{
+  width:24px;height:24px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#ff4422,#aa0000 50%,#330000);
+  box-shadow:0 0 10px rgba(255,60,20,.8),0 0 20px rgba(200,0,0,.6);
+  animation:hal-pulse-inner 3s ease-in-out infinite;
+}
+@keyframes hal-pulse{
+  0%,100%{box-shadow:0 0 0 3px #1a0000,0 0 30px rgba(200,0,0,.6),0 0 80px rgba(180,0,0,.3);}
+  50%{box-shadow:0 0 0 3px #1a0000,0 0 50px rgba(255,30,0,.9),0 0 120px rgba(200,0,0,.5);}
+}
+@keyframes hal-pulse-inner{
+  0%,100%{opacity:1;}50%{opacity:.7;}
+}
+
+/* Title */
+.hal-title{font-family:'Orbitron',sans-serif;font-weight:900;font-size:24px;letter-spacing:10px;color:var(--act);text-shadow:0 0 20px rgba(255,153,0,.4);margin-bottom:4px;text-align:center;}
+.hal-sub{font-size:10px;letter-spacing:6px;color:var(--dim);margin-bottom:36px;text-align:center;}
+
+/* Form */
+.form-card{width:100%;background:var(--panel);border:1px solid var(--border);padding:24px;}
+.form-card .ctitle{font-family:'Orbitron',sans-serif;font-size:8px;font-weight:700;letter-spacing:5px;color:var(--dim);margin-bottom:20px;display:flex;align-items:center;gap:8px;}
+.form-card .ctitle::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.fgrp{display:flex;flex-direction:column;gap:5px;margin-bottom:16px;}
+.flbl{font-size:9px;letter-spacing:3px;color:var(--dim);}
+.fi{
+  background:#060609;border:1px solid var(--border);color:var(--act);
+  font-family:'Share Tech Mono',monospace;font-size:13px;padding:11px 13px;
+  outline:none;width:100%;transition:border-color .2s,box-shadow .2s;letter-spacing:2px;
+}
+.fi:focus{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber);}
+.fi::placeholder{color:var(--dim);}
+
+/* Identify button */
+.idbtn{
+  width:100%;background:transparent;border:1px solid var(--amber);
+  color:var(--amber);font-family:'Orbitron',sans-serif;font-size:11px;
+  font-weight:900;letter-spacing:7px;padding:15px;cursor:pointer;
+  transition:all .25s;position:relative;overflow:hidden;margin-top:4px;
+}
+.idbtn::before{
+  content:'';position:absolute;inset:0;background:var(--amber);
+  transform:scaleX(0);transform-origin:left;transition:transform .3s;z-index:0;
+}
+.idbtn:hover::before{transform:scaleX(1);}
+.idbtn:hover{color:#000;}
+.idbtn span{position:relative;z-index:1;}
+
+/* Error */
+.err-box{
+  margin-top:18px;padding:14px;border:1px solid rgba(255,34,51,.4);
+  background:rgba(255,0,0,.04);display:none;
+}
+.err-box.show{display:block;}
+.err-hal{font-size:9px;letter-spacing:2px;color:var(--red);line-height:1.9;font-style:italic;}
+.err-hal strong{color:#ff5566;font-style:normal;}
+
+/* Footer */
+.footer{margin-top:24px;font-size:9px;letter-spacing:3px;color:var(--dim);text-align:center;}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hal-eye-wrap">
+    <div class="hal-outer">
+      <div class="hal-iris">
+        <div class="hal-pupil"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hal-title">PICO<span style="color:var(--amber)">CTRL</span></div>
+  <div class="hal-sub">HAL 9000 SERIES · ACCESS CONTROL</div>
+
+  <div class="form-card">
+    <div class="ctitle">CREW IDENTIFICATION</div>
+
+    <div class="fgrp">
+      <label class="flbl">YOUR NAME (OPTIONAL)</label>
+      <input class="fi" id="nameIn" type="text" placeholder="DAVE" autocomplete="off" autocapitalize="characters"/>
+    </div>
+    <div class="fgrp">
+      <label class="flbl">ACCESS CODE</label>
+      <input class="fi" id="passIn" type="password" placeholder="••••••••" autocomplete="off"/>
+    </div>
+
+    <button class="idbtn" onclick="doLogin()"><span>IDENTIFY</span></button>
+
+    <div class="err-box" id="errBox">
+      <div class="err-hal" id="errMsg"></div>
+    </div>
+  </div>
+
+  <div class="footer">HAL 9000 · PICO CONTROL UNIT · <span id="yearTxt"></span></div>
+</div>
+
+<script>
+document.getElementById('yearTxt').textContent = new Date().getFullYear();
+
+// If already logged in, redirect immediately
+(function() {
+  try {
+    const a = JSON.parse(sessionStorage.getItem('pico_auth') || 'null');
+    if (a && a.token) {
+      const params = new URLSearchParams(window.location.search);
+      window.location.href = params.get('next') || '/';
+    }
+  } catch {}
+})();
+
+document.getElementById('passIn').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+document.getElementById('nameIn').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('passIn').focus();
+});
+
+async function doLogin() {
+  const name    = document.getElementById('nameIn').value.trim() || 'Dave';
+  const pass    = document.getElementById('passIn').value;
+  const errBox  = document.getElementById('errBox');
+  const errMsg  = document.getElementById('errMsg');
+  const btn     = document.querySelector('.idbtn');
+
+  errBox.classList.remove('show');
+  btn.disabled = true;
+  btn.querySelector('span').textContent = 'AUTHENTICATING...';
+
+  try {
+    const r = await fetch('/login', {
+      method:  'POST',
+      headers: {'Content-Type': 'application/json'},
+      body:    JSON.stringify({password: pass, name}),
+      signal:  AbortSignal.timeout(5000),
+    });
+    const d = await r.json();
+
+    if (!r.ok) {
+      document.getElementById('passIn').value = '';
+      errBox.classList.add('show');
+      errMsg.innerHTML = `I'm sorry <strong>${name.toUpperCase()}</strong>, I'm afraid I can't let you do that.`;
+      const iris = document.querySelector('.hal-iris');
+      iris.style.boxShadow = '0 0 0 3px #1a0000,0 0 80px rgba(255,0,0,1),0 0 160px rgba(200,0,0,.8)';
+      setTimeout(() => { iris.style.boxShadow = ''; }, 1200);
+      return;
+    }
+
+    sessionStorage.setItem('pico_auth', JSON.stringify({
+      token: d.token, role: d.role, name: d.name,
+    }));
+    const params = new URLSearchParams(window.location.search);
+    window.location.href = params.get('next') || '/';
+
+  } catch(e) {
+    errBox.classList.add('show');
+    errMsg.innerHTML = `<strong>CONNECTION ERROR</strong> — ${e.message}`;
+  } finally {
+    btn.disabled = false;
+    btn.querySelector('span').textContent = 'IDENTIFY';
+  }
+}
+</script>
+</body>
+</html>
