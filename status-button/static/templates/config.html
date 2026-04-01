@@ -7,26 +7,23 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
 :root{
-  --red:#ff2233;--amber:#ff9900;
-  --bg:#03030a;--panel:#080810;--border:#1a1a2e;--bord2:#252540;
-  --text:#c0a060;--dim:#504030;--act:#ffcc66;
-  --gr:rgba(255,34,51,.4);--ga:rgba(255,153,0,.4);
+  --red:#ff2233;--black:#000;
+  --accent:#00ff88;
+  --bg:#010108;--panel:#05050f;--border:#0f0f22;--bord2:#1a1a30;
+  --text:#80c090;--dim:#1a4030;--act:#33ffaa;
+  --ga:rgba(0,255,136,.35);--gr:rgba(255,34,51,.4);
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-body{
-  background:var(--bg);color:var(--text);
-  font-family:'Share Tech Mono',monospace;
-  display:flex;flex-direction:column;align-items:center;
-  min-height:100vh;overflow-x:hidden;padding:20px 16px 60px;
-}
-body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.1) 2px,rgba(0,0,0,.1) 4px);pointer-events:none;z-index:9999;}
+body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;display:flex;flex-direction:column;align-items:center;min-height:100vh;overflow-x:hidden;padding:20px 16px 60px;}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.09) 2px,rgba(0,0,0,.09) 4px);pointer-events:none;z-index:9999;}
+#themeBar{position:fixed;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);z-index:9998;opacity:.6;pointer-events:none;}
 .w{width:100%;max-width:420px;}
 header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--border);}
 .logo{font-family:'Orbitron',sans-serif;font-weight:900;font-size:18px;letter-spacing:8px;color:var(--act);}
-.logo span{color:var(--amber);}
+.logo span{color:var(--accent);}
 .user-info{font-size:9px;letter-spacing:2px;color:var(--dim);display:flex;align-items:center;gap:8px;}
 .navbtn{background:transparent;border:1px solid var(--border);color:var(--dim);font-family:'Orbitron',sans-serif;font-size:8px;letter-spacing:2px;padding:5px 9px;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block;}
-.navbtn:hover{border-color:var(--amber);color:var(--amber);}
+.navbtn:hover{border-color:var(--accent);color:var(--accent);}
 .navbtn.exit:hover{border-color:var(--red);color:var(--red);}
 .card{background:var(--panel);border:1px solid var(--border);padding:18px;margin-bottom:16px;}
 .ctitle{font-family:'Orbitron',sans-serif;font-size:8px;font-weight:700;letter-spacing:5px;color:var(--dim);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
@@ -34,22 +31,13 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
 .fgrp{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
 .flbl{font-size:9px;letter-spacing:3px;color:var(--dim);}
 .fhint{font-size:9px;letter-spacing:2px;color:var(--dim);margin-top:3px;opacity:.7;}
-.fi{
-  background:#060609;border:1px solid var(--border);color:var(--act);
-  font-family:'Share Tech Mono',monospace;font-size:13px;padding:11px 13px;
-  outline:none;width:100%;transition:border-color .2s,box-shadow .2s;letter-spacing:2px;
-}
-.fi:focus{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber);}
+.fi{background:#020208;border:1px solid var(--border);color:var(--act);font-family:'Share Tech Mono',monospace;font-size:13px;padding:11px 13px;outline:none;width:100%;transition:border-color .2s,box-shadow .2s;letter-spacing:2px;}
+.fi:focus{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);}
 .fi::placeholder{color:var(--dim);}
-.btn{
-  width:100%;background:transparent;border:1px solid var(--amber);
-  color:var(--amber);font-family:'Orbitron',sans-serif;font-size:10px;
-  font-weight:900;letter-spacing:5px;padding:13px;cursor:pointer;
-  transition:all .25s;position:relative;overflow:hidden;
-}
-.btn::before{content:'';position:absolute;inset:0;background:var(--amber);transform:scaleX(0);transform-origin:left;transition:transform .3s;z-index:0;}
+.btn{width:100%;background:transparent;border:1px solid var(--accent);color:var(--accent);font-family:'Orbitron',sans-serif;font-size:10px;font-weight:900;letter-spacing:5px;padding:13px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;}
+.btn::before{content:'';position:absolute;inset:0;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .3s;z-index:0;}
 .btn:hover::before{transform:scaleX(1);}
-.btn:hover{color:#000;}
+.btn:hover{color:var(--black);}
 .btn span{position:relative;z-index:1;}
 .btn.danger{border-color:var(--red);color:var(--red);}
 .btn.danger::before{background:var(--red);}
@@ -58,17 +46,25 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
 .btn:disabled::before{display:none;}
 .brow{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .sline{font-size:10px;letter-spacing:2px;min-height:18px;margin-top:10px;transition:color .2s;}
-.sline.ok{color:#00cc66;}.sline.err{color:var(--red);}.sline.inf{color:var(--dim);}
-.info-grid{display:flex;flex-direction:column;gap:0;}
+.sline.ok{color:var(--accent);}.sline.err{color:var(--red);}.sline.inf{color:var(--dim);}
+.info-grid{display:flex;flex-direction:column;}
 .info-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:10px;letter-spacing:2px;}
 .info-row:last-child{border-bottom:none;}
 .info-key{color:var(--dim);}
 .info-val{color:var(--act);}
+/* Theme picker */
+.theme-row{display:flex;gap:12px;align-items:center;margin-bottom:14px;}
+.theme-swatch{width:44px;height:44px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s;flex-shrink:0;}
+.theme-swatch.on{border-color:var(--act);box-shadow:0 0 10px var(--ga);}
+.theme-preview{width:100%;height:40px;border:1px solid var(--border);border-radius:2px;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:8px;letter-spacing:3px;transition:all .2s;}
+.cprow{display:flex;gap:10px;align-items:center;margin-bottom:12px;}
+.cplbl{font-size:9px;letter-spacing:3px;color:var(--dim);min-width:80px;}
+input[type=color]{width:44px;height:32px;cursor:pointer;border:1px solid var(--border);background:transparent;padding:2px;}
 </style>
 </head>
 <body>
+<div id="themeBar"></div>
 <div class="w">
-
 <header>
   <div class="logo">PICO<span>CTRL</span></div>
   <div class="user-info">
@@ -79,6 +75,7 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
   </div>
 </header>
 
+<!-- Device Info -->
 <div class="card">
   <div class="ctitle">DEVICE INFO</div>
   <div class="info-grid">
@@ -89,11 +86,60 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
   </div>
 </div>
 
+<!-- Theme -->
+<div class="card">
+  <div class="ctitle">INTERFACE THEME</div>
+  <div class="fgrp">
+    <div class="flbl" style="margin-bottom:8px">PRESETS</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px">
+      <div onclick="applyPreset('#00ff88','#010108')" style="cursor:pointer;text-align:center">
+        <div style="width:100%;padding-top:100%;border-radius:50%;background:#00ff88;margin-bottom:4px;border:2px solid #003322;"></div>
+        <div style="font-size:8px;letter-spacing:1px;color:var(--dim)">GREEN</div>
+      </div>
+      <div onclick="applyPreset('#ff9900','#03030a')" style="cursor:pointer;text-align:center">
+        <div style="width:100%;padding-top:100%;border-radius:50%;background:#ff9900;margin-bottom:4px;border:2px solid #332200;"></div>
+        <div style="font-size:8px;letter-spacing:1px;color:var(--dim)">AMBER</div>
+      </div>
+      <div onclick="applyPreset('#00ccff','#010510')" style="cursor:pointer;text-align:center">
+        <div style="width:100%;padding-top:100%;border-radius:50%;background:#00ccff;margin-bottom:4px;border:2px solid #002233;"></div>
+        <div style="font-size:8px;letter-spacing:1px;color:var(--dim)">CYAN</div>
+      </div>
+      <div onclick="applyPreset('#cc44ff','#080010')" style="cursor:pointer;text-align:center">
+        <div style="width:100%;padding-top:100%;border-radius:50%;background:#cc44ff;margin-bottom:4px;border:2px solid #220033;"></div>
+        <div style="font-size:8px;letter-spacing:1px;color:var(--dim)">PURPLE</div>
+      </div>
+      <div onclick="applyPreset('#ff2233','#100005')" style="cursor:pointer;text-align:center">
+        <div style="width:100%;padding-top:100%;border-radius:50%;background:#ff2233;margin-bottom:4px;border:2px solid #330008;"></div>
+        <div style="font-size:8px;letter-spacing:1px;color:var(--dim)">RED</div>
+      </div>
+    </div>
+  </div>
+  <div class="cprow">
+    <span class="cplbl">ACCENT</span>
+    <input type="color" id="accentPick" value="#00ff88" oninput="onThemeInput()"/>
+    <div id="accentPreview" style="flex:1;height:32px;border:1px solid var(--border);background:var(--accent);transition:background .2s;"></div>
+  </div>
+  <div class="cprow">
+    <span class="cplbl">BACKGROUND</span>
+    <input type="color" id="bgPick" value="#010108" oninput="onThemeInput()"/>
+    <div id="bgPreview" style="flex:1;height:32px;border:1px solid var(--border);background:var(--bg);transition:background .2s;"></div>
+  </div>
+  <div class="theme-preview" id="themePreview" style="margin-bottom:12px">
+    <span style="color:var(--accent)">PICO</span><span style="color:var(--act)">CTRL</span>&nbsp;&nbsp;<span style="color:var(--dim)">PREVIEW</span>
+  </div>
+  <div class="brow">
+    <button class="btn" onclick="saveThemeNow()"><span>APPLY &amp; SAVE</span></button>
+    <button class="btn danger" onclick="resetTheme()"><span>RESET</span></button>
+  </div>
+  <div class="sline inf" id="themeSt"></div>
+</div>
+
+<!-- Network -->
 <div class="card">
   <div class="ctitle">NETWORK</div>
   <div class="fgrp">
     <label class="flbl">HOSTNAME</label>
-    <input class="fi" id="cfgHostname" type="text" maxlength="32" placeholder="picoctrl" style="text-transform:lowercase;letter-spacing:2px"/>
+    <input class="fi" id="cfgHostname" type="text" maxlength="32" placeholder="picoctrl" style="text-transform:lowercase"/>
     <div class="fhint">REACHABLE AT &lt;HOSTNAME&gt;.LOCAL AFTER REBOOT</div>
   </div>
   <div class="fgrp">
@@ -111,6 +157,7 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
   <div class="sline inf" id="netSt"></div>
 </div>
 
+<!-- Access Codes -->
 <div class="card">
   <div class="ctitle">ACCESS CODES</div>
   <div class="fgrp">
@@ -129,6 +176,7 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
   <div class="sline inf" id="passSt"></div>
 </div>
 
+<!-- System -->
 <div class="card">
   <div class="ctitle">SYSTEM</div>
   <div class="brow">
@@ -140,142 +188,162 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
 
 </div>
 <script>
-// ── Auth ──
-const _auth = (function(){
-  try { return JSON.parse(sessionStorage.getItem('pico_auth') || 'null'); } catch { return null; }
-})();
-if (!_auth || _auth.role !== 'admin') {
-  window.location.href = '/login?next=/settings';
-  throw new Error('unauthenticated');
-}
-document.getElementById('userBadge').textContent = (_auth.name || '').toUpperCase() + ' · ADMIN';
+// ════ PICO CTRL THEME ENGINE ════
+// Shared snippet — include at the top of every page's <script> tag.
+// Reads theme from localStorage, applies CSS vars, exposes applyTheme().
 
-function hdrs() {
-  return {'Content-Type':'application/json','Authorization':'Bearer '+_auth.token};
-}
+(function(){
+  var DEFAULTS = {
+    accent: '#00ff88',
+    bg:     '#03030a'
+  };
 
-function navBack() {
-  window.history.length > 1 ? window.history.back() : window.location.href = '/';
-}
-
-async function doLogout() {
-  try {
-    await fetch('/logout', {method:'POST',headers:hdrs(),body:'{}',signal:AbortSignal.timeout(3000)});
-  } catch {}
-  sessionStorage.removeItem('pico_auth');
-  window.location.href = '/login';
-}
-
-// ── Device Info ──
-async function loadDeviceInfo() {
-  try {
-    const r = await fetch('/health', {signal:AbortSignal.timeout(3000)});
-    const d = await r.json();
-    document.getElementById('infoStatus').textContent  = 'ONLINE';
-    document.getElementById('infoUptime').textContent  = (d.uptime_ms/1000).toFixed(0) + 's';
-    document.getElementById('infoRam').textContent     = (d.free_ram || '?') + ' B';
-  } catch {
-    document.getElementById('infoStatus').textContent = 'OFFLINE';
+  function hexToRgb(h){
+    h=h.replace('#','');
+    if(h.length===3)h=h.split('').map(function(c){return c+c;}).join('');
+    var n=parseInt(h,16);
+    return{r:(n>>16)&255,g:(n>>8)&255,b:n&255};
   }
+
+  function rgbToHex(r,g,b){
+    return '#'+[r,g,b].map(function(v){return Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0');}).join('');
+  }
+
+  function lighten(hex,amt){
+    var c=hexToRgb(hex);
+    return rgbToHex(c.r+(255-c.r)*amt,c.g+(255-c.g)*amt,c.b+(255-c.b)*amt);
+  }
+
+  function darken(hex,amt){
+    var c=hexToRgb(hex);
+    return rgbToHex(c.r*(1-amt),c.g*(1-amt),c.b*(1-amt));
+  }
+
+  function withAlpha(hex,a){
+    var c=hexToRgb(hex);
+    return 'rgba('+c.r+','+c.g+','+c.b+','+a+')';
+  }
+
+  function blendBg(hex,t){
+    // blend bg toward a very dark tinted version of accent
+    var c=hexToRgb(hex),bg=hexToRgb(hex);
+    // bg panel tint: barely visible accent hue
+    return rgbToHex(Math.round(c.r*t),Math.round(c.g*t),Math.round(c.b*t));
+  }
+
+  window.applyTheme = function(accent, bg){
+    accent = accent || DEFAULTS.accent;
+    bg     = bg     || DEFAULTS.bg;
+
+    var bgC   = hexToRgb(bg);
+    var panel = rgbToHex(bgC.r+5,  bgC.g+5,  bgC.b+16);
+    var bord  = rgbToHex(bgC.r+23, bgC.g+23, bgC.b+44);
+    var bord2 = rgbToHex(bgC.r+37, bgC.g+37, bgC.b+64);
+    var act   = lighten(accent, 0.18);
+    var dim   = withAlpha(accent, 0.28);
+    var text  = lighten(darken(accent,0.1), 0.3);
+    // derive a muted dim hex for non-rgba uses
+    var dimHex = rgbToHex(
+      Math.round(hexToRgb(accent).r*0.32),
+      Math.round(hexToRgb(accent).g*0.32),
+      Math.round(hexToRgb(accent).b*0.32)
+    );
+
+    var r = document.documentElement.style;
+    r.setProperty('--accent',  accent);
+    r.setProperty('--bg',      bg);
+    r.setProperty('--panel',   panel);
+    r.setProperty('--border',  bord);
+    r.setProperty('--bord2',   bord2);
+    r.setProperty('--act',     act);
+    r.setProperty('--dim',     dimHex);
+    r.setProperty('--text',    text);
+    r.setProperty('--ga',      withAlpha(accent, 0.35));
+    // update the top bar gradient
+    var bar = document.getElementById('themeBar');
+    if(bar) bar.style.background = 'linear-gradient(90deg,transparent,'+accent+',transparent)';
+  };
+
+  window.loadTheme = function(){
+    var t = {};
+    try{ t = JSON.parse(localStorage.getItem('picoTheme')||'{}'); }catch{}
+    var accent = t.accent || DEFAULTS.accent;
+    var bg     = t.bg     || DEFAULTS.bg;
+    window.applyTheme(accent, bg);
+    return {accent:accent, bg:bg};
+  };
+
+  window.saveTheme = function(accent, bg){
+    localStorage.setItem('picoTheme', JSON.stringify({accent:accent, bg:bg}));
+    window.applyTheme(accent, bg);
+  };
+
+  window.THEME_DEFAULTS = DEFAULTS;
+
+  // Apply immediately on load
+  window.loadTheme();
+})();
+
+const _auth=(function(){try{return JSON.parse(sessionStorage.getItem('pico_auth')||'null');}catch{return null;}})();
+if(!_auth||_auth.role!=='admin'){window.location.href='/login?next=/settings';throw new Error('unauthenticated');}
+document.getElementById('userBadge').textContent=(_auth.name||'').toUpperCase()+' · ADMIN';
+function hdrs(){return{'Content-Type':'application/json','Authorization':'Bearer '+_auth.token};}
+function navBack(){window.history.length>1?window.history.back():window.location.href='/';}
+async function doLogout(){try{await fetch('/logout',{method:'POST',headers:hdrs(),body:'{}',signal:AbortSignal.timeout(3000)});}catch{}sessionStorage.removeItem('pico_auth');window.location.href='/login';}
+
+// ── Theme picker ──
+var _curTheme = window.loadTheme();
+document.getElementById('accentPick').value = _curTheme.accent || '#00ff88';
+document.getElementById('bgPick').value     = _curTheme.bg     || '#010108';
+
+function onThemeInput(){
+  var accent = document.getElementById('accentPick').value;
+  var bg     = document.getElementById('bgPick').value;
+  window.applyTheme(accent, bg);
+  document.getElementById('accentPreview').style.background = accent;
+  document.getElementById('bgPreview').style.background     = bg;
 }
+
+function applyPreset(accent, bg){
+  document.getElementById('accentPick').value = accent;
+  document.getElementById('bgPick').value     = bg;
+  onThemeInput();
+}
+
+function saveThemeNow(){
+  var accent = document.getElementById('accentPick').value;
+  var bg     = document.getElementById('bgPick').value;
+  window.saveTheme(accent, bg);
+  var st = document.getElementById('themeSt');
+  st.className = 'sline ok';
+  st.textContent = '✓ THEME SAVED · APPLIES TO ALL PAGES';
+}
+
+function resetTheme(){
+  var accent = window.THEME_DEFAULTS.accent;
+  var bg     = window.THEME_DEFAULTS.bg;
+  document.getElementById('accentPick').value = accent;
+  document.getElementById('bgPick').value     = bg;
+  window.saveTheme(accent, bg);
+  var st = document.getElementById('themeSt');
+  st.className = 'sline ok';
+  st.textContent = '✓ RESET TO DEFAULT';
+}
+
+// ── Device info ──
+async function loadDeviceInfo(){try{const r=await fetch('/health',{signal:AbortSignal.timeout(3000)});const d=await r.json();document.getElementById('infoStatus').textContent='ONLINE';document.getElementById('infoUptime').textContent=(d.uptime_ms/1000).toFixed(0)+'s';document.getElementById('infoRam').textContent=(d.free_ram||'?')+' B';}catch{document.getElementById('infoStatus').textContent='OFFLINE';}}
 
 // ── Network ──
-async function loadNetwork() {
-  const st = document.getElementById('netSt');
-  st.className = 'sline inf'; st.textContent = 'LOADING...';
-  try {
-    const r = await fetch('/config/device', {signal:AbortSignal.timeout(3000)});
-    const d = await r.json();
-    document.getElementById('cfgHostname').value  = d.hostname  || '';
-    document.getElementById('cfgSsid').value      = d.wifi_ssid || '';
-    document.getElementById('cfgWifi').value      = '';
-    document.getElementById('infoHost').textContent = (d.hostname || '?') + '.local';
-    st.className = 'sline ok'; st.textContent = '✓ LOADED';
-  } catch(e) {
-    st.className = 'sline err'; st.textContent = '✗ ' + e.message;
-  }
-}
-
-async function saveNetwork() {
-  const st       = document.getElementById('netSt');
-  const hostname = document.getElementById('cfgHostname').value.trim().toLowerCase();
-  const ssid     = document.getElementById('cfgSsid').value.trim();
-  const wpass    = document.getElementById('cfgWifi').value;
-  if (!hostname) { st.className = 'sline err'; st.textContent = 'Hostname required'; return; }
-  const body = {hostname};
-  if (ssid)  body.wifi_ssid     = ssid;
-  if (wpass) body.wifi_password = wpass;
-  st.className = 'sline inf'; st.textContent = 'SAVING...';
-  try {
-    const r = await fetch('/config/device', {
-      method:'POST', headers:hdrs(), body:JSON.stringify(body),
-      signal:AbortSignal.timeout(5000)
-    });
-    const d = await r.json();
-    if (!r.ok) throw new Error(d.error);
-    document.getElementById('infoHost').textContent = d.hostname + '.local';
-    st.className = 'sline ok';
-    st.textContent = '✓ SAVED · REBOOT TO APPLY WIFI CHANGES';
-  } catch(e) {
-    st.className = 'sline err'; st.textContent = '✗ ' + e.message;
-  }
-}
+async function loadNetwork(){const st=document.getElementById('netSt');st.className='sline inf';st.textContent='LOADING...';try{const r=await fetch('/config/device',{signal:AbortSignal.timeout(3000)});const d=await r.json();document.getElementById('cfgHostname').value=d.hostname||'';document.getElementById('cfgSsid').value=d.wifi_ssid||'';document.getElementById('cfgWifi').value='';document.getElementById('infoHost').textContent=(d.hostname||'?')+'.local';st.className='sline ok';st.textContent='✓ LOADED';}catch(e){st.className='sline err';st.textContent='✗ '+e.message;}}
+async function saveNetwork(){const st=document.getElementById('netSt');const hostname=document.getElementById('cfgHostname').value.trim().toLowerCase();const ssid=document.getElementById('cfgSsid').value.trim();const wpass=document.getElementById('cfgWifi').value;if(!hostname){st.className='sline err';st.textContent='Hostname required';return;}const body={hostname};if(ssid)body.wifi_ssid=ssid;if(wpass)body.wifi_password=wpass;st.className='sline inf';st.textContent='SAVING...';try{const r=await fetch('/config/device',{method:'POST',headers:hdrs(),body:JSON.stringify(body),signal:AbortSignal.timeout(5000)});const d=await r.json();if(!r.ok)throw new Error(d.error);document.getElementById('infoHost').textContent=d.hostname+'.local';st.className='sline ok';st.textContent='✓ SAVED · REBOOT TO APPLY WIFI CHANGES';}catch(e){st.className='sline err';st.textContent='✗ '+e.message;}}
 
 // ── Passwords ──
-async function savePasswords() {
-  const st        = document.getElementById('passSt');
-  const newAdmin  = document.getElementById('newAdmin').value;
-  const newViewer = document.getElementById('newViewer').value;
-  const curAdmin  = document.getElementById('curAdmin').value;
-  if (!curAdmin) {
-    st.className = 'sline err'; st.textContent = 'Current admin password required'; return;
-  }
-  if (!newAdmin && !newViewer) {
-    st.className = 'sline err'; st.textContent = 'Enter at least one new password'; return;
-  }
-  const body = {current_admin: curAdmin};
-  if (newAdmin)  body.admin_pass  = newAdmin;
-  if (newViewer) body.viewer_pass = newViewer;
-  st.className = 'sline inf'; st.textContent = 'UPDATING...';
-  try {
-    const r = await fetch('/config/passwords', {
-      method:'POST', headers:hdrs(), body:JSON.stringify(body),
-      signal:AbortSignal.timeout(5000)
-    });
-    const d = await r.json();
-    if (!r.ok) throw new Error(d.error);
-    st.className = 'sline ok'; st.textContent = '✓ CODES UPDATED';
-    document.getElementById('newAdmin').value  = '';
-    document.getElementById('newViewer').value = '';
-    document.getElementById('curAdmin').value  = '';
-    if (newAdmin) {
-      st.textContent += ' · RE-LOGIN REQUIRED';
-      setTimeout(() => {
-        sessionStorage.removeItem('pico_auth');
-        window.location.href = '/login';
-      }, 2000);
-    }
-  } catch(e) {
-    st.className = 'sline err'; st.textContent = '✗ ' + e.message;
-  }
-}
+async function savePasswords(){const st=document.getElementById('passSt');const newAdmin=document.getElementById('newAdmin').value;const newViewer=document.getElementById('newViewer').value;const curAdmin=document.getElementById('curAdmin').value;if(!curAdmin){st.className='sline err';st.textContent='Current admin password required';return;}if(!newAdmin&&!newViewer){st.className='sline err';st.textContent='Enter at least one new password';return;}const body={current_admin:curAdmin};if(newAdmin)body.admin_pass=newAdmin;if(newViewer)body.viewer_pass=newViewer;st.className='sline inf';st.textContent='UPDATING...';try{const r=await fetch('/config/passwords',{method:'POST',headers:hdrs(),body:JSON.stringify(body),signal:AbortSignal.timeout(5000)});const d=await r.json();if(!r.ok)throw new Error(d.error);st.className='sline ok';st.textContent='✓ CODES UPDATED';document.getElementById('newAdmin').value='';document.getElementById('newViewer').value='';document.getElementById('curAdmin').value='';if(newAdmin){st.textContent+=' · RE-LOGIN REQUIRED';setTimeout(()=>{sessionStorage.removeItem('pico_auth');window.location.href='/login';},2000);}}catch(e){st.className='sline err';st.textContent='✗ '+e.message;}}
 
 // ── Reboot ──
-async function doReboot() {
-  if (!confirm('Reboot the Pico?')) return;
-  const st = document.getElementById('sysSt');
-  try {
-    await fetch('/reboot', {
-      method:'POST', headers:hdrs(), body:'{}', signal:AbortSignal.timeout(3000)
-    });
-  } catch {}
-  st.className = 'sline inf'; st.textContent = 'REBOOTING — RECONNECTING IN 10s...';
-  setTimeout(() => { st.textContent = ''; loadDeviceInfo(); }, 10000);
-}
+async function doReboot(){if(!confirm('Reboot the Pico?'))return;const st=document.getElementById('sysSt');try{await fetch('/reboot',{method:'POST',headers:hdrs(),body:'{}',signal:AbortSignal.timeout(3000)});}catch{}st.className='sline inf';st.textContent='REBOOTING — RECONNECTING IN 10s...';setTimeout(()=>{st.textContent='';loadDeviceInfo();},10000);}
 
-// Init
-loadDeviceInfo();
-loadNetwork();
+loadDeviceInfo();loadNetwork();
 </script>
 </body>
 </html>

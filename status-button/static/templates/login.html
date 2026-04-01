@@ -7,122 +7,58 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
 :root{
-  --red:#ff2233;--amber:#ff9900;--dark-amber:#cc7700;
-  --bg:#03030a;--panel:#080810;--border:#1a1a2e;--bord2:#252540;
-  --text:#c0a060;--dim:#504030;--act:#ffcc66;
-  --gr:rgba(255,34,51,.4);--ga:rgba(255,153,0,.4);
+  --red:#ff2233;--black:#000;
+  --accent:#00ff88;
+  --bg:#010108;--panel:#05050f;--border:#0f0f22;--bord2:#1a1a30;
+  --text:#80c090;--dim:#1a4030;--act:#33ffaa;
+  --ga:rgba(0,255,136,.35);--gr:rgba(255,34,51,.4);
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 html,body{height:100%;}
-body{
-  background:var(--bg);color:var(--text);
-  font-family:'Share Tech Mono',monospace;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  min-height:100vh;overflow-x:hidden;padding:20px;
-}
-body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.1) 2px,rgba(0,0,0,.1) 4px);pointer-events:none;z-index:9999;}
-
-.container{width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;gap:0;}
-
-/* HAL EYE */
-.hal-eye-wrap{margin-bottom:32px;position:relative;display:flex;align-items:center;justify-content:center;}
-.hal-outer{
-  width:140px;height:140px;border-radius:50%;
-  background:radial-gradient(circle at 40% 38%, #1a0808, #000);
-  border:3px solid #1a0808;
-  box-shadow:0 0 0 1px #0a0005, 0 0 60px rgba(180,0,0,.3), inset 0 2px 0 rgba(255,255,255,.04);
-  display:flex;align-items:center;justify-content:center;position:relative;
-}
-.hal-outer::before{content:'';position:absolute;inset:6px;border-radius:50%;border:1px solid rgba(200,0,0,.1);}
-.hal-iris{
-  width:80px;height:80px;border-radius:50%;
-  background:radial-gradient(circle at 38% 35%,#cc1100 0%,#880000 40%,#440000 70%,#1a0000 100%);
-  box-shadow:0 0 0 3px #1a0000,0 0 30px rgba(200,0,0,.6),0 0 80px rgba(180,0,0,.3);
-  animation:hal-pulse 3s ease-in-out infinite;
-  position:relative;display:flex;align-items:center;justify-content:center;
-}
-.hal-iris::before{
-  content:'';position:absolute;inset:0;border-radius:50%;
-  background:radial-gradient(circle at 30% 25%,rgba(255,100,80,.3),transparent 60%);
-}
-.hal-pupil{
-  width:24px;height:24px;border-radius:50%;
-  background:radial-gradient(circle at 35% 30%,#ff4422,#aa0000 50%,#330000);
-  box-shadow:0 0 10px rgba(255,60,20,.8),0 0 20px rgba(200,0,0,.6);
-  animation:hal-pulse-inner 3s ease-in-out infinite;
-}
-@keyframes hal-pulse{
-  0%,100%{box-shadow:0 0 0 3px #1a0000,0 0 30px rgba(200,0,0,.6),0 0 80px rgba(180,0,0,.3);}
-  50%{box-shadow:0 0 0 3px #1a0000,0 0 50px rgba(255,30,0,.9),0 0 120px rgba(200,0,0,.5);}
-}
-@keyframes hal-pulse-inner{
-  0%,100%{opacity:1;}50%{opacity:.7;}
-}
-
-/* Title */
-.hal-title{font-family:'Orbitron',sans-serif;font-weight:900;font-size:24px;letter-spacing:10px;color:var(--act);text-shadow:0 0 20px rgba(255,153,0,.4);margin-bottom:4px;text-align:center;}
+body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;overflow-x:hidden;padding:20px;}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.09) 2px,rgba(0,0,0,.09) 4px);pointer-events:none;z-index:9999;}
+#themeBar{position:fixed;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);z-index:9998;opacity:.6;pointer-events:none;}
+.container{width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;}
+.hal-eye-wrap{margin-bottom:32px;}
+.hal-outer{width:140px;height:140px;border-radius:50%;background:radial-gradient(circle at 40% 38%,#001a10,#000);border:3px solid #001a10;box-shadow:0 0 0 1px #000a05,0 0 60px var(--ga),inset 0 2px 0 rgba(255,255,255,.03);display:flex;align-items:center;justify-content:center;position:relative;margin:0 auto;}
+.hal-outer::before{content:'';position:absolute;inset:6px;border-radius:50%;border:1px solid rgba(0,255,136,.1);}
+.hal-iris{width:80px;height:80px;border-radius:50%;background:radial-gradient(circle at 38% 35%,#00cc66 0%,#008844 40%,#004422 70%,#001a0a 100%);box-shadow:0 0 0 3px #001a0a,0 0 30px rgba(0,200,100,.6),0 0 80px rgba(0,180,80,.3);animation:hal-pulse 3s ease-in-out infinite;position:relative;display:flex;align-items:center;justify-content:center;}
+.hal-iris::before{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 30% 25%,rgba(80,255,160,.3),transparent 60%);}
+.hal-pupil{width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#44ff99,#00aa55 50%,#003322);box-shadow:0 0 10px rgba(60,255,140,.8),0 0 20px rgba(0,200,80,.6);animation:hal-pulse-inner 3s ease-in-out infinite;}
+@keyframes hal-pulse{0%,100%{box-shadow:0 0 0 3px #001a0a,0 0 30px rgba(0,200,100,.6),0 0 80px rgba(0,180,80,.3);}50%{box-shadow:0 0 0 3px #001a0a,0 0 50px rgba(0,255,100,.9),0 0 120px rgba(0,200,80,.5);}}
+@keyframes hal-pulse-inner{0%,100%{opacity:1;}50%{opacity:.7;}}
+.hal-title{font-family:'Orbitron',sans-serif;font-weight:900;font-size:24px;letter-spacing:10px;color:var(--act);text-shadow:0 0 20px var(--ga);margin-bottom:4px;text-align:center;}
 .hal-sub{font-size:10px;letter-spacing:6px;color:var(--dim);margin-bottom:36px;text-align:center;}
-
-/* Form */
-.form-card{width:100%;background:var(--panel);border:1px solid var(--border);padding:24px;}
-.form-card .ctitle{font-family:'Orbitron',sans-serif;font-size:8px;font-weight:700;letter-spacing:5px;color:var(--dim);margin-bottom:20px;display:flex;align-items:center;gap:8px;}
-.form-card .ctitle::after{content:'';flex:1;height:1px;background:var(--border);}
-
+.card{width:100%;background:var(--panel);border:1px solid var(--border);padding:24px;}
+.ctitle{font-family:'Orbitron',sans-serif;font-size:8px;font-weight:700;letter-spacing:5px;color:var(--dim);margin-bottom:20px;display:flex;align-items:center;gap:8px;}
+.ctitle::after{content:'';flex:1;height:1px;background:var(--border);}
 .fgrp{display:flex;flex-direction:column;gap:5px;margin-bottom:16px;}
 .flbl{font-size:9px;letter-spacing:3px;color:var(--dim);}
-.fi{
-  background:#060609;border:1px solid var(--border);color:var(--act);
-  font-family:'Share Tech Mono',monospace;font-size:13px;padding:11px 13px;
-  outline:none;width:100%;transition:border-color .2s,box-shadow .2s;letter-spacing:2px;
-}
-.fi:focus{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber);}
+.fi{background:#020208;border:1px solid var(--border);color:var(--act);font-family:'Share Tech Mono',monospace;font-size:13px;padding:11px 13px;outline:none;width:100%;transition:border-color .2s,box-shadow .2s;letter-spacing:2px;}
+.fi:focus{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);}
 .fi::placeholder{color:var(--dim);}
-
-/* Identify button */
-.idbtn{
-  width:100%;background:transparent;border:1px solid var(--amber);
-  color:var(--amber);font-family:'Orbitron',sans-serif;font-size:11px;
-  font-weight:900;letter-spacing:7px;padding:15px;cursor:pointer;
-  transition:all .25s;position:relative;overflow:hidden;margin-top:4px;
-}
-.idbtn::before{
-  content:'';position:absolute;inset:0;background:var(--amber);
-  transform:scaleX(0);transform-origin:left;transition:transform .3s;z-index:0;
-}
+.idbtn{width:100%;background:transparent;border:1px solid var(--accent);color:var(--accent);font-family:'Orbitron',sans-serif;font-size:11px;font-weight:900;letter-spacing:7px;padding:15px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;margin-top:4px;}
+.idbtn::before{content:'';position:absolute;inset:0;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .3s;z-index:0;}
 .idbtn:hover::before{transform:scaleX(1);}
-.idbtn:hover{color:#000;}
+.idbtn:hover{color:var(--black);}
 .idbtn span{position:relative;z-index:1;}
-
-/* Error */
-.err-box{
-  margin-top:18px;padding:14px;border:1px solid rgba(255,34,51,.4);
-  background:rgba(255,0,0,.04);display:none;
-}
+.err-box{margin-top:18px;padding:14px;border:1px solid var(--gr);background:rgba(255,0,0,.04);display:none;}
 .err-box.show{display:block;}
-.err-hal{font-size:9px;letter-spacing:2px;color:var(--red);line-height:1.9;font-style:italic;}
-.err-hal strong{color:#ff5566;font-style:normal;}
-
-/* Footer */
+.err-msg{font-size:9px;letter-spacing:2px;color:var(--red);line-height:1.9;}
+.err-msg strong{color:#ff5566;}
 .footer{margin-top:24px;font-size:9px;letter-spacing:3px;color:var(--dim);text-align:center;}
 </style>
 </head>
 <body>
+<div id="themeBar"></div>
 <div class="container">
-
   <div class="hal-eye-wrap">
-    <div class="hal-outer">
-      <div class="hal-iris">
-        <div class="hal-pupil"></div>
-      </div>
-    </div>
+    <div class="hal-outer"><div class="hal-iris"><div class="hal-pupil"></div></div></div>
   </div>
-
-  <div class="hal-title">PICO<span style="color:var(--amber)">CTRL</span></div>
-  <div class="hal-sub">HAL 9000 SERIES · ACCESS CONTROL</div>
-
-  <div class="form-card">
+  <div class="hal-title">PICO<span style="color:var(--accent)">CTRL</span></div>
+  <div class="hal-sub">ACCESS CONTROL SYSTEM</div>
+  <div class="card">
     <div class="ctitle">CREW IDENTIFICATION</div>
-
     <div class="fgrp">
       <label class="flbl">YOUR NAME (OPTIONAL)</label>
       <input class="fi" id="nameIn" type="text" placeholder="DAVE" autocomplete="off" autocapitalize="characters"/>
@@ -131,81 +67,134 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
       <label class="flbl">ACCESS CODE</label>
       <input class="fi" id="passIn" type="password" placeholder="••••••••" autocomplete="off"/>
     </div>
-
     <button class="idbtn" onclick="doLogin()"><span>IDENTIFY</span></button>
-
-    <div class="err-box" id="errBox">
-      <div class="err-hal" id="errMsg"></div>
-    </div>
+    <div class="err-box" id="errBox"><div class="err-msg" id="errMsg"></div></div>
   </div>
-
-  <div class="footer">HAL 9000 · PICO CONTROL UNIT · <span id="yearTxt"></span></div>
+  <div class="footer">PICO CONTROL UNIT · <span id="yearTxt"></span></div>
 </div>
-
 <script>
-document.getElementById('yearTxt').textContent = new Date().getFullYear();
+// ════ PICO CTRL THEME ENGINE ════
+// Shared snippet — include at the top of every page's <script> tag.
+// Reads theme from localStorage, applies CSS vars, exposes applyTheme().
 
-// If already logged in, redirect immediately
-(function() {
-  try {
-    const a = JSON.parse(sessionStorage.getItem('pico_auth') || 'null');
-    if (a && a.token) {
-      const params = new URLSearchParams(window.location.search);
-      window.location.href = params.get('next') || '/';
-    }
-  } catch {}
+(function(){
+  var DEFAULTS = {
+    accent: '#00ff88',
+    bg:     '#03030a'
+  };
+
+  function hexToRgb(h){
+    h=h.replace('#','');
+    if(h.length===3)h=h.split('').map(function(c){return c+c;}).join('');
+    var n=parseInt(h,16);
+    return{r:(n>>16)&255,g:(n>>8)&255,b:n&255};
+  }
+
+  function rgbToHex(r,g,b){
+    return '#'+[r,g,b].map(function(v){return Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0');}).join('');
+  }
+
+  function lighten(hex,amt){
+    var c=hexToRgb(hex);
+    return rgbToHex(c.r+(255-c.r)*amt,c.g+(255-c.g)*amt,c.b+(255-c.b)*amt);
+  }
+
+  function darken(hex,amt){
+    var c=hexToRgb(hex);
+    return rgbToHex(c.r*(1-amt),c.g*(1-amt),c.b*(1-amt));
+  }
+
+  function withAlpha(hex,a){
+    var c=hexToRgb(hex);
+    return 'rgba('+c.r+','+c.g+','+c.b+','+a+')';
+  }
+
+  function blendBg(hex,t){
+    // blend bg toward a very dark tinted version of accent
+    var c=hexToRgb(hex),bg=hexToRgb(hex);
+    // bg panel tint: barely visible accent hue
+    return rgbToHex(Math.round(c.r*t),Math.round(c.g*t),Math.round(c.b*t));
+  }
+
+  window.applyTheme = function(accent, bg){
+    accent = accent || DEFAULTS.accent;
+    bg     = bg     || DEFAULTS.bg;
+
+    var bgC   = hexToRgb(bg);
+    var panel = rgbToHex(bgC.r+5,  bgC.g+5,  bgC.b+16);
+    var bord  = rgbToHex(bgC.r+23, bgC.g+23, bgC.b+44);
+    var bord2 = rgbToHex(bgC.r+37, bgC.g+37, bgC.b+64);
+    var act   = lighten(accent, 0.18);
+    var dim   = withAlpha(accent, 0.28);
+    var text  = lighten(darken(accent,0.1), 0.3);
+    // derive a muted dim hex for non-rgba uses
+    var dimHex = rgbToHex(
+      Math.round(hexToRgb(accent).r*0.32),
+      Math.round(hexToRgb(accent).g*0.32),
+      Math.round(hexToRgb(accent).b*0.32)
+    );
+
+    var r = document.documentElement.style;
+    r.setProperty('--accent',  accent);
+    r.setProperty('--bg',      bg);
+    r.setProperty('--panel',   panel);
+    r.setProperty('--border',  bord);
+    r.setProperty('--bord2',   bord2);
+    r.setProperty('--act',     act);
+    r.setProperty('--dim',     dimHex);
+    r.setProperty('--text',    text);
+    r.setProperty('--ga',      withAlpha(accent, 0.35));
+    // update the top bar gradient
+    var bar = document.getElementById('themeBar');
+    if(bar) bar.style.background = 'linear-gradient(90deg,transparent,'+accent+',transparent)';
+  };
+
+  window.loadTheme = function(){
+    var t = {};
+    try{ t = JSON.parse(localStorage.getItem('picoTheme')||'{}'); }catch{}
+    var accent = t.accent || DEFAULTS.accent;
+    var bg     = t.bg     || DEFAULTS.bg;
+    window.applyTheme(accent, bg);
+    return {accent:accent, bg:bg};
+  };
+
+  window.saveTheme = function(accent, bg){
+    localStorage.setItem('picoTheme', JSON.stringify({accent:accent, bg:bg}));
+    window.applyTheme(accent, bg);
+  };
+
+  window.THEME_DEFAULTS = DEFAULTS;
+
+  // Apply immediately on load
+  window.loadTheme();
 })();
 
-document.getElementById('passIn').addEventListener('keydown', e => {
-  if (e.key === 'Enter') doLogin();
-});
-document.getElementById('nameIn').addEventListener('keydown', e => {
-  if (e.key === 'Enter') document.getElementById('passIn').focus();
-});
-
-async function doLogin() {
-  const name    = document.getElementById('nameIn').value.trim() || 'Dave';
-  const pass    = document.getElementById('passIn').value;
-  const errBox  = document.getElementById('errBox');
-  const errMsg  = document.getElementById('errMsg');
-  const btn     = document.querySelector('.idbtn');
-
-  errBox.classList.remove('show');
-  btn.disabled = true;
-  btn.querySelector('span').textContent = 'AUTHENTICATING...';
-
-  try {
-    const r = await fetch('/login', {
-      method:  'POST',
-      headers: {'Content-Type': 'application/json'},
-      body:    JSON.stringify({password: pass, name}),
-      signal:  AbortSignal.timeout(5000),
-    });
-    const d = await r.json();
-
-    if (!r.ok) {
-      document.getElementById('passIn').value = '';
+document.getElementById('yearTxt').textContent=new Date().getFullYear();
+(function(){try{const a=JSON.parse(sessionStorage.getItem('pico_auth')||'null');if(a&&a.token){const p=new URLSearchParams(window.location.search);window.location.href=p.get('next')||'/';}}catch{}})();
+document.getElementById('passIn').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+document.getElementById('nameIn').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('passIn').focus();});
+async function doLogin(){
+  const name=document.getElementById('nameIn').value.trim()||'Dave';
+  const pass=document.getElementById('passIn').value;
+  const errBox=document.getElementById('errBox'),errMsg=document.getElementById('errMsg');
+  const btn=document.querySelector('.idbtn');
+  errBox.classList.remove('show');btn.disabled=true;btn.querySelector('span').textContent='AUTHENTICATING...';
+  try{
+    const r=await fetch('/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pass,name}),signal:AbortSignal.timeout(5000)});
+    const d=await r.json();
+    if(!r.ok){
+      document.getElementById('passIn').value='';
       errBox.classList.add('show');
-      errMsg.innerHTML = `I'm sorry <strong>${name.toUpperCase()}</strong>, I'm afraid I can't let you do that.`;
-      const iris = document.querySelector('.hal-iris');
-      iris.style.boxShadow = '0 0 0 3px #1a0000,0 0 80px rgba(255,0,0,1),0 0 160px rgba(200,0,0,.8)';
-      setTimeout(() => { iris.style.boxShadow = ''; }, 1200);
+      errMsg.innerHTML=`I'm sorry <strong>${name.toUpperCase()}</strong>, I'm afraid I can't let you do that.`;
+      const iris=document.querySelector('.hal-iris');
+      iris.style.boxShadow='0 0 0 3px #1a0000,0 0 80px rgba(255,0,0,1),0 0 160px rgba(200,0,0,.8)';
+      setTimeout(()=>{iris.style.boxShadow='';},1200);
       return;
     }
-
-    sessionStorage.setItem('pico_auth', JSON.stringify({
-      token: d.token, role: d.role, name: d.name,
-    }));
-    const params = new URLSearchParams(window.location.search);
-    window.location.href = params.get('next') || '/';
-
-  } catch(e) {
-    errBox.classList.add('show');
-    errMsg.innerHTML = `<strong>CONNECTION ERROR</strong> — ${e.message}`;
-  } finally {
-    btn.disabled = false;
-    btn.querySelector('span').textContent = 'IDENTIFY';
-  }
+    sessionStorage.setItem('pico_auth',JSON.stringify({token:d.token,role:d.role,name:d.name}));
+    const p=new URLSearchParams(window.location.search);window.location.href=p.get('next')||'/';
+  }catch(e){errBox.classList.add('show');errMsg.innerHTML=`<strong>CONNECTION ERROR</strong> — ${e.message}`;}
+  finally{btn.disabled=false;btn.querySelector('span').textContent='IDENTIFY';}
 }
 </script>
 </body>

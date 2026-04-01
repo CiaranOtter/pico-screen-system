@@ -7,164 +7,148 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
 :root{
-  --red:#ff2233;--green:#00ff88;--purple:#cc44ff;--black:#000;
-  --bg:#050508;--panel:#0a0a10;--panel2:#0d0d16;
-  --border:#1a1a2e;--bord2:#252540;
-  --text:#c0c0d0;--dim:#404055;--act:#fff;
-  --gr:rgba(255,34,51,.4);--gg:rgba(0,255,136,.4);--gp:rgba(204,68,255,.4);--gw:rgba(255,255,255,.15);
+  --red:#ff2233;--purple:#cc44ff;--black:#000;
+  --accent:#00ff88;
+  --bg:#010108;--panel:#05050f;--border:#0f0f22;--bord2:#1a1a30;
+  --text:#80c090;--dim:#1a4030;--act:#33ffaa;
+  --ga:rgba(0,255,136,.35);--gr:rgba(255,34,51,.4);--gp:rgba(204,68,255,.4);
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px 16px 60px;overflow-x:hidden;}
-body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.07) 2px,rgba(0,0,0,.07) 4px);pointer-events:none;z-index:9999;}
-body::after{content:'';position:fixed;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--green),transparent);z-index:9998;opacity:.5;}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.09) 2px,rgba(0,0,0,.09) 4px);pointer-events:none;z-index:9999;}
+#themeBar{position:fixed;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);z-index:9998;opacity:.6;pointer-events:none;}
 .w{width:100%;max-width:500px;}
 header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border);}
 .logo{font-family:'Orbitron',sans-serif;font-weight:900;font-size:20px;letter-spacing:8px;color:var(--act);}
-.logo span{color:var(--green);text-shadow:0 0 16px var(--gg);}
+.logo span{color:var(--accent);text-shadow:0 0 16px var(--ga);}
 .spill{display:flex;align-items:center;gap:7px;font-size:10px;letter-spacing:2px;color:var(--dim);}
 .sdot{width:7px;height:7px;border-radius:50%;background:var(--dim);transition:all .4s;flex-shrink:0;}
-.sdot.on{background:var(--green);box-shadow:0 0 10px var(--gg);animation:pulse 2s infinite;}
+.sdot.on{background:var(--accent);box-shadow:0 0 10px var(--ga);animation:pulse 2s infinite;}
 .sdot.err{background:var(--red);box-shadow:0 0 10px var(--gr);}
 .sdot.bsy{background:var(--purple);box-shadow:0 0 10px var(--gp);animation:pulse .5s infinite;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .ip-row{display:flex;gap:6px;margin-bottom:18px;}
-.ip-inp{flex:1;background:var(--panel);border:1px solid var(--border);color:var(--act);font-family:'Share Tech Mono',monospace;font-size:13px;padding:9px 13px;outline:none;letter-spacing:1px;transition:border-color .2s,box-shadow .2s;}
-.ip-inp:focus{border-color:var(--green);box-shadow:0 0 0 1px var(--green);}
+.ip-inp{flex:1;background:var(--panel);border:1px solid var(--border);color:var(--act);font-family:'Share Tech Mono',monospace;font-size:13px;padding:9px 13px;outline:none;transition:border-color .2s,box-shadow .2s;}
+.ip-inp:focus{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);}
 .ip-inp::placeholder{color:var(--dim);}
 .bxs{background:transparent;border:1px solid var(--bord2);color:var(--dim);font-family:'Orbitron',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;padding:9px 12px;cursor:pointer;transition:all .2s;}
-.bxs:hover,.bxs.ap{border-color:var(--green);color:var(--green);}
-.bxs.ap{box-shadow:0 0 8px var(--gg);}
-.bping{background:transparent;border:1px solid var(--green);color:var(--green);font-family:'Orbitron',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;padding:9px 14px;cursor:pointer;transition:all .2s;}
-.bping:hover{background:var(--green);color:var(--black);box-shadow:0 0 20px var(--gg);}
+.bxs:hover,.bxs.ap{border-color:var(--accent);color:var(--accent);}
+.bxs.ap{box-shadow:0 0 8px var(--ga);}
+.bping{background:transparent;border:1px solid var(--accent);color:var(--accent);font-family:'Orbitron',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;padding:9px 14px;cursor:pointer;transition:all .2s;}
+.bping:hover{background:var(--accent);color:var(--black);box-shadow:0 0 20px var(--ga);}
 .navbtn{background:transparent;border:1px solid var(--border);color:var(--dim);font-family:'Orbitron',sans-serif;font-size:8px;letter-spacing:2px;padding:5px 9px;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block;}
-.navbtn:hover{border-color:var(--green);color:var(--green);}
+.navbtn:hover{border-color:var(--accent);color:var(--accent);}
 .navbtn.exit:hover{border-color:var(--red);color:var(--red);}
-.tabs{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--border);margin-bottom:18px;background:var(--panel);}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--border);margin-bottom:18px;background:var(--panel);}
 .tab{background:transparent;border:none;color:var(--dim);font-family:'Orbitron',sans-serif;font-size:8px;font-weight:700;letter-spacing:1px;padding:12px 2px;cursor:pointer;transition:all .2s;border-bottom:2px solid transparent;}
 .tab:not(:last-child){border-right:1px solid var(--border);}
-.tab.on{color:var(--act);border-bottom-color:var(--act);background:rgba(255,255,255,.02);}
+.tab.on{color:var(--act);border-bottom-color:var(--accent);background:rgba(0,255,136,.03);}
 .tab-panel{display:none;}.tab-panel.on{display:block;}
 .lbl{font-size:9px;letter-spacing:4px;color:var(--dim);margin-bottom:8px;display:flex;align-items:center;gap:10px;}
 .lbl::after{content:'';flex:1;height:1px;background:var(--border);}
-/* LCD */
 .lcd-wrap{display:flex;justify-content:center;margin-bottom:22px;}
-.lcd-bez{width:210px;height:210px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#1a1a2e,#050508);border:3px solid #111122;box-shadow:0 0 0 1px #0a0a18,0 20px 60px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;position:relative;}
-.lcd-bez::before{content:'';position:absolute;inset:6px;border-radius:50%;border:1px solid rgba(255,255,255,.04);pointer-events:none;}
-.lcd-scr{width:186px;height:186px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .5s,box-shadow .5s;overflow:hidden;background:#080810;}
+.lcd-bez{width:210px;height:210px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#0a0a1a,#010108);border:3px solid #080818;box-shadow:0 0 0 1px #050510,0 20px 60px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.03);display:flex;align-items:center;justify-content:center;position:relative;}
+.lcd-bez::before{content:'';position:absolute;inset:6px;border-radius:50%;border:1px solid rgba(255,255,255,.03);pointer-events:none;}
+.lcd-scr{width:186px;height:186px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .5s,box-shadow .5s;overflow:hidden;background:#030310;}
 .lcd-scr.cr{background:#bb0010;box-shadow:0 0 40px rgba(187,0,16,.5);}
 .lcd-scr.cg{background:#005522;box-shadow:0 0 40px rgba(0,160,80,.4);}
 .lcd-scr.cp{background:#550077;box-shadow:0 0 40px rgba(140,0,200,.4);}
-.lcd-scr.rr{background:radial-gradient(circle,#0a0a14 52%,#bb0010 52%);}
-.lcd-scr.rg{background:radial-gradient(circle,#0a0a14 52%,#005522 52%);}
-.lcd-scr.rp{background:radial-gradient(circle,#0a0a14 52%,#550077 52%);}
+.lcd-scr.rr{background:radial-gradient(circle,#030310 52%,#bb0010 52%);}
+.lcd-scr.rg{background:radial-gradient(circle,#030310 52%,#005522 52%);}
+.lcd-scr.rp{background:radial-gradient(circle,#030310 52%,#550077 52%);}
 .lcd-cnt{font-family:'Orbitron',sans-serif;font-weight:900;font-size:12px;letter-spacing:1px;text-align:center;padding:10px;line-height:1.35;color:white;z-index:2;}
 .lcd-fng{font-size:44px;animation:fbnc 1.6s ease-in-out infinite;}
 @keyframes fbnc{0%,100%{transform:translateY(10px)}50%{transform:translateY(-10px)}}
-/* Grids */
 .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:18px;}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:18px;}
-/* State / mode / display buttons */
 .sbtn{background:var(--panel);border:1px solid var(--border);color:var(--dim);font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;padding:13px 6px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
 .sbtn::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:currentColor;transform:scaleX(0);transition:transform .25s;}
 .sbtn:hover::after,.sbtn.on::after{transform:scaleX(1);}
 .sbtn.sr.on,.sbtn.sr:hover{color:var(--red);border-color:var(--red);box-shadow:0 0 18px var(--gr);}
-.sbtn.sg.on,.sbtn.sg:hover{color:var(--green);border-color:var(--green);box-shadow:0 0 18px var(--gg);}
+.sbtn.sg.on,.sbtn.sg:hover{color:var(--accent);border-color:var(--accent);box-shadow:0 0 18px var(--ga);}
 .sbtn.sp.on,.sbtn.sp:hover{color:var(--purple);border-color:var(--purple);box-shadow:0 0 18px var(--gp);}
 .mbtn{background:var(--panel);border:1px solid var(--border);color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;padding:11px 6px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:5px;}
 .mico{font-size:17px;line-height:1;}
-.mbtn.on,.mbtn:hover{color:var(--act);border-color:var(--act);background:rgba(255,255,255,.02);}
+.mbtn.on,.mbtn:hover{color:var(--act);border-color:var(--accent);background:rgba(0,255,136,.03);}
 .dbtn{background:var(--panel);border:1px solid var(--border);color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;padding:14px 6px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:7px;}
 .dbtn .ico{font-size:22px;}
-.dbtn.on,.dbtn:hover{color:var(--act);border-color:var(--act);background:rgba(255,255,255,.02);}
-.dbtn.dp.on,.dbtn.dp:hover{color:var(--green);border-color:var(--green);box-shadow:0 0 14px var(--gg);}
+.dbtn.on,.dbtn:hover{color:var(--act);border-color:var(--act);}
+.dbtn.dp.on,.dbtn.dp:hover{color:var(--accent);border-color:var(--accent);box-shadow:0 0 14px var(--ga);}
 .dbtn.df.on,.dbtn.df:hover{color:var(--red);border-color:var(--red);box-shadow:0 0 14px var(--gr);}
 .dbtn.dm.on,.dbtn.dm:hover{color:var(--purple);border-color:var(--purple);box-shadow:0 0 14px var(--gp);}
-/* Message */
 .msgp{overflow:hidden;transition:max-height .3s,opacity .3s;max-height:0;opacity:0;}
 .msgp.op{max-height:130px;opacity:1;margin-bottom:18px;}
 .msgi{width:100%;background:var(--panel);border:1px solid var(--border);border-bottom:none;color:var(--act);font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;padding:12px 14px;outline:none;text-transform:uppercase;transition:border-color .2s;}
-.msgi:focus{border-color:var(--purple);}
+.msgi:focus{border-color:var(--accent);}
 .msgh{background:var(--panel);border:1px solid var(--border);padding:5px 14px;font-size:9px;letter-spacing:2px;color:var(--dim);display:flex;justify-content:space-between;}
 .cc{transition:color .2s;}.cc.w{color:var(--red);}
-/* Transmit */
-.txbtn{width:100%;background:transparent;border:1px solid var(--act);color:var(--act);font-family:'Orbitron',sans-serif;font-size:12px;font-weight:900;letter-spacing:7px;padding:15px;cursor:pointer;transition:all .25s;margin-bottom:18px;position:relative;overflow:hidden;}
-.txbtn::before{content:'';position:absolute;inset:0;background:var(--act);transform:scaleX(0);transform-origin:left;transition:transform .3s;z-index:0;}
+.txbtn{width:100%;background:transparent;border:1px solid var(--accent);color:var(--accent);font-family:'Orbitron',sans-serif;font-size:12px;font-weight:900;letter-spacing:7px;padding:15px;cursor:pointer;transition:all .25s;margin-bottom:18px;position:relative;overflow:hidden;}
+.txbtn::before{content:'';position:absolute;inset:0;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .3s;z-index:0;}
 .txbtn:hover::before{transform:scaleX(1);}
 .txbtn:hover{color:var(--black);}
 .txbtn span{position:relative;z-index:1;}
 .txbtn:disabled{border-color:var(--dim);color:var(--dim);cursor:not-allowed;}
 .txbtn:disabled::before{display:none;}
-/* Cards */
 .card{background:var(--panel);border:1px solid var(--border);padding:14px;margin-bottom:18px;}
 .ctitle{font-family:'Orbitron',sans-serif;font-size:9px;font-weight:700;letter-spacing:4px;color:var(--dim);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
 .ctitle::after{content:'';flex:1;height:1px;background:var(--border);}
-/* Forms */
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
 .fgrp{display:flex;flex-direction:column;gap:4px;}
 .flbl{font-size:9px;letter-spacing:3px;color:var(--dim);}
-.fi,.fsel{background:#060609;border:1px solid var(--border);color:var(--act);font-family:'Share Tech Mono',monospace;font-size:12px;padding:8px 10px;outline:none;width:100%;transition:border-color .2s;appearance:none;}
-.fi:focus,.fsel:focus{border-color:var(--green);}
+.fi,.fsel{background:#020208;border:1px solid var(--border);color:var(--act);font-family:'Share Tech Mono',monospace;font-size:12px;padding:8px 10px;outline:none;width:100%;transition:border-color .2s;appearance:none;}
+.fi:focus,.fsel:focus{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);}
 .fi::placeholder{color:var(--dim);}
-/* Sliders */
 .srow{display:flex;flex-direction:column;gap:3px;margin-bottom:8px;}
 .slbl{font-size:9px;letter-spacing:3px;color:var(--dim);display:flex;justify-content:space-between;}
-input[type=range]{width:100%;accent-color:var(--green);height:4px;cursor:pointer;background:var(--border);outline:none;border:none;-webkit-appearance:none;appearance:none;border-radius:0;}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;background:var(--green);box-shadow:0 0 6px var(--gg);cursor:pointer;}
-/* Days */
+input[type=range]{width:100%;accent-color:var(--accent);height:4px;cursor:pointer;background:var(--border);outline:none;border:none;-webkit-appearance:none;appearance:none;border-radius:0;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;background:var(--accent);cursor:pointer;}
 .drow{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:10px;}
-.dbtn2{background:#060609;border:1px solid var(--border);color:var(--dim);font-size:9px;letter-spacing:1px;padding:7px 2px;cursor:pointer;transition:all .15s;text-align:center;font-family:'Share Tech Mono',monospace;}
-.dbtn2.on{color:var(--green);border-color:var(--green);background:rgba(0,255,136,.04);}
-/* Small buttons */
-.smbtn{background:#060609;border:1px solid var(--border);color:var(--dim);font-size:10px;letter-spacing:1px;padding:8px 4px;cursor:pointer;transition:all .15s;text-align:center;font-family:'Share Tech Mono',monospace;width:100%;}
-.smbtn:hover,.smbtn.on{color:var(--act);border-color:var(--act);}
-.badd{background:transparent;border:1px solid var(--green);color:var(--green);font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;padding:11px;cursor:pointer;transition:all .2s;width:100%;}
-.badd:hover{background:var(--green);color:var(--black);box-shadow:0 0 20px var(--gg);}
+.dbtn2{background:#020208;border:1px solid var(--border);color:var(--dim);font-size:9px;letter-spacing:1px;padding:7px 2px;cursor:pointer;transition:all .15s;text-align:center;font-family:'Share Tech Mono',monospace;}
+.dbtn2.on{color:var(--accent);border-color:var(--accent);}
+.smbtn{background:#020208;border:1px solid var(--border);color:var(--dim);font-size:10px;letter-spacing:1px;padding:8px 4px;cursor:pointer;transition:all .15s;text-align:center;font-family:'Share Tech Mono',monospace;width:100%;}
+.smbtn:hover,.smbtn.on{color:var(--act);border-color:var(--accent);}
+.badd{background:transparent;border:1px solid var(--accent);color:var(--accent);font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;padding:11px;cursor:pointer;transition:all .2s;width:100%;}
+.badd:hover{background:var(--accent);color:var(--black);box-shadow:0 0 20px var(--ga);}
 .bdng{background:transparent;border:1px solid var(--red);color:var(--red);font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;padding:11px;cursor:pointer;transition:all .2s;width:100%;}
-.bdng:hover{background:var(--red);color:var(--black);box-shadow:0 0 20px var(--gr);}
+.bdng:hover{background:var(--red);color:var(--black);}
 .brow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
-/* Status */
 .sline{font-size:10px;letter-spacing:2px;min-height:18px;margin-top:8px;transition:color .2s;}
-.sline.ok{color:var(--green);}.sline.err{color:var(--red);}.sline.inf{color:var(--dim);}
-/* Progress */
+.sline.ok{color:var(--accent);}.sline.err{color:var(--red);}.sline.inf{color:var(--dim);}
 .prog{width:100%;height:3px;background:var(--border);margin-top:6px;display:none;}
 .prog.sh{display:block;}
-.pfill{height:100%;background:var(--green);transition:width .15s;width:0%;box-shadow:0 0 6px var(--gg);}
-/* Drop zone */
+.pfill{height:100%;background:var(--accent);transition:width .15s;width:0%;box-shadow:0 0 6px var(--ga);}
 .dz{border:2px dashed var(--bord2);padding:28px 16px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:12px;}
-.dz:hover,.dz.ov{border-color:var(--green);background:rgba(0,255,136,.02);}
-.dzi{font-size:30px;margin-bottom:8px;}.dzt{font-size:10px;letter-spacing:3px;color:var(--dim);}.dzs{font-size:9px;letter-spacing:2px;color:var(--dim);margin-top:4px;}
-/* Image controls */
+.dz:hover,.dz.ov{border-color:var(--accent);}
+.dzi{font-size:30px;margin-bottom:8px;}
+.dzt{font-size:10px;letter-spacing:3px;color:var(--dim);}
+.dzs{font-size:9px;letter-spacing:2px;color:var(--dim);margin-top:4px;}
 .imgc{display:none;flex-direction:column;gap:10px;}.imgc.sh{display:flex;}
 .pvrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:center;}
 .pvlbl{font-size:9px;letter-spacing:3px;color:var(--dim);text-align:center;margin-bottom:5px;}
 .srcpv{width:100%;aspect-ratio:1;object-fit:contain;border:1px solid var(--border);background:#000;display:block;}
-.rclip{width:100px;height:100px;border-radius:50%;overflow:hidden;border:2px solid var(--bord2);box-shadow:0 0 20px rgba(0,0,0,.6);margin:0 auto;}
+.rclip{width:100px;height:100px;border-radius:50%;overflow:hidden;border:2px solid var(--bord2);margin:0 auto;}
 .rclip canvas{display:block;}
-/* Draw canvas */
 .draw-outer{display:flex;justify-content:center;background:#000;border:1px solid var(--border);padding:10px;position:relative;margin-bottom:8px;overflow:hidden;}
 #drawCanvas{display:block;cursor:crosshair;image-rendering:pixelated;touch-action:none;}
-.ring-ov{position:absolute;pointer-events:none;z-index:10;border-radius:50%;box-shadow:0 0 0 9999px rgba(5,5,8,.72);}
+.ring-ov{position:absolute;pointer-events:none;z-index:10;border-radius:50%;box-shadow:0 0 0 9999px rgba(1,1,8,.8);}
 .dtrow{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px;}
 .dcsrow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center;}
 .csw{width:28px;height:28px;border:2px solid transparent;cursor:pointer;transition:all .15s;flex-shrink:0;}
-.csw.on{border-color:var(--act);box-shadow:0 0 8px rgba(255,255,255,.4);}
+.csw.on{border-color:var(--act);}
 .ccinp{width:28px;height:28px;cursor:pointer;border:1px solid var(--border);background:transparent;padding:0;}
 .dsz{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
 .dszpv{width:28px;height:28px;border:1px solid var(--border);background:#000;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .dacrow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;}
-/* Saved drawings grid */
 .saves-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
-.save-card{background:#060609;border:1px solid var(--border);cursor:pointer;transition:all .2s;position:relative;aspect-ratio:1;overflow:hidden;}
-.save-card:hover{border-color:var(--green);box-shadow:0 0 10px var(--gg);}
-.save-card canvas{display:block;width:100%;height:100%;}
-.save-card .save-name{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.8);font-size:8px;letter-spacing:1px;color:var(--dim);padding:3px 4px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;}
-.save-card .save-del{position:absolute;top:3px;right:3px;background:rgba(255,34,51,.8);color:white;border:none;font-size:9px;width:16px;height:16px;cursor:pointer;display:none;align-items:center;justify-content:center;line-height:1;}
+.save-card{background:#020208;border:1px solid var(--border);cursor:pointer;transition:all .2s;position:relative;aspect-ratio:1;overflow:hidden;}
+.save-card:hover{border-color:var(--accent);box-shadow:0 0 10px var(--ga);}
+.save-card img{display:block;width:100%;height:100%;object-fit:cover;}
+.save-card .save-name{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.85);font-size:8px;letter-spacing:1px;color:var(--dim);padding:3px 4px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;}
+.save-card .save-del{position:absolute;top:3px;right:3px;background:rgba(255,34,51,.85);color:white;border:none;font-size:9px;width:16px;height:16px;cursor:pointer;display:none;align-items:center;justify-content:center;line-height:1;}
 .save-card:hover .save-del{display:flex;}
-.save-card.selected{border-color:var(--green);box-shadow:0 0 12px var(--gg);}
+.save-card.selected{border-color:var(--accent);box-shadow:0 0 12px var(--ga);}
 .no-saves{color:var(--dim);font-size:11px;letter-spacing:2px;text-align:center;padding:20px;border:1px dashed var(--border);}
-/* Button config */
 .btn-seq{display:flex;flex-direction:column;gap:6px;margin-bottom:12px;}
-.seq-item{background:#060609;border:1px solid var(--border);padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:grab;}
+.seq-item{background:#020208;border:1px solid var(--border);padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:grab;}
 .seq-item:active{cursor:grabbing;}
 .seq-drag{color:var(--dim);font-size:14px;flex-shrink:0;}
 .seq-preview{width:32px;height:32px;border-radius:50%;flex-shrink:0;border:1px solid var(--bord2);}
@@ -174,11 +158,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
 .seq-del{background:transparent;border:1px solid var(--border);color:var(--dim);font-size:10px;padding:4px 8px;cursor:pointer;transition:all .15s;font-family:'Share Tech Mono',monospace;}
 .seq-del:hover{color:var(--red);border-color:var(--red);}
 .no-seq{color:var(--dim);font-size:11px;letter-spacing:2px;text-align:center;padding:20px;border:1px dashed var(--border);margin-bottom:12px;}
-/* Add screen picker */
 .screen-type-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px;}
-.stbtn{background:#060609;border:1px solid var(--border);color:var(--dim);font-size:9px;letter-spacing:1px;padding:8px 4px;cursor:pointer;transition:all .15s;text-align:center;font-family:'Share Tech Mono',monospace;}
-.stbtn.on{color:var(--act);border-color:var(--act);}
-/* Job list */
+.stbtn{background:#020208;border:1px solid var(--border);color:var(--dim);font-size:9px;letter-spacing:1px;padding:8px 4px;cursor:pointer;transition:all .15s;text-align:center;font-family:'Share Tech Mono',monospace;}
+.stbtn.on{color:var(--act);border-color:var(--accent);}
 .jlist{display:flex;flex-direction:column;gap:6px;margin-bottom:18px;}
 .jcard{background:var(--panel);border:1px solid var(--border);padding:11px 13px;display:flex;align-items:center;gap:11px;transition:border-color .2s,opacity .2s;}
 .jcard.off{opacity:.35;}
@@ -186,35 +168,32 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
 .jinfo{flex:1;}
 .jmeta{font-size:10px;letter-spacing:1px;display:flex;align-items:center;gap:6px;}
 .jdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-.jr{background:var(--red);box-shadow:0 0 5px var(--gr);}
-.jg{background:var(--green);box-shadow:0 0 5px var(--gg);}
-.jp{background:var(--purple);box-shadow:0 0 5px var(--gp);}
+.jr{background:var(--red);}
+.jg{background:var(--accent);}
+.jp{background:var(--purple);}
 .jdays{font-size:9px;letter-spacing:1px;color:var(--dim);margin-top:2px;}
 .jacts{display:flex;gap:5px;}
 .jb{background:transparent;border:1px solid var(--border);color:var(--dim);font-size:10px;padding:4px 7px;cursor:pointer;transition:all .15s;font-family:'Share Tech Mono',monospace;}
-.jb:hover{color:var(--act);border-color:var(--act);}
+.jb:hover{color:var(--act);border-color:var(--accent);}
 .jb.del:hover{color:var(--red);border-color:var(--red);}
-.jb.tog:hover{color:var(--green);border-color:var(--green);}
 .nojobs{color:var(--dim);font-size:11px;letter-spacing:2px;text-align:center;padding:28px 16px;border:1px dashed var(--border);}
-/* Colour picker row */
 .colour-pick-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
 .cpick{width:28px;height:28px;border:2px solid transparent;cursor:pointer;transition:all .15s;flex-shrink:0;}
-.cpick.on{border-color:var(--act);box-shadow:0 0 8px rgba(255,255,255,.4);}
-/* Log */
+.cpick.on{border-color:var(--act);}
 .logw{margin-top:4px;}
 .log{background:var(--panel);border:1px solid var(--border);padding:10px;height:110px;overflow-y:auto;font-size:10px;line-height:1.9;letter-spacing:1px;}
 .log::-webkit-scrollbar{width:3px;}
 .log::-webkit-scrollbar-thumb{background:var(--border);}
 .lr{display:flex;gap:10px;}
 .lt{color:var(--dim);flex-shrink:0;}
-.lm.ok{color:var(--green);}.lm.err{color:var(--red);}.lm.inf{color:var(--text);}
+.lm.ok{color:var(--accent);}.lm.err{color:var(--red);}.lm.inf{color:var(--text);}
 .spin{display:inline-block;width:10px;height:10px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:sp .6s linear infinite;vertical-align:middle;margin-right:5px;}
 @keyframes sp{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
+<div id="themeBar"></div>
 <div class="w">
-
 <header>
   <div class="logo">PICO<span>CTRL</span></div>
   <div style="display:flex;align-items:center;gap:10px;">
@@ -225,38 +204,26 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
     <button class="navbtn exit" onclick="doLogout()">EXIT</button>
   </div>
 </header>
-
 <div class="ip-row">
   <input class="ip-inp" id="ipIn" type="text" placeholder="192.168.1.52" value="192.168.1.52"/>
   <button class="bping" onclick="ping()">PING</button>
   <button class="bxs" id="pollBtn" onclick="togglePoll()">POLL</button>
   <button id="rebootBtn" class="bxs" onclick="rebootPico()" style="border-color:var(--red);color:var(--red)">REBOOT</button>
 </div>
-
-<!-- LCD Preview — always visible regardless of role -->
 <div class="lcd-wrap" style="margin:16px 0;">
   <div class="lcd-bez">
     <div class="lcd-scr cg" id="lcdScr"><div class="lcd-cnt" id="lcdCnt"></div></div>
   </div>
 </div>
-
-<!-- Viewer mode notice -->
-<div id="viewerNote" style="display:none;text-align:center;padding:20px;font-size:9px;letter-spacing:3px;color:var(--dim);border:1px dashed var(--border);margin-bottom:18px;">
-  VIEW ONLY MODE · PING TO SYNC DISPLAY STATE
-</div>
-
-<!-- Admin-only content -->
+<div id="viewerNote" style="display:none;text-align:center;padding:20px;font-size:9px;letter-spacing:3px;color:var(--dim);border:1px dashed var(--border);margin-bottom:18px;">VIEW ONLY MODE · PING TO SYNC DISPLAY STATE</div>
 <div id="adminContent">
-
 <div class="tabs">
-  <button class="tab on"  onclick="switchTab('ctrl')">CTRL</button>
-  <button class="tab"     onclick="switchTab('media')">MEDIA</button>
-  <button class="tab"     onclick="switchTab('draw')">DRAW</button>
-  <button class="tab"     onclick="switchTab('btn')">BTN</button>
-  <button class="tab"     onclick="switchTab('sched')">SCHED</button>
+  <button class="tab on" onclick="switchTab('ctrl')">CTRL</button>
+  <button class="tab"    onclick="switchTab('draw')">DRAW</button>
+  <button class="tab"    onclick="switchTab('btn')">BTN</button>
+  <button class="tab"    onclick="switchTab('sched')">SCHED</button>
 </div>
-
-<!-- ═══════════ CONTROL ═══════════ -->
+<!-- CONTROL -->
 <div class="tab-panel on" id="tab-ctrl">
   <div class="lbl">Colour State</div>
   <div class="g3">
@@ -267,8 +234,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
   <div class="lbl">Display Mode</div>
   <div class="g3">
     <button class="mbtn on" data-m="solid" onclick="selMd('solid')"><span class="mico">◼</span>SOLID</button>
-    <button class="mbtn" data-m="ring"     onclick="selMd('ring')"><span class="mico">◯</span>RING</button>
-    <button class="mbtn" data-m="flash"    onclick="selMd('flash')"><span class="mico">⚡</span>FLASH</button>
+    <button class="mbtn"    data-m="ring"  onclick="selMd('ring')"><span class="mico">◯</span>RING</button>
+    <button class="mbtn"    data-m="flash" onclick="selMd('flash')"><span class="mico">⚡</span>FLASH</button>
   </div>
   <div class="lbl">Display Type</div>
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:18px">
@@ -282,39 +249,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
   </div>
   <button class="txbtn" id="txBtn" onclick="transmit()"><span id="txLbl">TRANSMIT</span></button>
 </div>
-
-<!-- ═══════════ MEDIA ═══════════ -->
-<div class="tab-panel" id="tab-media">
+<!-- DRAW + MEDIA -->
+<div class="tab-panel" id="tab-draw">
   <div class="card">
-    <div class="ctitle">GIF565 FROM PICO FLASH</div>
-    <div style="font-size:9px;letter-spacing:2px;color:var(--dim);margin-bottom:10px;line-height:1.8">
-      CONVERT: python gif_converter.py anim.gif out.gif565<br>
-      UPLOAD: mpremote cp out.gif565 :out.gif565
-    </div>
-    <div class="fgrp" style="margin-bottom:10px">
-      <label class="flbl">FILE PATH ON PICO</label>
-      <input class="fi" id="gif565P" type="text" placeholder="output.gif565"/>
-    </div>
-    <div class="brow">
-      <button class="badd" onclick="playGif565()">▶ PLAY</button>
-      <button class="bdng" onclick="clearMedia()">✕ CLEAR</button>
-    </div>
-    <div class="sline inf" id="gif565St"></div>
-  </div>
-  <div class="card">
-    <div class="ctitle">IMAGE FROM URL</div>
-    <div class="fgrp" style="margin-bottom:8px">
-      <label class="flbl">URL (.bmp or .bin)</label>
-      <input class="fi" id="imgUrlI" type="text" placeholder="http://192.168.1.x:8080/photo.bmp"/>
-    </div>
-    <div class="brow">
-      <button class="badd" onclick="loadImgUrl()">▶ LOAD</button>
-      <button class="bdng" onclick="clearMedia()">✕ CLEAR</button>
-    </div>
-    <div class="sline inf" id="imgUrlSt"></div>
-  </div>
-  <div class="card">
-    <div class="ctitle">UPLOAD &amp; FORMAT IMAGE</div>
+    <div class="ctitle">UPLOAD IMAGE</div>
     <div class="dz" id="dz" onclick="document.getElementById('fIn').click()" ondragover="onDragOv(event)" ondragleave="onDragLv(event)" ondrop="onDrop(event)">
       <div class="dzi">🖼</div><div class="dzt">DROP IMAGE OR CLICK TO BROWSE</div><div class="dzs">PNG · JPG · GIF · WEBP · BMP</div>
       <input type="file" id="fIn" accept="image/*" style="display:none" onchange="onFSel(event)"/>
@@ -357,22 +295,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
       <div class="sline inf" id="upSt"></div>
     </div>
   </div>
-  <!-- Photo save dialog -->
   <div class="card" id="photoSaveDialog" style="display:none">
     <div class="ctitle">SAVE IMAGE</div>
-    <div class="fgrp" style="margin-bottom:10px">
-      <label class="flbl">NAME</label>
-      <input class="fi" id="photoSaveNameI" type="text" placeholder="MY PHOTO" maxlength="20"/>
-    </div>
+    <div class="fgrp" style="margin-bottom:10px"><label class="flbl">NAME</label><input class="fi" id="photoSaveNameI" type="text" placeholder="MY PHOTO" maxlength="20"/></div>
     <div class="brow">
       <button class="badd" onclick="confirmPhotoSave()">💾 SAVE</button>
       <button class="bdng" onclick="closePhotoSaveDialog()">✕ CANCEL</button>
     </div>
   </div>
-</div>
-
-<!-- ═══════════ DRAW ═══════════ -->
-<div class="tab-panel" id="tab-draw">
   <div class="card">
     <div class="ctitle">DRAW FOR DISPLAY</div>
     <div class="draw-outer">
@@ -380,7 +310,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
       <div class="ring-ov" id="ringOv" style="width:240px;height:240px;top:10px;left:50%;transform:translateX(-50%);"></div>
     </div>
     <div style="font-size:9px;letter-spacing:2px;color:var(--dim);text-align:center;margin-bottom:10px">240×240 · ROUND DISPLAY PREVIEW</div>
-
     <div class="lbl">Tool</div>
     <div class="dtrow">
       <button class="smbtn on" id="tPen"     onclick="setTool('pen')">✏ PEN</button>
@@ -392,50 +321,38 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
       <button class="smbtn"    id="tEyedrop" onclick="setTool('eyedrop')">💉 PICK</button>
       <button class="smbtn"    id="tText"    onclick="setTool('text')">T TEXT</button>
     </div>
-
     <div class="lbl">Colour</div>
     <div class="dcsrow" id="palette">
       <div class="csw on" style="background:#fff"    onclick="setCol('#ffffff')" data-c="#ffffff"></div>
       <div class="csw"    style="background:#ff2233" onclick="setCol('#ff2233')" data-c="#ff2233"></div>
       <div class="csw"    style="background:#00ff88" onclick="setCol('#00ff88')" data-c="#00ff88"></div>
+      <div class="csw"    style="background:#ff9900" onclick="setCol('#ff9900')" data-c="#ff9900"></div>
+      <div class="csw"    style="background:#ffcc66" onclick="setCol('#ffcc66')" data-c="#ffcc66"></div>
       <div class="csw"    style="background:#cc44ff" onclick="setCol('#cc44ff')" data-c="#cc44ff"></div>
-      <div class="csw"    style="background:#ffee00" onclick="setCol('#ffee00')" data-c="#ffee00"></div>
       <div class="csw"    style="background:#00ccff" onclick="setCol('#00ccff')" data-c="#00ccff"></div>
-      <div class="csw"    style="background:#ff8800" onclick="setCol('#ff8800')" data-c="#ff8800"></div>
       <div class="csw"    style="background:#000;border-color:#333" onclick="setCol('#000000')" data-c="#000000"></div>
       <input type="color" class="ccinp" id="custCol" value="#ffffff" oninput="setCol(this.value)"/>
     </div>
-
     <div class="lbl">Brush Size</div>
     <div class="dsz">
       <div class="dszpv"><div id="szDot" style="border-radius:50%;background:white;width:4px;height:4px;"></div></div>
       <input type="range" id="szS" min="1" max="40" value="4" oninput="onSz()" style="flex:1"/>
       <span style="font-size:11px;color:var(--dim);min-width:24px" id="szV">4</span>
     </div>
-
     <div id="txtPanel" style="display:none;margin-bottom:8px">
       <div class="flbl" style="margin-bottom:4px">TEXT TO STAMP</div>
       <input class="fi" id="drawTxt" type="text" placeholder="Type then click canvas..."/>
     </div>
-
     <div class="lbl">Canvas Actions</div>
     <div class="dacrow">
       <button class="smbtn" onclick="undoDr()">↩ UNDO</button>
       <button class="smbtn" onclick="clearDr()">🗑 CLEAR</button>
       <button class="smbtn" onclick="fillBg()">■ FILL BG</button>
     </div>
-
     <div class="frow">
-      <div class="fgrp">
-        <label class="flbl">BACKGROUND</label>
-        <input type="color" id="bgCol" value="#000000" class="fi" style="height:36px;padding:2px 6px;cursor:pointer"/>
-      </div>
-      <div class="fgrp">
-        <label class="flbl">RING GUIDE</label>
-        <button class="smbtn on" id="rgBtn" onclick="toggleRing()" style="height:36px">◯ ON</button>
-      </div>
+      <div class="fgrp"><label class="flbl">BACKGROUND</label><input type="color" id="bgCol" value="#000000" class="fi" style="height:36px;padding:2px 6px;cursor:pointer"/></div>
+      <div class="fgrp"><label class="flbl">RING GUIDE</label><button class="smbtn on" id="rgBtn" onclick="toggleRing()" style="height:36px">◯ ON</button></div>
     </div>
-
     <div class="brow" style="margin-bottom:10px">
       <button class="badd" onclick="sendDraw()">▶ SEND TO PICO</button>
       <button class="badd" style="border-color:var(--purple);color:var(--purple)" onclick="openSaveDialog()">💾 SAVE</button>
@@ -443,36 +360,29 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
     <div class="prog" id="drProg"><div class="pfill" id="drFill"></div></div>
     <div class="sline inf" id="drSt"></div>
   </div>
-
-  <!-- Save dialog -->
   <div class="card" id="saveDialog" style="display:none">
     <div class="ctitle">SAVE DRAWING</div>
-    <div class="fgrp" style="margin-bottom:10px">
-      <label class="flbl">NAME</label>
-      <input class="fi" id="saveNameI" type="text" placeholder="MY DRAWING" maxlength="20"/>
-    </div>
+    <div class="fgrp" style="margin-bottom:10px"><label class="flbl">NAME</label><input class="fi" id="saveNameI" type="text" placeholder="MY DRAWING" maxlength="20"/></div>
     <div class="brow">
       <button class="badd" onclick="confirmSave()">💾 SAVE</button>
       <button class="bdng" onclick="closeSaveDialog()">✕ CANCEL</button>
     </div>
   </div>
-
-  <!-- Saved drawings -->
   <div class="card">
-    <div class="ctitle">SAVED DRAWINGS</div>
+    <div class="ctitle">SAVED LIBRARY</div>
     <div id="savesGrid" class="saves-grid"><div class="no-saves" style="grid-column:span 3">NO SAVED DRAWINGS</div></div>
-    <div class="sline inf" id="savesSt"></div>
+  </div>
+  <div class="card">
+    <div class="ctitle">DISPLAY CONTROL</div>
+    <button class="bdng" onclick="clearMedia()" style="width:100%">✕ CLEAR MEDIA FROM SCREEN</button>
+    <div class="sline inf" id="mediaClearSt"></div>
   </div>
 </div>
-
-<!-- ═══════════ BUTTON CONFIG ═══════════ -->
+<!-- BTN -->
 <div class="tab-panel" id="tab-btn">
   <div class="card">
     <div class="ctitle">BUTTON SEQUENCE</div>
-    <div style="font-size:9px;letter-spacing:2px;color:var(--dim);margin-bottom:12px;line-height:1.8">
-      CLICKING THE BUTTON CYCLES THROUGH THIS LIST IN ORDER.
-      DRAG ITEMS TO REORDER.
-    </div>
+    <div style="font-size:9px;letter-spacing:2px;color:var(--dim);margin-bottom:12px;line-height:1.8">CLICKING THE BUTTON CYCLES THROUGH THIS LIST. DRAG TO REORDER.</div>
     <div id="btnSeq" class="btn-seq"><div class="no-seq">NO SCREENS IN SEQUENCE</div></div>
     <div class="brow" style="margin-bottom:0">
       <button class="badd" onclick="pushSeqToPico()">▶ APPLY TO PICO</button>
@@ -480,7 +390,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
     </div>
     <div class="sline inf" id="seqSt"></div>
   </div>
-
   <div class="card">
     <div class="ctitle">ADD SCREEN</div>
     <div class="screen-type-row">
@@ -489,8 +398,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
       <button class="stbtn"    id="stMessage" onclick="setScreenType('message')">💬 MSG</button>
       <button class="stbtn"    id="stSaved"   onclick="setScreenType('saved')">🖼 SAVED</button>
     </div>
-
-    <!-- Colour picker -->
     <div id="addColourPanel">
       <div class="flbl" style="margin-bottom:6px">COLOUR</div>
       <div class="colour-pick-row">
@@ -505,8 +412,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
         <button class="smbtn"    id="addMdFlash" onclick="setAddMode('flash')">⚡ FLASH</button>
       </div>
     </div>
-
-    <!-- Message panel -->
     <div id="addMsgPanel" style="display:none">
       <div class="flbl" style="margin-bottom:6px">COLOUR</div>
       <div class="colour-pick-row">
@@ -514,40 +419,27 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
         <div class="cpick"    style="background:#005522" data-col="green"  onclick="setAddCol('green')"></div>
         <div class="cpick"    style="background:#550077" data-col="purple" onclick="setAddCol('purple')"></div>
       </div>
-      <div class="fgrp" style="margin-bottom:10px">
-        <label class="flbl">MESSAGE TEXT</label>
-        <input class="fi" id="addMsgTxt" type="text" maxlength="28" placeholder="YOUR MESSAGE..." style="text-transform:uppercase"/>
-      </div>
+      <div class="fgrp" style="margin-bottom:10px"><label class="flbl">MESSAGE TEXT</label><input class="fi" id="addMsgTxt" type="text" maxlength="28" placeholder="YOUR MESSAGE..." style="text-transform:uppercase"/></div>
     </div>
-
-    <!-- Saved drawings panel -->
     <div id="addSavedPanel" style="display:none">
-      <div class="flbl" style="margin-bottom:6px">SELECT SAVED DRAWING</div>
-      <div id="addSavedGrid" class="saves-grid" style="margin-bottom:10px">
-        <div class="no-saves" style="grid-column:span 3">NO SAVED DRAWINGS</div>
-      </div>
+      <div class="flbl" style="margin-bottom:6px">SELECT SAVED DRAWING OR IMAGE</div>
+      <div id="addSavedGrid" class="saves-grid" style="margin-bottom:10px"><div class="no-saves" style="grid-column:span 3">NO SAVED DRAWINGS</div></div>
     </div>
-
     <button class="badd" onclick="addToSeq()">+ ADD TO SEQUENCE</button>
     <div class="sline inf" id="addSt"></div>
   </div>
 </div>
-
-<!-- ═══════════ SCHEDULE ═══════════ -->
+<!-- SCHED -->
 <div class="tab-panel" id="tab-sched">
   <div class="card">
-  <div class="ctitle">CLOCK SYNC</div>
-  <div style="font-size:9px;letter-spacing:2px;color:var(--dim);margin-bottom:10px;line-height:1.8">
-    PICO HAS NO BATTERY — CLOCK RESETS ON REBOOT.<br>
-    SYNC FROM BROWSER OR USE NTP ON BOOT.
+    <div class="ctitle">CLOCK SYNC</div>
+    <div style="font-size:9px;letter-spacing:2px;color:var(--dim);margin-bottom:10px;line-height:1.8">PICO HAS NO BATTERY — CLOCK RESETS ON REBOOT.<br>SYNC FROM BROWSER OR USE NTP ON BOOT.</div>
+    <div class="brow">
+      <button class="badd" onclick="syncTime()">⏱ SYNC FROM BROWSER</button>
+      <button class="bxs" style="width:100%" onclick="getTime()">? CHECK TIME</button>
+    </div>
+    <div class="sline inf" id="timeSt"></div>
   </div>
-  <div class="brow">
-    <button class="badd" onclick="syncTime()">⏱ SYNC FROM BROWSER</button>
-    <button class="bxs" style="width:100%" onclick="getTime()">? CHECK TIME</button>
-  </div>
-  <div class="sline inf" id="timeSt"></div>
-</div>
-
   <div class="card">
     <div class="ctitle">NEW JOB</div>
     <div class="frow">
@@ -555,7 +447,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
       <div class="fgrp"><label class="flbl">MINUTE (0–59)</label><input class="fi" id="sMn" type="number" min="0" max="59" value="0"/></div>
     </div>
     <div class="flbl" style="margin-bottom:5px">DAYS (empty = every day)</div>
-    <div class="drow" id="dRow">
+    <div class="drow">
       <button class="dbtn2" data-d="0" onclick="togDay(0)">MON</button>
       <button class="dbtn2" data-d="1" onclick="togDay(1)">TUE</button>
       <button class="dbtn2" data-d="2" onclick="togDay(2)">WED</button>
@@ -565,823 +457,226 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
       <button class="dbtn2" data-d="6" onclick="togDay(6)">SUN</button>
     </div>
     <div class="frow">
-      <div class="fgrp"><label class="flbl">COLOUR</label>
-        <select class="fsel" id="sSt"><option value="red">RED</option><option value="green" selected>GREEN</option><option value="purple">PURPLE</option></select>
-      </div>
-      <div class="fgrp"><label class="flbl">MODE</label>
-        <select class="fsel" id="sMo"><option value="solid" selected>SOLID</option><option value="ring">RING</option><option value="flash">FLASH</option></select>
-      </div>
+      <div class="fgrp"><label class="flbl">COLOUR</label><select class="fsel" id="sSt"><option value="red">RED</option><option value="green" selected>GREEN</option><option value="purple">PURPLE</option></select></div>
+      <div class="fgrp"><label class="flbl">MODE</label><select class="fsel" id="sMo"><option value="solid" selected>SOLID</option><option value="ring">RING</option><option value="flash">FLASH</option></select></div>
     </div>
-    <div class="fgrp" style="margin-bottom:10px">
-      <label class="flbl">DISPLAY TYPE</label>
-      <select class="fsel" id="sDp" onchange="onScDisp()"><option value="plain">PLAIN</option><option value="finger">FINGER 🖕</option><option value="message">MESSAGE 💬</option></select>
-    </div>
-    <div id="sMsgW" style="display:none" class="fgrp" style="margin-bottom:10px">
-      <label class="flbl">MESSAGE</label>
-      <input class="fi" id="sMsg" type="text" maxlength="28" placeholder="YOUR MESSAGE..." style="text-transform:uppercase"/>
-    </div>
+    <div class="fgrp" style="margin-bottom:10px"><label class="flbl">DISPLAY TYPE</label><select class="fsel" id="sDp" onchange="onScDisp()"><option value="plain">PLAIN</option><option value="finger">FINGER 🖕</option><option value="message">MESSAGE 💬</option></select></div>
+    <div id="sMsgW" style="display:none;margin-bottom:10px"><label class="flbl">MESSAGE</label><input class="fi" id="sMsg" type="text" maxlength="28" placeholder="YOUR MESSAGE..." style="text-transform:uppercase"/></div>
     <button class="badd" onclick="addJob()">+ ADD JOB</button>
     <div class="sline inf" id="scSt"></div>
   </div>
   <div class="lbl">Scheduled Jobs</div>
   <div class="jlist" id="jList"><div class="nojobs">NO JOBS SCHEDULED</div></div>
 </div>
-
-</div><!-- /adminContent -->
-
-<!-- Log -->
+</div>
 <div class="logw">
   <div class="lbl" style="margin-top:6px">Activity Log</div>
   <div class="log" id="log"></div>
 </div>
-
 </div>
 <script>
-// ════════════════════════════════════
-// AUTH
-// ════════════════════════════════════
-const _picoAuth = (function() {
-  try { return JSON.parse(sessionStorage.getItem('pico_auth') || 'null'); } catch { return null; }
+// ════ THEME ENGINE ════
+// ════ PICO CTRL THEME ENGINE ════
+// Shared snippet — include at the top of every page's <script> tag.
+// Reads theme from localStorage, applies CSS vars, exposes applyTheme().
+
+(function(){
+  var DEFAULTS = {
+    accent: '#00ff88',
+    bg:     '#03030a'
+  };
+
+  function hexToRgb(h){
+    h=h.replace('#','');
+    if(h.length===3)h=h.split('').map(function(c){return c+c;}).join('');
+    var n=parseInt(h,16);
+    return{r:(n>>16)&255,g:(n>>8)&255,b:n&255};
+  }
+
+  function rgbToHex(r,g,b){
+    return '#'+[r,g,b].map(function(v){return Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0');}).join('');
+  }
+
+  function lighten(hex,amt){
+    var c=hexToRgb(hex);
+    return rgbToHex(c.r+(255-c.r)*amt,c.g+(255-c.g)*amt,c.b+(255-c.b)*amt);
+  }
+
+  function darken(hex,amt){
+    var c=hexToRgb(hex);
+    return rgbToHex(c.r*(1-amt),c.g*(1-amt),c.b*(1-amt));
+  }
+
+  function withAlpha(hex,a){
+    var c=hexToRgb(hex);
+    return 'rgba('+c.r+','+c.g+','+c.b+','+a+')';
+  }
+
+  function blendBg(hex,t){
+    // blend bg toward a very dark tinted version of accent
+    var c=hexToRgb(hex),bg=hexToRgb(hex);
+    // bg panel tint: barely visible accent hue
+    return rgbToHex(Math.round(c.r*t),Math.round(c.g*t),Math.round(c.b*t));
+  }
+
+  window.applyTheme = function(accent, bg){
+    accent = accent || DEFAULTS.accent;
+    bg     = bg     || DEFAULTS.bg;
+
+    var bgC   = hexToRgb(bg);
+    var panel = rgbToHex(bgC.r+5,  bgC.g+5,  bgC.b+16);
+    var bord  = rgbToHex(bgC.r+23, bgC.g+23, bgC.b+44);
+    var bord2 = rgbToHex(bgC.r+37, bgC.g+37, bgC.b+64);
+    var act   = lighten(accent, 0.18);
+    var dim   = withAlpha(accent, 0.28);
+    var text  = lighten(darken(accent,0.1), 0.3);
+    // derive a muted dim hex for non-rgba uses
+    var dimHex = rgbToHex(
+      Math.round(hexToRgb(accent).r*0.32),
+      Math.round(hexToRgb(accent).g*0.32),
+      Math.round(hexToRgb(accent).b*0.32)
+    );
+
+    var r = document.documentElement.style;
+    r.setProperty('--accent',  accent);
+    r.setProperty('--bg',      bg);
+    r.setProperty('--panel',   panel);
+    r.setProperty('--border',  bord);
+    r.setProperty('--bord2',   bord2);
+    r.setProperty('--act',     act);
+    r.setProperty('--dim',     dimHex);
+    r.setProperty('--text',    text);
+    r.setProperty('--ga',      withAlpha(accent, 0.35));
+    // update the top bar gradient
+    var bar = document.getElementById('themeBar');
+    if(bar) bar.style.background = 'linear-gradient(90deg,transparent,'+accent+',transparent)';
+  };
+
+  window.loadTheme = function(){
+    var t = {};
+    try{ t = JSON.parse(localStorage.getItem('picoTheme')||'{}'); }catch{}
+    var accent = t.accent || DEFAULTS.accent;
+    var bg     = t.bg     || DEFAULTS.bg;
+    window.applyTheme(accent, bg);
+    return {accent:accent, bg:bg};
+  };
+
+  window.saveTheme = function(accent, bg){
+    localStorage.setItem('picoTheme', JSON.stringify({accent:accent, bg:bg}));
+    window.applyTheme(accent, bg);
+  };
+
+  window.THEME_DEFAULTS = DEFAULTS;
+
+  // Apply immediately on load
+  window.loadTheme();
 })();
-if (!_picoAuth || !_picoAuth.token) {
-  window.location.href = '/login';
-  throw new Error('unauthenticated');
-}
-// Inject auth header into every fetch
-const _origFetch = window.fetch;
-window.fetch = function(url, opts) {
-  opts = Object.assign({}, opts);
-  opts.headers = Object.assign({'Authorization': 'Bearer ' + _picoAuth.token}, opts.headers || {});
-  return _origFetch(url, opts);
-};
-// Show user badge
-document.getElementById('userBadge').textContent = (_picoAuth.name || '').toUpperCase() + ' · ' + (_picoAuth.role || '').toUpperCase();
 
-async function doLogout() {
-  try { await _origFetch('/logout', {method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+_picoAuth.token},body:'{}'}); } catch {}
-  sessionStorage.removeItem('pico_auth');
-  window.location.href = '/login';
-}
-
-// ════════════════════════════════════
-// CORE
-// ════════════════════════════════════
+// ════ AUTH ════
+const _picoAuth=(function(){try{return JSON.parse(sessionStorage.getItem('pico_auth')||'null');}catch{return null;}})();
+if(!_picoAuth||!_picoAuth.token){window.location.href='/login';throw new Error('unauthenticated');}
+const _origFetch=window.fetch;
+window.fetch=function(url,opts){opts=Object.assign({},opts);opts.headers=Object.assign({'Authorization':'Bearer '+_picoAuth.token},opts.headers||{});return _origFetch(url,opts);};
+document.getElementById('userBadge').textContent=(_picoAuth.name||'').toUpperCase()+' · '+(_picoAuth.role||'').toUpperCase();
+async function doLogout(){try{await _origFetch('/logout',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+_picoAuth.token},body:'{}'});}catch{}sessionStorage.removeItem('pico_auth');window.location.href='/login';}
+// ════ CORE ════
 let curSt='green',curMd='solid',curDp='plain',pollT=null,schedDays=[];
+let _lcdImageMode=false,_pvCvsForLCD=null;
 const DAYS=['MON','TUE','WED','THU','FRI','SAT','SUN'];
 function ip(){return document.getElementById('ipIn').value.trim()||'192.168.1.52';}
-
-function lg(m,t='inf'){
-  const el=document.getElementById('log'),n=new Date().toTimeString().slice(0,8);
-  const r=document.createElement('div');r.className='lr';
-  r.innerHTML=`<span class="lt">${n}</span><span class="lm ${t}">${m}</span>`;
-  el.appendChild(r);el.scrollTop=el.scrollHeight;
-}
-
-async function syncTime() {
-  const st = document.getElementById('timeSt');
-  const now = new Date();
-  // JS weekday: 0=Sun, MicroPython: 0=Mon — convert
-  const weekday = (now.getDay() + 6) % 7;
-  const body = {
-    year: now.getFullYear(), month: now.getMonth() + 1,
-    day: now.getDate(), weekday,
-    hour: now.getHours(), minute: now.getMinutes(),
-    second: now.getSeconds()
-  };
-  try {
-    const r = await fetch(`http://${ip()}/time`, {
-      method: 'POST', headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(body), signal: AbortSignal.timeout(5000)
-    });
-    const d = await r.json();
-    if (!r.ok) throw new Error(d.error);
-    st.className = 'sline ok';
-    st.textContent = `✓ SYNCED ${String(d.hour).padStart(2,'0')}:${String(d.minute).padStart(2,'0')}`;
-    lg('✓ Clock synced', 'ok');
-  } catch(e) {
-    st.className = 'sline err'; st.textContent = `✗ ${e.message}`;
-  }
-}
-
-async function getTime() {
-  const st = document.getElementById('timeSt');
-  try {
-    const r = await fetch(`http://${ip()}/time`, {signal: AbortSignal.timeout(3000)});
-    const d = await r.json();
-    if (!r.ok) throw new Error(d.error);
-    st.className = 'sline ok';
-    st.textContent = `${d.year}-${String(d.month).padStart(2,'0')}-${String(d.day).padStart(2,'0')} ${String(d.hour).padStart(2,'0')}:${String(d.minute).padStart(2,'0')}:${String(d.second).padStart(2,'0')}`;
-  } catch(e) {
-    st.className = 'sline err'; st.textContent = `✗ ${e.message}`;
-  }
-}
-
-function switchTab(t){
-  const names=['ctrl','media','draw','btn','sched'];
-  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('on',names[i]===t));
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('on',p.id===`tab-${t}`));
-  if(t==='sched')loadJobs();
-  if(t==='btn'){renderSeq();renderAddSavedGrid();}
-  if(t==='draw')renderSavesGrid();
-}
-
-function setSt(s){
-  const d=document.getElementById('sDot'),tx=document.getElementById('sTxt');
-  d.className='sdot';
-  if(s==='online'){d.classList.add('on');tx.textContent='ONLINE';}
-  else if(s==='error'){d.classList.add('err');tx.textContent='ERROR';}
-  else if(s==='busy'){d.classList.add('bsy');tx.textContent='BUSY';}
-  else tx.textContent='OFFLINE';
-}
-
-async function rebootPico() {
-  if (!confirm('Reboot the Pico?')) return;
-  try {
-    await fetch(`http://${ip()}/reboot`, {
-      method: 'POST', headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({}), signal: AbortSignal.timeout(3000)
-    });
-    setSt('error');
-    stopPoll();
-    lg('Pico rebooting — wait 5s then ping', 'inf');
-    // Auto-ping after 6 seconds
-    setTimeout(() => ping(), 6000);
-  } catch(e) {
-    lg(`Reboot: ${e.message}`, 'inf');
-  }
-}
-
-// ════════════════════════════════════
-// CONTROL TAB
-// ════════════════════════════════════
-function selSt(s){curSt=s;document.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('on'));document.querySelector(`.sbtn.s${s[0]}`).classList.add('on');updLCD();}
-function selMd(m){curMd=m;document.querySelectorAll('.mbtn').forEach(b=>b.classList.remove('on'));document.querySelector(`[data-m="${m}"]`).classList.add('on');updLCD();}
-function selDp(d){
-  curDp=d;
-  document.querySelectorAll('.dbtn').forEach(b=>b.classList.remove('on'));
-  const cls=d==='plain'?'.dp':d==='finger'?'.df':'.dm';
-  document.querySelector(`.dbtn${cls}`).classList.add('on');
-  const mp=document.getElementById('msgP');
-  if(d==='message'){mp.classList.add('op');document.getElementById('msgI').focus();}
-  else mp.classList.remove('op');
-  updLCD();
-}
-function onMsg(){const v=document.getElementById('msgI').value,cc=document.getElementById('cc');cc.textContent=`${v.length} / 28`;cc.classList.toggle('w',v.length>20);updLCD();}
-function updLCD(){
-  if(_lcdImageMode) return; // image is showing — don't overwrite
-  const scr=document.getElementById('lcdScr'),cnt=document.getElementById('lcdCnt');
-  scr.className='lcd-scr';scr.classList.add((curMd==='ring'?'r':'c')+curSt[0]);
-  scr.style.backgroundImage='';scr.style.backgroundSize='';
-  if(curDp==='finger')cnt.innerHTML='<div class="lcd-fng">🖕</div>';
-  else if(curDp==='message'){const t=document.getElementById('msgI').value||'...';cnt.innerHTML=`<div style="font-family:Orbitron,sans-serif;font-weight:900;font-size:${t.length>7?'10px':'14px'};color:white;text-align:center;padding:6px;line-height:1.3">${t.toUpperCase()}</div>`;}
-  else cnt.innerHTML='';
-}
-function showLCDImage(canvas){
-  // Render the canvas into the LCD preview circle
-  const scr=document.getElementById('lcdScr'),cnt=document.getElementById('lcdCnt');
-  const dataUrl=canvas.toDataURL('image/png');
-  scr.className='lcd-scr'; // remove colour classes
-  scr.style.backgroundImage=`url(${dataUrl})`;
-  scr.style.backgroundSize='cover';
-  scr.style.backgroundPosition='center';
-  cnt.innerHTML='';
-  _lcdImageMode=true;
-}
-function clearLCDImage(){
-  const scr=document.getElementById('lcdScr');
-  scr.style.backgroundImage='';
-  scr.style.backgroundSize='';
-  _lcdImageMode=false;
-  updLCD();
-}
-async function transmit(){
-  if(_picoAuth.role!=='admin'){lg('Admin access required','err');return;}
-  const btn=document.getElementById('txBtn'),lbl=document.getElementById('txLbl');
-  btn.disabled=true;lbl.innerHTML='<span class="spin"></span>SENDING';
-  const pay={state:curSt};
-  if(curDp==='finger')pay.show_middle_finger=true;
-  if(curDp==='message'){const m=document.getElementById('msgI').value.trim();if(!m){lg('Message empty','err');btn.disabled=false;lbl.textContent='TRANSMIT';return;}pay.message=m;}
-  lg(`→ ${JSON.stringify(pay)}`,'inf');
-  try{
-    const r1=await fetch(`http://${ip()}/state`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(pay),signal:AbortSignal.timeout(5000)});
-    const d1=await r1.json();if(!r1.ok)throw new Error(d1.error||`HTTP ${r1.status}`);
-    const r2=await fetch(`http://${ip()}/config`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:curMd}),signal:AbortSignal.timeout(5000)});
-    if(!r2.ok){const d2=await r2.json();throw new Error(d2.error||`HTTP ${r2.status}`);}
-    setSt('online');lg(`✓ ${curSt}/${curMd}/${curDp}`,'ok');
-  }catch(e){setSt('error');lg(`✗ ${e.message}`,'err');}
-  finally{btn.disabled=false;lbl.textContent='TRANSMIT';}
-}
-function startPoll(){
-  if(pollT)return;document.getElementById('pollBtn').classList.add('ap');
-  pollT=setInterval(async()=>{try{const r1=await fetch(`http://${ip()}/state`,{signal:AbortSignal.timeout(1000)});const d1=await r1.json();const r2=await fetch(`http://${ip()}/config`,{signal:AbortSignal.timeout(1000)});const d2=await r2.json();syncDev(d1,d2.mode);setSt('online');}catch{setSt('error');}},600);
-  lg('Polling started','inf');
-}
+function lg(m,t='inf'){const el=document.getElementById('log'),n=new Date().toTimeString().slice(0,8);const r=document.createElement('div');r.className='lr';r.innerHTML=`<span class="lt">${n}</span><span class="lm ${t}">${m}</span>`;el.appendChild(r);el.scrollTop=el.scrollHeight;}
+function switchTab(t){const names=['ctrl','draw','btn','sched'];document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('on',names[i]===t));document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('on',p.id===`tab-${t}`));if(t==='sched')loadJobs();if(t==='btn'){renderSeq();renderAddSavedGrid();}if(t==='draw')renderSavesGrid();}
+function setSt(s){const d=document.getElementById('sDot'),tx=document.getElementById('sTxt');d.className='sdot';if(s==='online'){d.classList.add('on');tx.textContent='ONLINE';}else if(s==='error'){d.classList.add('err');tx.textContent='ERROR';}else if(s==='busy'){d.classList.add('bsy');tx.textContent='BUSY';}else tx.textContent='OFFLINE';}
+function updLCD(){if(_lcdImageMode)return;const scr=document.getElementById('lcdScr'),cnt=document.getElementById('lcdCnt');scr.className='lcd-scr';scr.classList.add((curMd==='ring'?'r':'c')+curSt[0]);scr.style.backgroundImage='';scr.style.backgroundSize='';if(curDp==='finger')cnt.innerHTML='<div class="lcd-fng">🖕</div>';else if(curDp==='message'){const t=document.getElementById('msgI').value||'...';cnt.innerHTML=`<div style="font-family:Orbitron,sans-serif;font-weight:900;font-size:${t.length>7?'10px':'14px'};color:white;text-align:center;padding:6px;line-height:1.3">${t.toUpperCase()}</div>`;}else cnt.innerHTML='';}
+function showLCDImage(canvas){const scr=document.getElementById('lcdScr'),cnt=document.getElementById('lcdCnt');scr.className='lcd-scr';scr.style.backgroundImage=`url(${canvas.toDataURL('image/png')})`;scr.style.backgroundSize='cover';scr.style.backgroundPosition='center';cnt.innerHTML='';_lcdImageMode=true;_pvCvsForLCD=canvas;}
+function clearLCDImage(){const scr=document.getElementById('lcdScr');scr.style.backgroundImage='';scr.style.backgroundSize='';_lcdImageMode=false;_pvCvsForLCD=null;updLCD();}
+function syncDev(d,mode){if(curSt!==d.state)selSt(d.state);if(curMd!==mode)selMd(mode);const nd=d.show_middle_finger?'finger':d.message?'message':'plain';if(curDp!==nd){selDp(nd);if(nd==='message'&&d.message){document.getElementById('msgI').value=d.message;onMsg();}}if(d.image_active||d.gif_active){if(!_lcdImageMode){_lcdImageMode=true;if(!_pvCvsForLCD){const scr=document.getElementById('lcdScr'),cnt=document.getElementById('lcdCnt');scr.className='lcd-scr';scr.style.backgroundImage='';cnt.innerHTML=`<div style="font-family:Orbitron,sans-serif;font-size:9px;letter-spacing:3px;color:rgba(0,255,136,.5)">${d.gif_active?'GIF':'IMG'}</div>`;}}}else{if(_lcdImageMode&&!_pvCvsForLCD){_lcdImageMode=false;updLCD();}}}
+function startPoll(){if(pollT)return;document.getElementById('pollBtn').classList.add('ap');pollT=setInterval(async()=>{try{const r1=await fetch(`http://${ip()}/state`,{signal:AbortSignal.timeout(1000)});const d1=await r1.json();const r2=await fetch(`http://${ip()}/config`,{signal:AbortSignal.timeout(1000)});const d2=await r2.json();syncDev(d1,d2.mode);setSt('online');}catch{setSt('error');}},600);lg('Polling started','inf');}
 function stopPoll(){if(!pollT)return;clearInterval(pollT);pollT=null;document.getElementById('pollBtn').classList.remove('ap');lg('Polling stopped','inf');}
 function togglePoll(){pollT?stopPoll():startPoll();}
-function syncDev(d,mode){
-  if(curSt!==d.state)selSt(d.state);if(curMd!==mode)selMd(mode);
-  const nd=d.show_middle_finger?'finger':d.message?'message':'plain';
-  if(curDp!==nd){selDp(nd);if(nd==='message'&&d.message){document.getElementById('msgI').value=d.message;onMsg();}}
-}
-async function ping() {
-  lg(`Pinging ${ip()}...`, 'inf');
-  setSt('busy');
-  try {
-    const r = await fetch(`http://${ip()}/health`, { signal: AbortSignal.timeout(3000) });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    const d = await r.json();
-    setSt('online');
-    lg(`Online · uptime ${(d.uptime_ms/1000).toFixed(1)}s · RAM ${d.free_ram||'?'}B`, 'ok');
-
-    const rs = await fetch(`http://${ip()}/state`,  { signal: AbortSignal.timeout(2000) });
-    const ds = await rs.json();
-    const rconf = await fetch(`http://${ip()}/config`, { signal: AbortSignal.timeout(2000) });
-    const dc2 = await rconf.json();
-    syncDev(ds, dc2.mode);
-    startPoll();
-  } catch(e) {
-    setSt('error'); stopPoll(); lg(`Ping failed: ${e.message}`, 'err');
-  }
-}
-
-// ════════════════════════════════════
-// MEDIA TAB
-// ════════════════════════════════════
-async function clearMedia(){
-  try{
-    await fetch(`http://${ip()}/image`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:'clear'}),signal:AbortSignal.timeout(5000)});
-    lg('Media cleared','ok');
-    clearLCDImage();
-  }
-  catch(e){lg(`✗ ${e.message}`,'err');}
-}
-async function playGif565(){
-  const path=document.getElementById('gif565P').value.trim(),st=document.getElementById('gif565St');
-  if(!path){lg('No path','err');return;}
-  st.className='sline inf';st.textContent='LOADING...';
-  try{
-    const r=await fetch(`http://${ip()}/gif565`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path}),signal:AbortSignal.timeout(5000)});
-    const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);
-    st.className='sline ok';st.textContent=`✓ ${d.frames} FRAMES · ${d.delay_ms}ms/FRAME`;lg(`✓ Playing ${path}`,'ok');
-    // Show GIF indicator on LCD preview
-    const scr=document.getElementById('lcdScr'),cnt=document.getElementById('lcdCnt');
-    scr.className='lcd-scr';scr.style.backgroundImage='';_lcdImageMode=true;
-    cnt.innerHTML='<div style="font-family:Orbitron,sans-serif;font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.6)">GIF</div>';
-  }catch(e){st.className='sline err';st.textContent=`✗ ${e.message}`;lg(`✗ gif565: ${e.message}`,'err');}
-}
-async function loadImgUrl(){
-  const url=document.getElementById('imgUrlI').value.trim(),st=document.getElementById('imgUrlSt');
-  if(!url){lg('Image URL empty','err');return;}st.className='sline inf';st.textContent='LOADING...';
-  try{
-    const r=await fetch(`http://${ip()}/image`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url}),signal:AbortSignal.timeout(60000)});
-    const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);
-    st.className='sline ok';st.textContent='✓ DISPLAYED';lg('✓ Image displayed','ok');
-  }catch(e){st.className='sline err';st.textContent=`✗ ${e.message}`;lg(`✗ Image: ${e.message}`,'err');}
-}
+async function ping(){lg(`Pinging ${ip()}...`,'inf');setSt('busy');try{const r=await fetch(`http://${ip()}/health`,{signal:AbortSignal.timeout(3000)});if(!r.ok)throw new Error(`HTTP ${r.status}`);const d=await r.json();setSt('online');lg(`Online · ${(d.uptime_ms/1000).toFixed(1)}s · RAM ${d.free_ram||'?'}B`,'ok');const rs=await fetch(`http://${ip()}/state`,{signal:AbortSignal.timeout(2000)});const ds=await rs.json();const rc=await fetch(`http://${ip()}/config`,{signal:AbortSignal.timeout(2000)});const dc=await rc.json();syncDev(ds,dc.mode);startPoll();}catch(e){setSt('error');stopPoll();lg(`Ping failed: ${e.message}`,'err');}}
+async function rebootPico(){if(!confirm('Reboot the Pico?'))return;try{await fetch(`http://${ip()}/reboot`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({}),signal:AbortSignal.timeout(3000)});setSt('error');stopPoll();lg('Pico rebooting — wait 5s','inf');setTimeout(()=>ping(),6000);}catch(e){lg(`Reboot: ${e.message}`,'inf');}}
+async function syncTime(){const st=document.getElementById('timeSt');const now=new Date();const weekday=(now.getDay()+6)%7;const body={year:now.getFullYear(),month:now.getMonth()+1,day:now.getDate(),weekday,hour:now.getHours(),minute:now.getMinutes(),second:now.getSeconds()};try{const r=await fetch(`http://${ip()}/time`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(5000)});const d=await r.json();if(!r.ok)throw new Error(d.error);st.className='sline ok';st.textContent=`✓ SYNCED ${String(d.hour).padStart(2,'0')}:${String(d.minute).padStart(2,'0')}`;lg('✓ Clock synced','ok');}catch(e){st.className='sline err';st.textContent=`✗ ${e.message}`;}}
+async function getTime(){const st=document.getElementById('timeSt');try{const r=await fetch(`http://${ip()}/time`,{signal:AbortSignal.timeout(3000)});const d=await r.json();if(!r.ok)throw new Error(d.error);st.className='sline ok';st.textContent=`${d.year}-${String(d.month).padStart(2,'0')}-${String(d.day).padStart(2,'0')} ${String(d.hour).padStart(2,'0')}:${String(d.minute).padStart(2,'0')}:${String(d.second).padStart(2,'0')}`;}catch(e){st.className='sline err';st.textContent=`✗ ${e.message}`;}}
+function selSt(s){curSt=s;document.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('on'));document.querySelector(`.sbtn.s${s[0]}`).classList.add('on');updLCD();}
+function selMd(m){curMd=m;document.querySelectorAll('.mbtn').forEach(b=>b.classList.remove('on'));document.querySelector(`[data-m="${m}"]`).classList.add('on');updLCD();}
+function selDp(d){curDp=d;document.querySelectorAll('.dbtn').forEach(b=>b.classList.remove('on'));const cls=d==='plain'?'.dp':d==='finger'?'.df':'.dm';document.querySelector(`.dbtn${cls}`).classList.add('on');const mp=document.getElementById('msgP');if(d==='message'){mp.classList.add('op');document.getElementById('msgI').focus();}else mp.classList.remove('op');updLCD();}
+function onMsg(){const v=document.getElementById('msgI').value,cc=document.getElementById('cc');cc.textContent=`${v.length} / 28`;cc.classList.toggle('w',v.length>20);updLCD();}
+async function transmit(){if(_picoAuth.role!=='admin'){lg('Admin access required','err');return;}const btn=document.getElementById('txBtn'),lbl=document.getElementById('txLbl');btn.disabled=true;lbl.innerHTML='<span class="spin"></span>SENDING';const pay={state:curSt};if(curDp==='finger')pay.show_middle_finger=true;if(curDp==='message'){const m=document.getElementById('msgI').value.trim();if(!m){lg('Message empty','err');btn.disabled=false;lbl.textContent='TRANSMIT';return;}pay.message=m;}try{const r1=await fetch(`http://${ip()}/state`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(pay),signal:AbortSignal.timeout(5000)});const d1=await r1.json();if(!r1.ok)throw new Error(d1.error||`HTTP ${r1.status}`);const r2=await fetch(`http://${ip()}/config`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:curMd}),signal:AbortSignal.timeout(5000)});if(!r2.ok){const d2=await r2.json();throw new Error(d2.error||`HTTP ${r2.status}`);}clearLCDImage();setSt('online');lg(`✓ ${curSt}/${curMd}/${curDp}`,'ok');}catch(e){setSt('error');lg(`✗ ${e.message}`,'err');}finally{btn.disabled=false;lbl.textContent='TRANSMIT';}}
+async function clearMedia(){const st=document.getElementById('mediaClearSt');st.className='sline inf';st.textContent='CLEARING...';try{await fetch(`http://${ip()}/image`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:'clear'}),signal:AbortSignal.timeout(5000)});clearLCDImage();_pvCvsForLCD=null;st.className='sline ok';st.textContent='✓ CLEARED';lg('Media cleared','ok');}catch(e){st.className='sline err';st.textContent=`✗ ${e.message}`;lg(`✗ ${e.message}`,'err');}}
 let srcImg=null,fitMd='fill',rot=0,fH=false,fV=false,pvCvs=null;
-let _lcdImageMode=false; // true when an image/drawing is on the LCD
-
 function onDragOv(e){e.preventDefault();document.getElementById('dz').classList.add('ov');}
 function onDragLv(){document.getElementById('dz').classList.remove('ov');}
 function onDrop(e){e.preventDefault();onDragLv();const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))loadFile(f);}
 function onFSel(e){const f=e.target.files[0];if(f)loadFile(f);}
-function loadFile(file){
-  const rd=new FileReader();rd.onload=e=>{const img=new Image();img.onload=()=>{
-    srcImg=img;rot=0;fH=false;fV=false;
-    ['brS','coS','saS'].forEach(id=>document.getElementById(id).value=100);
-    ['brV','coV','saV'].forEach(id=>document.getElementById(id).textContent=100);
-    const sc=document.getElementById('srcC');sc.width=img.width;sc.height=img.height;sc.getContext('2d').drawImage(img,0,0);
-    document.getElementById('imgC').classList.add('sh');document.getElementById('dz').style.display='none';
-    rendPv();lg(`Image: ${img.width}×${img.height}`,'ok');};img.src=e.target.result;};rd.readAsDataURL(file);
-}
+function loadFile(file){const rd=new FileReader();rd.onload=e=>{const img=new Image();img.onload=()=>{srcImg=img;rot=0;fH=false;fV=false;['brS','coS','saS'].forEach(id=>document.getElementById(id).value=100);['brV','coV','saV'].forEach(id=>document.getElementById(id).textContent=100);const sc=document.getElementById('srcC');sc.width=img.width;sc.height=img.height;sc.getContext('2d').drawImage(img,0,0);document.getElementById('imgC').classList.add('sh');document.getElementById('dz').style.display='none';rendPv();lg(`Image: ${img.width}x${img.height}`,'ok');};img.src=e.target.result;};rd.readAsDataURL(file);}
 function setFit(m){fitMd=m;['Fill','Fit','Stretch'].forEach(n=>document.getElementById(`fit${n}`).classList.toggle('on',n.toLowerCase()===m));rendPv();}
 function onAdj(){['br','co','sa'].forEach(k=>{document.getElementById(`${k}V`).textContent=document.getElementById(`${k}S`).value;});rendPv();}
 function setRot(r){rot=r;[0,90,180,270].forEach(d=>document.getElementById(`rot${d}`).classList.toggle('on',d===r));rendPv();}
 function toggleFlip(ax){if(ax==='h')fH=!fH;else fV=!fV;document.getElementById('flipH').classList.toggle('on',fH);document.getElementById('flipV').classList.toggle('on',fV);rendPv();}
-function rendPv(){
-  if(!srcImg)return;
-  const S=240,off=document.createElement('canvas');off.width=S;off.height=S;
-  const cx=off.getContext('2d');cx.fillStyle='#000';cx.fillRect(0,0,S,S);cx.save();
-  cx.translate(S/2,S/2);if(fH)cx.scale(-1,1);if(fV)cx.scale(1,-1);cx.rotate(rot*Math.PI/180);
-  const iw=srcImg.width,ih=srcImg.height;let dw,dh,dx,dy;
-  if(fitMd==='stretch'){dw=S;dh=S;dx=-S/2;dy=-S/2;}
-  else if(fitMd==='fit'){const sc=Math.min(S/iw,S/ih);dw=iw*sc;dh=ih*sc;dx=-dw/2;dy=-dh/2;}
-  else{const sc=Math.max(S/iw,S/ih);dw=iw*sc;dh=ih*sc;dx=-dw/2;dy=-dh/2;}
-  cx.filter=`brightness(${document.getElementById('brS').value}%) contrast(${document.getElementById('coS').value}%) saturate(${document.getElementById('saS').value}%)`;
-  cx.drawImage(srcImg,dx,dy,dw,dh);cx.restore();pvCvs=off;
-  document.getElementById('pvC').getContext('2d').drawImage(off,0,0,100,100);
-}
-// ── Corrected RGB565 conversion ──
-function cvs2b64(canvas){
-  const cx=canvas.getContext('2d'),px=cx.getImageData(0,0,240,240).data,buf=new Uint8Array(240*240*2);
-  let i=0;
-  for(let p=0;p<px.length;p+=4){
-    const r=px[p],g=px[p+1],b=px[p+2];
-    const c=((r&0xF8)<<8)|((g&0xFC)<<3)|(b>>3);
-    // Correct byte order for framebuf
-    buf[i++]=(c>>8)&0xFF;
-    buf[i++]=c&0xFF;
-  }
-  let s='';for(let j=0;j<buf.length;j++)s+=String.fromCharCode(buf[j]);return btoa(s);
-}
-async function sendChunks(canvas, progId, fillId, stId, _attempt=0) {
-  const st=document.getElementById(stId),pr=document.getElementById(progId),fi=document.getElementById(fillId);
-  st.className='sline inf'; st.textContent='CLEARING RAM...';
-
-  try {
-    await fetch(`http://${ip()}/clear`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({}), signal:AbortSignal.timeout(8000)
-    });
-  } catch(e) { lg(`Clear: ${e.message}`, 'inf'); }
-
-  await new Promise(r => setTimeout(r, 500));
-
-  st.textContent='CONVERTING...';
-  await new Promise(r=>setTimeout(r,30));
-  const b64=cvs2b64(canvas), CH=2000, tot=Math.ceil(b64.length/CH);
-  pr.classList.add('sh');
-  lg(`Sending ${tot} chunks`, 'inf');
-  try {
-    for(let i=0;i<tot;i++){
-      fi.style.width=Math.round((i/tot)*100)+'%';
-      st.textContent=`SENDING ${i+1} / ${tot}...`;
-      const r=await fetch(`http://${ip()}/upload_chunk`,{
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({chunk:b64.slice(i*CH,(i+1)*CH),index:i,total:tot}),
-        signal:AbortSignal.timeout(15000)
-      });
-      const d=await r.json();
-      if(!r.ok) throw new Error(d.error||`HTTP ${r.status}`);
-    }
-    fi.style.width='100%';
-    st.className='sline ok'; st.textContent='✓ SENT';
-    lg('✓ Sent to Pico','ok');
-    // Update LCD preview with the image that was just sent
-    if(canvas) showLCDImage(canvas);
-  } catch(e) {
-    const isMemErr = e.message.includes('Alloc failed') || e.message.includes('Not enough RAM');
-    if (_attempt === 0 && isMemErr) {
-      // Reboot once and retry — if it fails again, give up
-      st.className='sline err';
-      st.textContent='⚠ LOW RAM — REBOOTING PICO...';
-      lg('Low RAM — rebooting Pico', 'inf');
-      try {
-        await fetch(`http://${ip()}/reboot`, {
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({}), signal:AbortSignal.timeout(3000)
-        });
-      } catch {}
-      st.textContent='WAITING FOR REBOOT (15s)...';
-      await new Promise(r => setTimeout(r, 15000));
-      st.textContent='RETRYING...';
-      await sendChunks(canvas, progId, fillId, stId, 1);  // _attempt=1 — no further retries
-    } else {
-      st.className='sline err'; st.textContent=`✗ ${e.message}`;
-      lg(`✗ ${e.message}`, 'err');
-    }Playing
-  } finally {
-    setTimeout(()=>{pr.classList.remove('sh');fi.style.width='0%';},1500);
-  }
-}
+function rendPv(){if(!srcImg)return;const S=240,off=document.createElement('canvas');off.width=S;off.height=S;const cx=off.getContext('2d');cx.fillStyle='#000';cx.fillRect(0,0,S,S);cx.save();cx.translate(S/2,S/2);if(fH)cx.scale(-1,1);if(fV)cx.scale(1,-1);cx.rotate(rot*Math.PI/180);const iw=srcImg.width,ih=srcImg.height;let dw,dh,dx,dy;if(fitMd==='stretch'){dw=S;dh=S;dx=-S/2;dy=-S/2;}else if(fitMd==='fit'){const sc=Math.min(S/iw,S/ih);dw=iw*sc;dh=ih*sc;dx=-dw/2;dy=-dh/2;}else{const sc=Math.max(S/iw,S/ih);dw=iw*sc;dh=ih*sc;dx=-dw/2;dy=-dh/2;}cx.filter=`brightness(${document.getElementById('brS').value}%) contrast(${document.getElementById('coS').value}%) saturate(${document.getElementById('saS').value}%)`;cx.drawImage(srcImg,dx,dy,dw,dh);cx.restore();pvCvs=off;document.getElementById('pvC').getContext('2d').drawImage(off,0,0,100,100);}
+function cvs2b64(canvas){const cx=canvas.getContext('2d'),px=cx.getImageData(0,0,240,240).data,buf=new Uint8Array(240*240*2);let i=0;for(let p=0;p<px.length;p+=4){const r=px[p],g=px[p+1],b=px[p+2];const c=((r&0xF8)<<8)|((g&0xFC)<<3)|(b>>3);buf[i++]=(c>>8)&0xFF;buf[i++]=c&0xFF;}let s='';for(let j=0;j<buf.length;j++)s+=String.fromCharCode(buf[j]);return btoa(s);}
+async function sendChunks(canvas,progId,fillId,stId,_attempt=0){const st=document.getElementById(stId),pr=document.getElementById(progId),fi=document.getElementById(fillId);st.className='sline inf';st.textContent='CLEARING RAM...';try{await fetch(`http://${ip()}/clear`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({}),signal:AbortSignal.timeout(8000)});}catch(e){lg(`Clear: ${e.message}`,'inf');}await new Promise(r=>setTimeout(r,500));st.textContent='CONVERTING...';await new Promise(r=>setTimeout(r,30));const b64=cvs2b64(canvas),CH=2000,tot=Math.ceil(b64.length/CH);pr.classList.add('sh');lg(`Sending ${tot} chunks`,'inf');try{for(let i=0;i<tot;i++){fi.style.width=Math.round((i/tot)*100)+'%';st.textContent=`SENDING ${i+1}/${tot}...`;const r=await fetch(`http://${ip()}/upload_chunk`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chunk:b64.slice(i*CH,(i+1)*CH),index:i,total:tot}),signal:AbortSignal.timeout(15000)});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);}fi.style.width='100%';st.className='sline ok';st.textContent='✓ SENT';lg('✓ Sent to Pico','ok');if(canvas)showLCDImage(canvas);}catch(e){const isMemErr=e.message.includes('Alloc failed')||e.message.includes('Not enough RAM');if(_attempt===0&&isMemErr){st.className='sline err';st.textContent='LOW RAM — REBOOTING PICO...';lg('Low RAM — rebooting','inf');try{await fetch(`http://${ip()}/reboot`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({}),signal:AbortSignal.timeout(3000)});}catch{}st.textContent='WAITING FOR REBOOT (15s)...';await new Promise(r=>setTimeout(r,15000));await sendChunks(canvas,progId,fillId,stId,1);}else{st.className='sline err';st.textContent=`✗ ${e.message}`;lg(`✗ ${e.message}`,'err');}}finally{setTimeout(()=>{pr.classList.remove('sh');fi.style.width='0%';},1500);}}
 async function sendUpload(){if(!pvCvs){lg('No image','err');return;}await sendChunks(pvCvs,'upProg','upFill','upSt');}
 function clearUpload(){srcImg=null;pvCvs=null;document.getElementById('imgC').classList.remove('sh');document.getElementById('dz').style.display='block';document.getElementById('fIn').value='';document.getElementById('upSt').textContent='';clearLCDImage();}
-// ════════════════════════════════════
-// DRAW TAB
-// ════════════════════════════════════
 const DC=document.getElementById('drawCanvas'),DX=DC.getContext('2d');
 let dTool='pen',dCol='#ffffff',dSz=4,drawing=false,lastX=0,lastY=0,snapSt=null,hist=[],showRing=true,bgC='#000000';
-
-// Init canvas black
 DX.fillStyle='#000000';DX.fillRect(0,0,240,240);hist.push(DX.getImageData(0,0,240,240));
-
 function savHist(){hist.push(DX.getImageData(0,0,240,240));if(hist.length>30)hist.shift();}
 function undoDr(){if(hist.length>1){hist.pop();DX.putImageData(hist[hist.length-1],0,0);}}
 function clearDr(){DX.fillStyle=bgC;DX.fillRect(0,0,240,240);savHist();}
 function fillBg(){bgC=document.getElementById('bgCol').value;clearDr();}
-function toggleRing(){
-  showRing=!showRing;
-  const b=document.getElementById('rgBtn');b.textContent=showRing?'◯ ON':'◯ OFF';b.classList.toggle('on',showRing);
-  document.getElementById('ringOv').style.display=showRing?'block':'none';
-}
-function setTool(t){
-  dTool=t;
-  // Only update the tool buttons — do NOT touch the canvas
-  document.querySelectorAll('.dtrow .smbtn').forEach(b=>b.classList.remove('on'));
-  const tid='t'+t.charAt(0).toUpperCase()+t.slice(1);
-  const el=document.getElementById(tid);if(el)el.classList.add('on');
-  document.getElementById('txtPanel').style.display=t==='text'?'block':'none';
-  DC.style.cursor=t==='eyedrop'?'crosshair':t==='fill'?'cell':t==='text'?'text':'crosshair';
-}
-function setCol(c){
-  dCol=c;
-  document.querySelectorAll('.csw').forEach(s=>s.classList.toggle('on',s.dataset.c===c));
-  document.getElementById('custCol').value=c;
-}
+function toggleRing(){showRing=!showRing;const b=document.getElementById('rgBtn');b.textContent=showRing?'◯ ON':'◯ OFF';b.classList.toggle('on',showRing);document.getElementById('ringOv').style.display=showRing?'block':'none';}
+function setTool(t){dTool=t;document.querySelectorAll('.dtrow .smbtn').forEach(b=>b.classList.remove('on'));const tid='t'+t.charAt(0).toUpperCase()+t.slice(1);const el=document.getElementById(tid);if(el)el.classList.add('on');document.getElementById('txtPanel').style.display=t==='text'?'block':'none';DC.style.cursor=t==='eyedrop'?'crosshair':t==='fill'?'cell':t==='text'?'text':'crosshair';}
+function setCol(c){dCol=c;document.querySelectorAll('.csw').forEach(s=>s.classList.toggle('on',s.dataset.c===c));document.getElementById('custCol').value=c;}
 function onSz(){dSz=parseInt(document.getElementById('szS').value);document.getElementById('szV').textContent=dSz;const d=document.getElementById('szDot'),sz=Math.min(dSz,24);d.style.width=sz+'px';d.style.height=sz+'px';}
-function getPos(e){
-  const r=DC.getBoundingClientRect(),sx=240/r.width,sy=240/r.height;
-  const cx=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
-  const cy=(e.touches?e.touches[0].clientY:e.clientY)-r.top;
-  return[cx*sx,cy*sy];
-}
-function floodFill(sx,sy,fc){
-  sx=Math.floor(sx);sy=Math.floor(sy);
-  const id=DX.getImageData(0,0,240,240),d=id.data,idx=(sy*240+sx)*4;
-  const tr=d[idx],tg=d[idx+1],tb=d[idx+2];
-  const fr=parseInt(fc.slice(1,3),16),fg=parseInt(fc.slice(3,5),16),fb=parseInt(fc.slice(5,7),16);
-  if(tr===fr&&tg===fg&&tb===fb)return;
-  const st=[[sx,sy]];
-  while(st.length){const[x,y]=st.pop();if(x<0||x>=240||y<0||y>=240)continue;const i=(y*240+x)*4;if(d[i]!==tr||d[i+1]!==tg||d[i+2]!==tb)continue;d[i]=fr;d[i+1]=fg;d[i+2]=fb;d[i+3]=255;st.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);}
-  DX.putImageData(id,0,0);
-}
+function getPos(e){const r=DC.getBoundingClientRect(),sx=240/r.width,sy=240/r.height;const cx=(e.touches?e.touches[0].clientX:e.clientX)-r.left;const cy=(e.touches?e.touches[0].clientY:e.clientY)-r.top;return[cx*sx,cy*sy];}
+function floodFill(sx,sy,fc){sx=Math.floor(sx);sy=Math.floor(sy);const id=DX.getImageData(0,0,240,240),d=id.data,idx=(sy*240+sx)*4;const tr=d[idx],tg=d[idx+1],tb=d[idx+2];const fr=parseInt(fc.slice(1,3),16),fg=parseInt(fc.slice(3,5),16),fb2=parseInt(fc.slice(5,7),16);if(tr===fr&&tg===fg&&tb===fb2)return;const st=[[sx,sy]];while(st.length){const[x,y]=st.pop();if(x<0||x>=240||y<0||y>=240)continue;const i=(y*240+x)*4;if(d[i]!==tr||d[i+1]!==tg||d[i+2]!==tb)continue;d[i]=fr;d[i+1]=fg;d[i+2]=fb2;d[i+3]=255;st.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);}DX.putImageData(id,0,0);}
 function pickCol(x,y){const px=DX.getImageData(Math.floor(x),Math.floor(y),1,1).data;const h='#'+[px[0],px[1],px[2]].map(v=>v.toString(16).padStart(2,'0')).join('');setCol(h);document.getElementById('custCol').value=h;setTool('pen');}
 function stampTxt(x,y){const t=document.getElementById('drawTxt').value;if(!t)return;DX.save();DX.fillStyle=dCol;DX.font=`bold ${dSz*4+8}px Orbitron,monospace`;DX.textAlign='left';DX.fillText(t,x,y);DX.restore();savHist();}
-function onDrStart(e){
-  e.preventDefault();drawing=true;const[x,y]=getPos(e);lastX=x;lastY=y;
-  if(dTool==='fill'){floodFill(x,y,dCol);savHist();return;}
-  if(dTool==='eyedrop'){pickCol(x,y);return;}
-  if(dTool==='text'){stampTxt(x,y);return;}
-  if(['line','rect','circle'].includes(dTool)){snapSt=[x,y];return;}
-  DX.beginPath();DX.arc(x,y,dSz/2,0,Math.PI*2);DX.fillStyle=dTool==='eraser'?bgC:dCol;DX.fill();
-}
-function onDrMove(e){
-  e.preventDefault();if(!drawing)return;const[x,y]=getPos(e);
-  if(dTool==='pen'||dTool==='eraser'){
-    DX.beginPath();DX.moveTo(lastX,lastY);DX.lineTo(x,y);DX.strokeStyle=dTool==='eraser'?bgC:dCol;DX.lineWidth=dSz;DX.lineCap='round';DX.lineJoin='round';DX.stroke();lastX=x;lastY=y;
-  }else if(snapSt&&['line','rect','circle'].includes(dTool)){
-    DX.putImageData(hist[hist.length-1],0,0);
-    DX.strokeStyle=dCol;DX.lineWidth=dSz;DX.lineCap='round';
-    const[sx,sy]=snapSt;
-    if(dTool==='line'){DX.beginPath();DX.moveTo(sx,sy);DX.lineTo(x,y);DX.stroke();}
-    else if(dTool==='rect'){DX.strokeRect(sx,sy,x-sx,y-sy);}
-    else{const rx=Math.abs(x-sx)/2,ry=Math.abs(y-sy)/2,cx=(sx+x)/2,cy=(sy+y)/2;DX.beginPath();DX.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);DX.stroke();}
-  }
-}
+function onDrStart(e){e.preventDefault();drawing=true;const[x,y]=getPos(e);lastX=x;lastY=y;if(dTool==='fill'){floodFill(x,y,dCol);savHist();return;}if(dTool==='eyedrop'){pickCol(x,y);return;}if(dTool==='text'){stampTxt(x,y);return;}if(['line','rect','circle'].includes(dTool)){snapSt=[x,y];return;}DX.beginPath();DX.arc(x,y,dSz/2,0,Math.PI*2);DX.fillStyle=dTool==='eraser'?bgC:dCol;DX.fill();}
+function onDrMove(e){e.preventDefault();if(!drawing)return;const[x,y]=getPos(e);if(dTool==='pen'||dTool==='eraser'){DX.beginPath();DX.moveTo(lastX,lastY);DX.lineTo(x,y);DX.strokeStyle=dTool==='eraser'?bgC:dCol;DX.lineWidth=dSz;DX.lineCap='round';DX.lineJoin='round';DX.stroke();lastX=x;lastY=y;}else if(snapSt&&['line','rect','circle'].includes(dTool)){DX.putImageData(hist[hist.length-1],0,0);DX.strokeStyle=dCol;DX.lineWidth=dSz;DX.lineCap='round';const[sx,sy]=snapSt;if(dTool==='line'){DX.beginPath();DX.moveTo(sx,sy);DX.lineTo(x,y);DX.stroke();}else if(dTool==='rect'){DX.strokeRect(sx,sy,x-sx,y-sy);}else{const rx=Math.abs(x-sx)/2,ry=Math.abs(y-sy)/2,cx=(sx+x)/2,cy=(sy+y)/2;DX.beginPath();DX.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);DX.stroke();}}}
 function onDrEnd(){if(!drawing)return;drawing=false;snapSt=null;savHist();}
 DC.addEventListener('mousedown',onDrStart);DC.addEventListener('mousemove',onDrMove);DC.addEventListener('mouseup',onDrEnd);DC.addEventListener('mouseleave',onDrEnd);
 DC.addEventListener('touchstart',onDrStart,{passive:false});DC.addEventListener('touchmove',onDrMove,{passive:false});DC.addEventListener('touchend',onDrEnd);
-
 async function sendDraw(){await sendChunks(DC,'drProg','drFill','drSt');}
-
-// ════════════════════════════════════
-// SAVED DRAWINGS
-// ════════════════════════════════════
-// Stored as { id, name, dataUrl } in localStorage
 function getSaves(){try{return JSON.parse(localStorage.getItem('picoDrawings')||'[]');}catch{return[];}}
 function putSaves(arr){localStorage.setItem('picoDrawings',JSON.stringify(arr));}
-
-function openSaveDialog(){
-  document.getElementById('saveNameI').value='';
-  document.getElementById('saveDialog').style.display='block';
-  document.getElementById('saveNameI').focus();
-}
+function openSaveDialog(){document.getElementById('saveNameI').value='';document.getElementById('saveDialog').style.display='block';document.getElementById('saveNameI').focus();}
 function closeSaveDialog(){document.getElementById('saveDialog').style.display='none';}
-
-function confirmSave(){
-  const name=document.getElementById('saveNameI').value.trim()||'DRAWING '+Date.now();
-  const dataUrl=DC.toDataURL('image/png');
-  const saves=getSaves();
-  saves.push({id:Date.now(),name:name.toUpperCase(),dataUrl});
-  putSaves(saves);
-  closeSaveDialog();
-  renderSavesGrid();
-  lg(`Saved: ${name}`,'ok');
-}
-
-function deleteSave(id){
-  const saves=getSaves().filter(s=>s.id!==id);
-  putSaves(saves);renderSavesGrid();renderAddSavedGrid();
-  // Also remove from button sequence if present
-  btnSequence=btnSequence.filter(s=>!(s.type==='saved'&&s.saveId===id));
-  renderSeq();
-}
-
-function loadSaveToCanvas(save){
-  const img=new Image();
-  img.onload=()=>{DX.clearRect(0,0,240,240);DX.drawImage(img,0,0,240,240);savHist();lg(`Loaded: ${save.name}`,'ok');};
-  img.src=save.dataUrl;
-}
-
-function renderSavesGrid(){
-  const saves=getSaves(),grid=document.getElementById('savesGrid');
-  if(!saves.length){grid.innerHTML='<div class="no-saves" style="grid-column:span 3">NO SAVED DRAWINGS</div>';return;}
-  grid.innerHTML=saves.map(s=>`
-    <div class="save-card" onclick="loadSaveToCanvas(getSaves().find(x=>x.id===${s.id}))">
-      <img src="${s.dataUrl}" style="width:100%;height:100%;object-fit:cover;display:block;"/>
-      <div class="save-name">${s.name}</div>
-      <button class="save-del" onclick="event.stopPropagation();deleteSave(${s.id})">✕</button>
-    </div>`).join('');
-}
-
-function renderAddSavedGrid(){
-  const saves=getSaves(),grid=document.getElementById('addSavedGrid');
-  if(!saves.length){grid.innerHTML='<div class="no-saves" style="grid-column:span 3">NO SAVED DRAWINGS</div>';return;}
-  grid.innerHTML=saves.map(s=>`
-    <div class="save-card" id="addSave_${s.id}" onclick="selectAddSave(${s.id})">
-      <img src="${s.dataUrl}" style="width:100%;height:100%;object-fit:cover;display:block;"/>
-      <div class="save-name">${s.name}</div>
-    </div>`).join('');
-}
-
+function confirmSave(){const name=document.getElementById('saveNameI').value.trim()||'DRAWING '+Date.now();const dataUrl=DC.toDataURL('image/png');const saves=getSaves();saves.push({id:Date.now(),name:name.toUpperCase(),dataUrl});putSaves(saves);closeSaveDialog();renderSavesGrid();lg(`Saved: ${name}`,'ok');}
+function openPhotoSaveDialog(){if(!pvCvs){lg('No image loaded','err');return;}document.getElementById('photoSaveNameI').value='';document.getElementById('photoSaveDialog').style.display='block';document.getElementById('photoSaveNameI').focus();}
+function closePhotoSaveDialog(){document.getElementById('photoSaveDialog').style.display='none';}
+function confirmPhotoSave(){const name=document.getElementById('photoSaveNameI').value.trim()||'PHOTO '+Date.now();const dataUrl=pvCvs.toDataURL('image/png');const saves=getSaves();saves.push({id:Date.now(),name:name.toUpperCase(),dataUrl});putSaves(saves);closePhotoSaveDialog();renderSavesGrid();renderAddSavedGrid();lg(`Saved: ${name}`,'ok');}
+function deleteSave(id){const saves=getSaves().filter(s=>s.id!==id);putSaves(saves);renderSavesGrid();renderAddSavedGrid();btnSequence=btnSequence.filter(s=>!(s.type==='saved'&&s.saveId===id));renderSeq();}
+function loadSaveToCanvas(save){const img=new Image();img.onload=()=>{DX.clearRect(0,0,240,240);DX.drawImage(img,0,0,240,240);savHist();lg(`Loaded: ${save.name}`,'ok');};img.src=save.dataUrl;}
+function renderSavesGrid(){const saves=getSaves(),grid=document.getElementById('savesGrid');if(!saves.length){grid.innerHTML='<div class="no-saves" style="grid-column:span 3">NO SAVED DRAWINGS</div>';return;}grid.innerHTML=saves.map(s=>`<div class="save-card" onclick="loadSaveToCanvas(getSaves().find(x=>x.id===${s.id}))"><img src="${s.dataUrl}"/><div class="save-name">${s.name}</div><button class="save-del" onclick="event.stopPropagation();deleteSave(${s.id})">✕</button></div>`).join('');}
+function renderAddSavedGrid(){const saves=getSaves(),grid=document.getElementById('addSavedGrid');if(!saves.length){grid.innerHTML='<div class="no-saves" style="grid-column:span 3">NO SAVED DRAWINGS</div>';return;}grid.innerHTML=saves.map(s=>`<div class="save-card" id="addSave_${s.id}" onclick="selectAddSave(${s.id})"><img src="${s.dataUrl}"/><div class="save-name">${s.name}</div></div>`).join('');}
 let selectedAddSave=null;
-function selectAddSave(id){
-  selectedAddSave=id;
-  document.querySelectorAll('[id^="addSave_"]').forEach(el=>el.classList.remove('selected'));
-  document.getElementById(`addSave_${id}`).classList.add('selected');
-}
-
-// ════════════════════════════════════
-// BUTTON CONFIG
-// ════════════════════════════════════
-// btnSequence: array of screen descriptors
-// { type:'colour'|'finger'|'message'|'saved', state, mode, message, saveId, name }
-let btnSequence=[];
-try{btnSequence=JSON.parse(localStorage.getItem('picoBtnSeq')||'[]');}catch{}
-
+function selectAddSave(id){selectedAddSave=id;document.querySelectorAll('[id^="addSave_"]').forEach(el=>el.classList.remove('selected'));document.getElementById(`addSave_${id}`).classList.add('selected');}
+let btnSequence=[];try{btnSequence=JSON.parse(localStorage.getItem('picoBtnSeq')||'[]');}catch{}
 let addScreenType='colour',addColour='red',addMode='solid';
-
-function setScreenType(t){
-  addScreenType=t;
-  document.querySelectorAll('.stbtn').forEach(b=>b.classList.remove('on'));
-  document.getElementById(`st${t.charAt(0).toUpperCase()+t.slice(1)}`).classList.add('on');
-  document.getElementById('addColourPanel').style.display=t==='colour'?'block':'none';
-  document.getElementById('addMsgPanel').style.display=t==='message'?'block':'none';
-  document.getElementById('addSavedPanel').style.display=t==='saved'?'block':'none';
-}
-
-function setAddCol(c){
-  addColour=c;
-  // Update both colour pick rows
-  document.querySelectorAll('.cpick').forEach(el=>el.classList.toggle('on',el.dataset.col===c));
-}
-function setAddMode(m){
-  addMode=m;
-  ['Solid','Ring','Flash'].forEach(n=>document.getElementById(`addMd${n}`).classList.toggle('on',n.toLowerCase()===m));
-}
-
-function addToSeq(){
-  const st=document.getElementById('addSt');
-  let item={};
-
-  if(addScreenType==='colour'){
-    item={type:'colour',state:addColour,mode:addMode,name:`${addColour.toUpperCase()} ${addMode.toUpperCase()}`};
-  } else if(addScreenType==='finger'){
-    item={type:'finger',state:'red',mode:'solid',name:'MIDDLE FINGER'};
-  } else if(addScreenType==='message'){
-    const msg=document.getElementById('addMsgTxt').value.trim();
-    if(!msg){st.className='sline err';st.textContent='Message required';return;}
-    item={type:'message',state:addColour,mode:'solid',message:msg,name:`MSG: ${msg.toUpperCase()}`};
-  } else if(addScreenType==='saved'){
-    if(!selectedAddSave){st.className='sline err';st.textContent='Select a drawing';return;}
-    const save=getSaves().find(s=>s.id===selectedAddSave);
-    if(!save){st.className='sline err';st.textContent='Drawing not found';return;}
-    item={type:'saved',saveId:selectedAddSave,name:save.name,dataUrl:save.dataUrl};
-  }
-
-  item.id=Date.now();
-  btnSequence.push(item);
-  localStorage.setItem('picoBtnSeq',JSON.stringify(btnSequence));
-  renderSeq();
-  st.className='sline ok';st.textContent=`✓ Added: ${item.name}`;
-  lg(`Seq: added ${item.name}`,'ok');
-}
-
-function removeFromSeq(id){
-  btnSequence=btnSequence.filter(s=>s.id!==id);
-  localStorage.setItem('picoBtnSeq',JSON.stringify(btnSequence));
-  renderSeq();
-}
-
-function clearSeq(){
-  btnSequence=[];localStorage.removeItem('picoBtnSeq');renderSeq();
-  document.getElementById('seqSt').textContent='';
-}
-
-function renderSeq(){
-  const el=document.getElementById('btnSeq');
-  if(!btnSequence.length){el.innerHTML='<div class="no-seq">NO SCREENS IN SEQUENCE</div>';return;}
-
-  el.innerHTML=btnSequence.map((s,i)=>{
-    const preview=s.type==='saved'
-      ?`<img src="${s.dataUrl}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid var(--bord2);"/>`
-      :`<div class="seq-preview" style="background:${s.state==='red'?'#bb0010':s.state==='green'?'#005522':'#550077'}"></div>`;
-    return`<div class="seq-item" draggable="true" data-idx="${i}"
-      ondragstart="onSeqDragStart(event,${i})"
-      ondragover="onSeqDragOver(event)"
-      ondrop="onSeqDrop(event,${i})">
-      <span class="seq-drag">⠿</span>
-      ${preview}
-      <div class="seq-info">
-        <div class="seq-label">${i+1}. ${s.name}</div>
-        <div class="seq-sub">${s.type.toUpperCase()}${s.message?' · '+s.message.toUpperCase():''}</div>
-      </div>
-      <button class="seq-del" onclick="removeFromSeq(${s.id})">✕</button>
-    </div>`;
-  }).join('');
-}
-
-// Drag to reorder
+function setScreenType(t){addScreenType=t;document.querySelectorAll('.stbtn').forEach(b=>b.classList.remove('on'));document.getElementById(`st${t.charAt(0).toUpperCase()+t.slice(1)}`).classList.add('on');document.getElementById('addColourPanel').style.display=t==='colour'?'block':'none';document.getElementById('addMsgPanel').style.display=t==='message'?'block':'none';document.getElementById('addSavedPanel').style.display=t==='saved'?'block':'none';}
+function setAddCol(c){addColour=c;document.querySelectorAll('.cpick').forEach(el=>el.classList.toggle('on',el.dataset.col===c));}
+function setAddMode(m){addMode=m;['Solid','Ring','Flash'].forEach(n=>document.getElementById(`addMd${n}`).classList.toggle('on',n.toLowerCase()===m));}
+function addToSeq(){const st=document.getElementById('addSt');let item={};if(addScreenType==='colour'){item={type:'colour',state:addColour,mode:addMode,name:`${addColour.toUpperCase()} ${addMode.toUpperCase()}`};}else if(addScreenType==='finger'){item={type:'finger',state:'red',mode:'solid',name:'MIDDLE FINGER'};}else if(addScreenType==='message'){const msg=document.getElementById('addMsgTxt').value.trim();if(!msg){st.className='sline err';st.textContent='Message required';return;}item={type:'message',state:addColour,mode:'solid',message:msg,name:`MSG: ${msg.toUpperCase()}`};}else if(addScreenType==='saved'){if(!selectedAddSave){st.className='sline err';st.textContent='Select a drawing';return;}const save=getSaves().find(s=>s.id===selectedAddSave);if(!save){st.className='sline err';st.textContent='Drawing not found';return;}item={type:'saved',saveId:selectedAddSave,name:save.name,dataUrl:save.dataUrl};}item.id=Date.now();btnSequence.push(item);localStorage.setItem('picoBtnSeq',JSON.stringify(btnSequence));renderSeq();st.className='sline ok';st.textContent=`✓ Added: ${item.name}`;lg(`Seq: added ${item.name}`,'ok');}
+function removeFromSeq(id){btnSequence=btnSequence.filter(s=>s.id!==id);localStorage.setItem('picoBtnSeq',JSON.stringify(btnSequence));renderSeq();}
+function clearSeq(){btnSequence=[];localStorage.removeItem('picoBtnSeq');renderSeq();document.getElementById('seqSt').textContent='';}
+function renderSeq(){const el=document.getElementById('btnSeq');if(!btnSequence.length){el.innerHTML='<div class="no-seq">NO SCREENS IN SEQUENCE</div>';return;}el.innerHTML=btnSequence.map((s,i)=>{const preview=s.type==='saved'?`<img src="${s.dataUrl}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid var(--bord2);"/>`:`<div class="seq-preview" style="background:${s.state==='red'?'#bb0010':s.state==='green'?'#005522':'#550077'}"></div>`;return`<div class="seq-item" draggable="true" ondragstart="onSeqDragStart(event,${i})" ondragover="onSeqDragOver(event)" ondrop="onSeqDrop(event,${i})"><span class="seq-drag">⠿</span>${preview}<div class="seq-info"><div class="seq-label">${i+1}. ${s.name}</div><div class="seq-sub">${s.type.toUpperCase()}${s.message?' · '+s.message.toUpperCase():''}</div></div><button class="seq-del" onclick="removeFromSeq(${s.id})">✕</button></div>`;}).join('');}
 let dragIdx=null;
 function onSeqDragStart(e,i){dragIdx=i;e.dataTransfer.effectAllowed='move';}
 function onSeqDragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';}
-function onSeqDrop(e,targetIdx){
-  e.preventDefault();
-  if(dragIdx===null||dragIdx===targetIdx)return;
-  const item=btnSequence.splice(dragIdx,1)[0];
-  btnSequence.splice(targetIdx,0,item);
-  dragIdx=null;
-  localStorage.setItem('picoBtnSeq',JSON.stringify(btnSequence));
-  renderSeq();
-}
-
-async function pushSeqToPico() {
-  const st = document.getElementById('seqSt');
-  if (!btnSequence.length) {
-    st.className = 'sline err'; st.textContent = 'Sequence is empty'; return;
-  }
-  st.className = 'sline inf'; st.textContent = 'APPLYING...';
-  lg(`Applying sequence (${btnSequence.length} items)`, 'inf');
-
-  try {
-    // Pre-assign a slot index to every saved item
-    let slotIdx = 0;
-    const withSlots = btnSequence.map(s => ({
-      ...s,
-      _slot: s.type === 'saved' ? slotIdx++ : null,
-    }));
-
-    // Step 1 — upload each saved drawing to its assigned slot
-    for (const s of withSlots) {
-      if (s.type !== 'saved' || !s.dataUrl) continue;
-
-      st.textContent = `UPLOADING DRAWING TO SLOT ${s._slot}...`;
-      lg(`Uploading drawing to slot ${s._slot}`, 'inf');
-
-      const canvas = document.createElement('canvas');
-      canvas.width = 240; canvas.height = 240;
-      const ctx = canvas.getContext('2d');
-      await new Promise(res => {
-        const img = new Image();
-        img.onload = () => { ctx.drawImage(img, 0, 0, 240, 240); res(); };
-        img.src = s.dataUrl;
-      });
-
-      try {
-        await fetch(`http://${ip()}/clear`, {
-          method: 'POST', headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({}), signal: AbortSignal.timeout(5000)
-        });
-      } catch(e) { lg(`Clear warn: ${e.message}`, 'inf'); }
-      await new Promise(r => setTimeout(r, 300));
-
-      const b64 = cvs2b64(canvas);
-      const CH  = 2000;
-      const tot = Math.ceil(b64.length / CH);
-
-      for (let c = 0; c < tot; c++) {
-        st.textContent = `SLOT ${s._slot} · CHUNK ${c+1}/${tot}`;
-        const r = await fetch(`http://${ip()}/upload_chunk`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chunk: b64.slice(c * CH, (c+1) * CH),
-            index: c,
-            total: tot,
-            slot:  s._slot,
-          }),
-          signal: AbortSignal.timeout(15000)
-        });
-        const d = await r.json();
-        if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
-        if (c === tot - 1) {
-          lg(`✓ Slot ${s._slot} stored (${d.free_ram || '?'}B free)`, 'ok');
-        }
-      }
-    }
-
-    // Step 2 — send sequence metadata using the same pre-assigned slot indices
-    st.textContent = 'SENDING SEQUENCE...';
-    const seqMeta = withSlots.map(s => ({
-      index:    s._slot !== null ? s._slot : 0,
-      type:     s.type,
-      state:    s.state   || 'green',
-      mode:     s.mode    || 'solid',
-      message:  s.message || null,
-      hasSaved: s.type === 'saved',
-    }));
-
-    console.log('Sending seqMeta:', JSON.stringify(seqMeta));
-
-    const r = await fetch(`http://${ip()}/button_sequence`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body:   JSON.stringify({ sequence: seqMeta }),
-      signal: AbortSignal.timeout(5000)
-    });
-    const d = await r.json();
-    if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
-
-    st.className  = 'sline ok';
-    st.textContent = `✓ ${d.count} SCREENS APPLIED`;
-    lg('✓ Button sequence applied', 'ok');
-
-  } catch(e) {
-    st.className  = 'sline err';
-    st.textContent = `✗ ${e.message}`;
-    lg(`✗ Seq: ${e.message}`, 'err');
-  }
-}
-async function sendChunksToSlot(canvas,slotIndex){
-  // Pre-clear RAM
-  try{await fetch(`http://${ip()}/clear`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({}),signal:AbortSignal.timeout(5000)});}catch{}
-  await new Promise(r=>setTimeout(r,200));
-  const b64=cvs2b64(canvas),CH=2000,tot=Math.ceil(b64.length/CH);
-  for(let i=0;i<tot;i++){
-    const r=await fetch(`http://${ip()}/upload_chunk`,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({chunk:b64.slice(i*CH,(i+1)*CH),index:i,total:tot,slot:slotIndex}),
-      signal:AbortSignal.timeout(15000)
-    });
-    const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);
-  }
-}
-
-// ════════════════════════════════════
-// SCHEDULE TAB
-// ════════════════════════════════════
+function onSeqDrop(e,targetIdx){e.preventDefault();if(dragIdx===null||dragIdx===targetIdx)return;const item=btnSequence.splice(dragIdx,1)[0];btnSequence.splice(targetIdx,0,item);dragIdx=null;localStorage.setItem('picoBtnSeq',JSON.stringify(btnSequence));renderSeq();}
+async function pushSeqToPico(){const st=document.getElementById('seqSt');if(!btnSequence.length){st.className='sline err';st.textContent='Sequence is empty';return;}st.className='sline inf';st.textContent='APPLYING...';lg(`Applying sequence (${btnSequence.length} items)`,'inf');try{let uploadSlot=0;const withSlots=btnSequence.map(s=>({...s,_slot:s.type==='saved'?uploadSlot++:null}));for(const s of withSlots){if(s.type!=='saved'||!s.dataUrl)continue;st.textContent=`UPLOADING TO SLOT ${s._slot}...`;const canvas=document.createElement('canvas');canvas.width=240;canvas.height=240;const ctx=canvas.getContext('2d');await new Promise(res=>{const img=new Image();img.onload=()=>{ctx.drawImage(img,0,0,240,240);res();};img.src=s.dataUrl;});try{await fetch(`http://${ip()}/clear`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({}),signal:AbortSignal.timeout(5000)});}catch(e){lg(`Clear: ${e.message}`,'inf');}await new Promise(r=>setTimeout(r,300));const b64=cvs2b64(canvas),CH=2000,tot=Math.ceil(b64.length/CH);for(let c=0;c<tot;c++){st.textContent=`SLOT ${s._slot} · ${c+1}/${tot}`;const r=await fetch(`http://${ip()}/upload_chunk`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chunk:b64.slice(c*CH,(c+1)*CH),index:c,total:tot,slot:s._slot}),signal:AbortSignal.timeout(15000)});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);if(c===tot-1)lg(`✓ Slot ${s._slot} (${d.free_ram||'?'}B free)`,'ok');}}st.textContent='SENDING SEQUENCE...';let sc2=0;const seqMeta=btnSequence.map(s=>({index:s.type==='saved'?sc2++:0,type:s.type,state:s.state||'green',mode:s.mode||'solid',message:s.message||null,hasSaved:s.type==='saved'}));const r=await fetch(`http://${ip()}/button_sequence`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sequence:seqMeta}),signal:AbortSignal.timeout(5000)});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);st.className='sline ok';st.textContent=`✓ ${d.count} SCREENS APPLIED`;lg('✓ Button sequence applied','ok');}catch(e){st.className='sline err';st.textContent=`✗ ${e.message}`;lg(`✗ Seq: ${e.message}`,'err');}}
 function togDay(d){const i=schedDays.indexOf(d);if(i===-1)schedDays.push(d);else schedDays.splice(i,1);document.querySelectorAll('.dbtn2').forEach(b=>b.classList.toggle('on',schedDays.includes(parseInt(b.dataset.d))));}
 function onScDisp(){document.getElementById('sMsgW').style.display=document.getElementById('sDp').value==='message'?'block':'none';}
-async function addJob(){
-  const h=parseInt(document.getElementById('sHr').value),m=parseInt(document.getElementById('sMn').value);
-  const st=document.getElementById('sSt').value,mo=document.getElementById('sMo').value;
-  const di=document.getElementById('sDp').value,msg=document.getElementById('sMsg').value.trim()||null;
-  const ss=document.getElementById('scSt');
-  if(isNaN(h)||isNaN(m)){ss.className='sline err';ss.textContent='Invalid time';return;}
-  const pay={hour:h,minute:m,days:schedDays.slice(),state:st,mode:mo,show_middle_finger:di==='finger',message:di==='message'?msg:null};
-  try{
-    const r=await fetch(`http://${ip()}/schedule`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(pay),signal:AbortSignal.timeout(5000)});
-    const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);
-    ss.className='sline ok';ss.textContent=`✓ Job #${d.id}`;lg(`✓ Job #${d.id}`,'ok');loadJobs();
-  }catch(e){ss.className='sline err';ss.textContent=`✗ ${e.message}`;lg(`✗ ${e.message}`,'err');}
-}
+async function addJob(){const h=parseInt(document.getElementById('sHr').value),m=parseInt(document.getElementById('sMn').value);const st=document.getElementById('sSt').value,mo=document.getElementById('sMo').value;const di=document.getElementById('sDp').value,msg=document.getElementById('sMsg').value.trim()||null;const ss=document.getElementById('scSt');if(isNaN(h)||isNaN(m)){ss.className='sline err';ss.textContent='Invalid time';return;}const pay={hour:h,minute:m,days:schedDays.slice(),state:st,mode:mo,show_middle_finger:di==='finger',message:di==='message'?msg:null};try{const r=await fetch(`http://${ip()}/schedule`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(pay),signal:AbortSignal.timeout(5000)});const d=await r.json();if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);ss.className='sline ok';ss.textContent=`✓ Job #${d.id}`;lg(`✓ Job #${d.id}`,'ok');loadJobs();}catch(e){ss.className='sline err';ss.textContent=`✗ ${e.message}`;lg(`✗ ${e.message}`,'err');}}
 async function loadJobs(){try{const r=await fetch(`http://${ip()}/schedule`,{signal:AbortSignal.timeout(3000)});const d=await r.json();rendJobs(d.jobs||[]);}catch(e){lg(`Jobs: ${e.message}`,'err');}}
-function rendJobs(jobs){
-  const el=document.getElementById('jList');
-  if(!jobs.length){el.innerHTML='<div class="nojobs">NO JOBS SCHEDULED</div>';return;}
-  el.innerHTML=jobs.map(j=>{
-    const h=String(j.hour).padStart(2,'0'),m=String(j.minute).padStart(2,'0');
-    const days=j.days&&j.days.length?j.days.map(d=>DAYS[d]).join(' '):'EVERY DAY';
-    const dp=j.show_middle_finger?'🖕':j.message?`💬 ${j.message.toUpperCase()}`:'🎨';
-    const dc=j.state==='red'?'r':j.state==='green'?'g':'p';
-    return`<div class="jcard ${j.enabled?'':'off'}">
-      <div class="jtime">${h}:${m}</div>
-      <div class="jinfo"><div class="jmeta"><span class="jdot j${dc}"></span>${j.state.toUpperCase()}·${j.mode.toUpperCase()}·${dp}</div><div class="jdays">${days}</div></div>
-      <div class="jacts"><button class="jb tog" onclick="togJob(${j.id})">${j.enabled?'OFF':'ON'}</button><button class="jb del" onclick="delJob(${j.id})">DEL</button></div>
-    </div>`;
-  }).join('');
-}
+function rendJobs(jobs){const el=document.getElementById('jList');if(!jobs.length){el.innerHTML='<div class="nojobs">NO JOBS SCHEDULED</div>';return;}el.innerHTML=jobs.map(j=>{const h=String(j.hour).padStart(2,'0'),m=String(j.minute).padStart(2,'0');const days=j.days&&j.days.length?j.days.map(d=>DAYS[d]).join(' '):'EVERY DAY';const dp=j.show_middle_finger?'🖕':j.message?`💬 ${j.message.toUpperCase()}`:'🎨';const dc=j.state==='red'?'r':j.state==='green'?'g':'p';return`<div class="jcard ${j.enabled?'':'off'}"><div class="jtime">${h}:${m}</div><div class="jinfo"><div class="jmeta"><span class="jdot j${dc}"></span>${j.state.toUpperCase()}·${j.mode.toUpperCase()}·${dp}</div><div class="jdays">${days}</div></div><div class="jacts"><button class="jb tog" onclick="togJob(${j.id})">${j.enabled?'OFF':'ON'}</button><button class="jb del" onclick="delJob(${j.id})">DEL</button></div></div>`;}).join('');}
 async function togJob(id){try{const r=await fetch(`http://${ip()}/schedule/${id}/toggle`,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}',signal:AbortSignal.timeout(3000)});const d=await r.json();if(!r.ok)throw new Error(d.error);lg(`Job #${id} ${d.enabled?'on':'off'}`,'ok');loadJobs();}catch(e){lg(`✗ ${e.message}`,'err');}}
 async function delJob(id){try{const r=await fetch(`http://${ip()}/schedule/${id}`,{method:'DELETE',signal:AbortSignal.timeout(3000)});if(!r.ok){const d=await r.json();throw new Error(d.error);}lg(`Job #${id} deleted`,'ok');loadJobs();}catch(e){lg(`✗ ${e.message}`,'err');}}
-
-// ════════════════════════════════════
-// PHOTO SAVE (MEDIA TAB)
-// ════════════════════════════════════
-function openPhotoSaveDialog() {
-  if (!pvCvs) { lg('No image loaded', 'err'); return; }
-  document.getElementById('photoSaveNameI').value = '';
-  document.getElementById('photoSaveDialog').style.display = 'block';
-  document.getElementById('photoSaveNameI').focus();
-}
-function closePhotoSaveDialog() {
-  document.getElementById('photoSaveDialog').style.display = 'none';
-}
-function confirmPhotoSave() {
-  const name = document.getElementById('photoSaveNameI').value.trim() || 'PHOTO ' + Date.now();
-  const dataUrl = pvCvs.toDataURL('image/png');
-  const saves = getSaves();
-  saves.push({id: Date.now(), name: name.toUpperCase(), dataUrl});
-  putSaves(saves);
-  closePhotoSaveDialog();
-  renderSavesGrid();
-  renderAddSavedGrid();
-  lg(`Saved: ${name}`, 'ok');
-}
-
-// Init
-updLCD();
-renderSavesGrid();
-lg('Ready · enter IP and ping','inf');
-
-// Apply role-based UI
-if (_picoAuth.role !== 'admin') {
-  document.getElementById('adminContent').style.display = 'none';
-  document.getElementById('viewerNote').style.display = 'block';
-  document.getElementById('rebootBtn').style.display = 'none';
-  const sLink = document.getElementById('settingsNavBtn');
-  if (sLink) sLink.style.display = 'none';
-  // Auto-connect so viewer sees current state
-  setTimeout(() => ping(), 400);
-}
+updLCD();renderSavesGrid();lg('Ready · enter IP and ping','inf');
+if(_picoAuth.role!=='admin'){document.getElementById('adminContent').style.display='none';document.getElementById('viewerNote').style.display='block';document.getElementById('rebootBtn').style.display='none';const sLink=document.getElementById('settingsNavBtn');if(sLink)sLink.style.display='none';setTimeout(()=>ping(),400);}
 </script>
 </body>
 </html>
