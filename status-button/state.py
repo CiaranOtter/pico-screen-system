@@ -381,33 +381,43 @@ def _draw_ring_background():
     _push()
 
 
-def _draw_middle_finger_frame(raise_amount):
+def _draw_middle_finger_frame(raise_amount, shake_x=0):
     global _ring_drawn, _static_drawn
     colour = STATE_COLOURS[current['state']]
-
+ 
     if not _ring_drawn:
         _draw_ring_background()
         _ring_drawn = True
-
+ 
     if not _static_drawn:
+        # Palm base
         fb.fill_rect(95,  155, 50, 45, colour)
+        # Index and ring fingers (down)
         fb.fill_rect(75,  135, 18, 30, colour)
+        fb.fill_rect(151, 135, 18, 30, colour)
+        # Pinky and pointer knuckle bases
         fb.fill_rect(95,  120, 18, 40, colour)
         fb.fill_rect(131, 120, 18, 40, colour)
-        fb.fill_rect(151, 135, 18, 30, colour)
+        # Finger gaps
         fb.fill_rect(93,  120, 2,  55, BLACK)
         fb.fill_rect(129, 120, 2,  55, BLACK)
         fb.fill_rect(149, 120, 2,  55, BLACK)
         _static_drawn = True
-
-    fb.fill_rect(113, 60, 18, 120, BLACK)
+ 
+    # Middle finger — animated rise with optional horizontal shake
+    cx = 113 + shake_x
+    fb.fill_rect(cx - 2, 60, 22, 120, BLACK)   # clear previous position
     offset = int((1.0 - raise_amount) * 50)
-    fb.fill_rect(113, 85 + offset, 18, 75, colour)
-    fb.fill_rect(111, 60, 2, 120, BLACK)
-    fb.fill_rect(129, 60, 2, 120, BLACK)
+    fb.fill_rect(cx, 85 + offset, 18, 75, colour)
+    fb.fill_rect(cx - 2, 60, 2,  120, BLACK)    # left gap
+    fb.fill_rect(cx + 18, 60, 2, 120, BLACK)    # right gap
+ 
+    # Rounded fingernail hint at the top
+    if raise_amount > 0.85:
+        nail_y = 85 + offset - 6
+        fb.fill_rect(cx + 3, nail_y, 12, 7, BLACK)
+ 
     _push()
-
-
 # ════════════════════════════════════
 # TRANSITIONS
 # ════════════════════════════════════

@@ -253,7 +253,10 @@ async def health(request):
 # ── State ──
 @app.get('/state')
 async def get_state(request):
-    return dict(state.current)
+    d = dict(state.current)
+    d['image_active'] = image_loader.active
+    d['gif_active']   = gif_player.active
+    return d
 
 @app.post('/state')
 async def set_state(request):
@@ -773,6 +776,220 @@ async def set_passwords(request):
 
     return {'status': 'ok', 'changed': changed}
 
+# ── Drop-in replacements for the /image and /gif POST handlers in api.py ──
+# Replace the existing @app.post('/image') and @app.post('/gif') handlers
+# with these two. Everything else in api.py stays the same.
+
+@app.post('/image')
+async def set_image(request):
+    mem.collect()
+    body = request.json
+    if body is None:
+        return {'error': 'JSON body required'}, 400
+
+    url = body.get('url')
+    del body
+    mem.collect()
+
+    if not url:
+        return {'error': 'url required'}, 400
+
+    if url == 'clear':
+        _clear_media()
+        state.current['gif_url'] = None
+        state.render_state()
+        return {'status': 'cleared'}
+
+    try:
+        _clear_media()
+        state.current['gif_url']            = None
+        state.current['show_middle_finger'] = False
+        state.current['message']            = None
+        mem.collect()
+
+        # load_from_url now streams download to flash then
+        # streams flash to display — never holds full image in RAM
+        image_loader.load_from_url(url)
+        image_loader.active = True
+        return {'status': 'ok', 'free_ram': mem.free()}
+
+    except Exception as e:
+        mem.collect()
+        return {'error': str(e)}, 500
+
+
+@app.post('/gif')
+async def set_gif(request):
+    mem.collect()
+    body = request.json
+    if body is None:
+        return {'error': 'JSON body required'}, 400
+
+    url  = body.get('url')
+    path = body.get('path')   # optional: where to save on flash
+    del body
+    mem.collect()
+
+    if not url:
+        return {'error': 'url required'}, 400
+
+    if url == 'clear':
+        _clear_media()
+        state.current['gif_url'] = None
+        state.render_state()
+        return {'status': 'cleared'}
+
+    try:
+        _clear_media()
+        mem.collect()
+
+        # Download .gif565 from URL and save to flash, then play
+        dest = path or '/tmp_dl.gif565'
+        count, delay = gif_player.load_from_url(url, dest_path=dest)
+
+        state.current['gif_url']            = url
+        state.current['show_middle_finger'] = False
+        state.current['message']            = None
+
+        return {
+            'status':   'ok',
+            'frames':   count,
+            'delay_ms': delay,
+            'saved_to': dest,
+            'free_ram': mem.free(),
+        }
+
+    except Exception as e:
+        mem.collect()
+        return {'error': str(e)}, 500
+    
+_GIF_UPLOAD_PATH  = '/tmp_upload.gif565'
+_gif_upload_file  = None
+_gif_upload_pos   = 0
+_gif_b64_leftover = ''
+ 
+@app.route('/upload_gif565_chunk', methods=['OPTIONS'])
+async def opt_gif565_chunk(request):
+    return '', 204, CORS_HEADERS
+ 
+@app.post('/upload_gif565_chunk')
+async def upload_gif565_chunk(request):
+    global _gif_upload_file, _gif_upload_pos, _gif_b64_leftover
+ 
+    mem.collect()
+    body = request.json
+    if body is None:
+        return {'error': 'JSON body required'}, 400
+ 
+    chunk = body.get('chunk')
+    index = body.get('index')
+    total = body.get('total')
+    del body
+    mem.collect()
+ 
+    if chunk is None or index is None or total is None:
+        return {'error': 'chunk, index, total required'}, 400
+ 
+    if index == 0:
+        # Close any previous upload
+        if _gif_upload_file is not None:
+            try:
+                _gif_upload_file.close()
+            except Exception:
+                pass
+            _gif_upload_file = None
+ 
+        _gif_b64_leftover = ''
+        _gif_upload_pos   = 0
+ 
+        # Clear existing gif player
+        try:
+            gif_player.clear()
+        except Exception:
+            pass
+        mem.collect()
+ 
+        import os
+        try:
+            os.remove(_GIF_UPLOAD_PATH)
+        except OSError:
+            pass
+        try:
+            _gif_upload_file = open(_GIF_UPLOAD_PATH, 'wb')
+        except Exception as e:
+            return {'error': f'Cannot open file: {e}'}, 500
+ 
+    if _gif_upload_file is None:
+        return {'error': 'Send chunk 0 first'}, 400
+ 
+    # Decode and write
+    b64_data          = _gif_b64_leftover + chunk
+    chunk             = None
+    mem.collect()
+ 
+    complete          = (len(b64_data) // 4) * 4
+    _gif_b64_leftover = b64_data[complete:]
+    to_decode         = b64_data[:complete]
+    b64_data          = None
+    mem.collect()
+ 
+    if to_decode:
+        try:
+            decoded   = binascii.a2b_base64(to_decode)
+            to_decode = None
+            _gif_upload_file.write(decoded)
+            _gif_upload_pos += len(decoded)
+            decoded   = None
+            mem.collect()
+        except Exception as e:
+            to_decode = None
+            mem.collect()
+            return {'error': f'Decode: {e}'}, 500
+    else:
+        to_decode = None
+ 
+    # Last chunk — flush leftover and start playing
+    if index == total - 1:
+        if _gif_b64_leftover:
+            try:
+                pad = len(_gif_b64_leftover) % 4
+                if pad:
+                    _gif_b64_leftover += '=' * (4 - pad)
+                decoded            = binascii.a2b_base64(_gif_b64_leftover)
+                _gif_upload_file.write(decoded)
+                _gif_upload_pos   += len(decoded)
+                decoded            = None
+                _gif_b64_leftover  = ''
+                mem.collect()
+            except Exception as e:
+                return {'error': f'Final decode: {e}'}, 500
+ 
+        _gif_upload_file.close()
+        _gif_upload_file = None
+        mem.collect()
+ 
+        print(f"GIF565 received: {_gif_upload_pos} bytes → {_GIF_UPLOAD_PATH}")
+ 
+        # Load and play
+        try:
+            _clear_media()
+            mem.collect()
+            count, delay = gif_player.load_from_file(_GIF_UPLOAD_PATH)
+            state.current['gif_url']            = _GIF_UPLOAD_PATH
+            state.current['show_middle_finger'] = False
+            state.current['message']            = None
+            return {
+                'status':   'ok',
+                'frames':   count,
+                'delay_ms': delay,
+                'bytes':    _gif_upload_pos,
+                'free_ram': mem.free(),
+            }
+        except Exception as e:
+            mem.collect()
+            return {'error': str(e)}, 500
+ 
+    return {'status': 'chunk_received', 'index': index, 'free_ram': mem.free()}
 
 # ── Error handlers ──
 @app.errorhandler(404)

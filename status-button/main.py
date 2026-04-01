@@ -99,21 +99,26 @@ async def button_task():
                         slot_idx = item.get('index', 0)
                         path     = f'/static/sequence_slots/seq_slot_{slot_idx}.bin'
                         print(f"Loading slot {slot_idx} from {path}, RAM: {mem.free()}")
-                        print(f"Item: {item}")  # ← add this to see what the Pico received
 
                         try:
-                            # Stream directly to display in small row chunks
-                            # — never allocates more than ROWS * 480 bytes at once
                             ROWS      = 8
                             row_bytes = 240 * 2
                             buf       = bytearray(ROWS * row_bytes)
                             mv        = memoryview(buf)
 
+                            # Kill transition/flash before streaming image
+                            state.transition['active']          = False
+                            state.transition['progress']        = 1.0
+                            state.current['mode']               = 'solid'
+                            state.current['show_middle_finger'] = False
+                            state.current['message']            = None
+                            await asyncio.sleep_ms(30)
+
                             with open(path, 'rb') as f:
                                 y = 0
                                 while y < 240:
-                                    rows  = min(ROWS, 240 - y)
-                                    n     = f.readinto(mv[:rows * row_bytes])
+                                    rows   = min(ROWS, 240 - y)
+                                    n      = f.readinto(mv[:rows * row_bytes])
                                     if not n:
                                         break
                                     actual = n // row_bytes
@@ -145,6 +150,7 @@ async def button_task():
                         print(f"Slot error: {e}")
                         mem.collect()
                         state.render_state()
+
                 else:
                     image_loader.image_data             = None
                     image_loader.active                 = False
@@ -159,8 +165,9 @@ async def button_task():
                         state.start_transition(old, new)
                     else:
                         state.render_state()
+
             else:
-                # no sequence — cycle through states manually
+                # no sequence — cycle through states manually on button press
                 old = state.current['state']
                 idx = list(state.STATES).index(old)
                 new = state.STATES[(idx + 1) % len(state.STATES)]
@@ -177,6 +184,7 @@ async def button_task():
 
         last_btn = btn
         await asyncio.sleep_ms(10)
+
 async def flash_task():
     """Smooth sine-wave background pulse with stable text overlay."""
     import math, time
@@ -235,79 +243,74 @@ async def transition_task():
 
 async def finger_task():
     import math, time
- 
-    # Animation constants
-    RISE_SPEED   = 0.04   # how fast the finger rises (lower = slower)
-    HOLD_FRAMES  = 25     # frames to hold at the top
-    REST_FRAMES  = 20     # frames to rest at the bottom
-    SHAKE_RANGE  = 3      # pixels of horizontal shake at the top
- 
-    step        = 0
-    hold_count  = 0
-    rest_count  = 0
-    phase       = 'rise'  # 'rise' | 'hold' | 'lower' | 'rest'
-    shake_idx   = 0
- 
+
+    SPEED        = 0.05
+    PAUSE_FRAMES = 15
+    FLASH_COUNT  = 3
+    FLASH_MS     = 300
+    step         = 0
+    pause        = 0
+    flashed_top  = False
+
     while True:
         if (state.current['state'] == 'red'
                 and state.current['show_middle_finger']
                 and state.current['mode'] != 'flash'
                 and not state.transition['active']):
- 
-            t0 = time.ticks_ms()
- 
-            if phase == 'rise':
-                step += 1
-                raise_amount = min(1.0, step * RISE_SPEED)
-                state._draw_middle_finger_frame(raise_amount, shake_x=0)
-                if raise_amount >= 1.0:
-                    phase      = 'hold'
-                    hold_count = 0
-                    shake_idx  = 0
- 
-            elif phase == 'hold':
-                # Subtle left-right shake at the top
-                shake_offsets = [0, 1, 2, 1, 0, -1, -2, -1]
-                sx = shake_offsets[shake_idx % len(shake_offsets)] * SHAKE_RANGE // 2
-                state._draw_middle_finger_frame(1.0, shake_x=sx)
-                shake_idx  += 1
-                hold_count += 1
-                if hold_count >= HOLD_FRAMES:
-                    phase = 'lower'
-                    step  = int(1.0 / RISE_SPEED)  # start from top
- 
-            elif phase == 'lower':
-                step -= 1
-                raise_amount = max(0.0, step * RISE_SPEED)
-                state._draw_middle_finger_frame(raise_amount, shake_x=0)
-                if raise_amount <= 0.0:
-                    phase      = 'rest'
-                    rest_count = 0
- 
-            elif phase == 'rest':
-                rest_count += 1
-                if rest_count >= REST_FRAMES:
-                    phase = 'rise'
-                    step  = 0
- 
+
+            t0           = time.ticks_ms()
+            raise_amount = (math.sin(step * SPEED) + 1) / 2
+            at_top       = raise_amount > 0.98
+            at_bottom    = raise_amount < 0.02
+
+            if at_top:
+                if not flashed_top:
+                    state._draw_middle_finger_frame(1.0)
+                    if not state.finger_no_text:
+                        for _ in range(FLASH_COUNT):
+                            state._draw_text_centered(
+                                "UP YOURS", 170, state.font_med, 8,
+                                state.STATE_COLOURS[state.current['state']],
+                                state.BLACK
+                            )
+                            await asyncio.sleep_ms(FLASH_MS)
+                            state.tft.fill_rect(0, 165, 240, 20, state.BLACK)
+                            await asyncio.sleep_ms(FLASH_MS)
+                    flashed_top = True
+
+                if pause < PAUSE_FRAMES:
+                    pause += 1
+                else:
+                    pause = 0; flashed_top = False; step += 1
+
+            elif at_bottom:
+                flashed_top = False
+                if pause < PAUSE_FRAMES:
+                    pause += 1
+                else:
+                    pause = 0; step += 1
+            else:
+                pause = 0; step += 1
+
+            state._draw_middle_finger_frame(raise_amount)
             elapsed = time.ticks_diff(time.ticks_ms(), t0)
-            await asyncio.sleep_ms(max(10, 40 - elapsed))
- 
+            await asyncio.sleep_ms(max(0, 50 - elapsed))
         else:
-            # Reset when not active
-            step       = 0
-            hold_count = 0
-            rest_count = 0
-            phase      = 'rise'
-            shake_idx  = 0
+            step = 0; pause = 0; flashed_top = False
             await asyncio.sleep_ms(30)
+
+
 async def gif_task():
     import time
     frame_idx = 0
     while True:
         if gif_player.active and gif_player._frame_count > 0:
-            t0 = time.ticks_ms()
-            gif_player.read_frame(frame_idx)  # blits directly, no buffer returned
+            t0    = time.ticks_ms()
+            frame = gif_player.read_frame(frame_idx)
+            if frame:
+                state.tft.blit_buffer(frame, 0, 0, 240, 240)
+                frame = None
+                mem.collect()
             delay     = gif_player.get_delay(frame_idx)
             frame_idx = (frame_idx + 1) % gif_player._frame_count
             elapsed   = time.ticks_diff(time.ticks_ms(), t0)
@@ -316,10 +319,12 @@ async def gif_task():
             frame_idx = 0
             await asyncio.sleep_ms(50)
 
+
 async def scheduler_task():
     import time
     while True:
         try:
+            old = state.current['state']          # capture BEFORE check_jobs updates it
             fired = scheduler.check_jobs(state.current)
             if fired:
                 # Clear any active media so the scheduled state actually shows
@@ -332,9 +337,7 @@ async def scheduler_task():
                 state.transition['active']   = False
                 state.transition['progress'] = 1.0
 
-                old = fired.get('_prev_state', state.current['state'])
-                new = fired['state']
-
+                new = state.current['state']      # already updated by check_jobs
                 if old != new:
                     state.start_transition(old, new)
                 else:

@@ -68,10 +68,12 @@ def check_jobs(current_state):
                 continue
 
             _last_fired[job['id']] = (hour, minute)
+            prev = current_state['state']
             current_state['state']              = job['state']
             current_state['mode']               = job['mode']
             current_state['show_middle_finger'] = job['show_middle_finger']
             current_state['message']            = job['message']
+            job['_prev_state'] = prev
             print(f"Scheduler fired job {job['id']} at {hour:02d}:{minute:02d}")
             return job
         except Exception as e:
