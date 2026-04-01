@@ -78,10 +78,6 @@ async def button_task():
         if btn == 0 and last_btn == 1:  # button just pressed
             if state.btn_sequence:
                 new_index = (state.btn_index + 1) % len(state.btn_sequence)
-                if new_index >= len(state.btn_sequence):
-                    last_btn = btn
-                    await asyncio.sleep_ms(10)
-                    continue
                 state.btn_index = new_index
                 item = state.btn_sequence[state.btn_index]
                 old  = state.current['state']
@@ -96,24 +92,23 @@ async def button_task():
                         mem.collect()
                         mem.collect()
 
-                        slot_idx = item.get('index', 0)
-                        path     = f'/static/sequence_slots/seq_slot_{slot_idx}.bin'
-                        print(f"Loading slot {slot_idx} from {path}, RAM: {mem.free()}")
+                        slot_name = item.get('slotName', str(item.get('index', 0)))
+                        path      = f'/static/sequence_slots/seq_slot_{slot_name}.bin'
+                        print(f"Loading slot '{slot_name}' from {path}, RAM: {mem.free()}")
+
+                        # Kill transition/flash before streaming so nothing draws over it
+                        state.transition['active']          = False
+                        state.transition['progress']        = 1.0
+                        state.current['mode']               = 'solid'
+                        state.current['show_middle_finger'] = False
+                        state.current['message']            = None
+                        await asyncio.sleep_ms(30)
 
                         try:
                             ROWS      = 8
                             row_bytes = 240 * 2
                             buf       = bytearray(ROWS * row_bytes)
                             mv        = memoryview(buf)
-
-                            # Kill transition/flash before streaming image
-                            state.transition['active']          = False
-                            state.transition['progress']        = 1.0
-                            state.current['mode']               = 'solid'
-                            state.current['show_middle_finger'] = False
-                            state.current['message']            = None
-                            await asyncio.sleep_ms(30)
-
                             with open(path, 'rb') as f:
                                 y = 0
                                 while y < 240:
@@ -124,7 +119,6 @@ async def button_task():
                                     actual = n // row_bytes
                                     state.tft.blit_buffer(mv[:actual * row_bytes], 0, y, 240, actual)
                                     y += actual
-
                             buf = None
                             mv  = None
                             mem.collect()
@@ -167,7 +161,7 @@ async def button_task():
                         state.render_state()
 
             else:
-                # no sequence — cycle through states manually on button press
+                # No sequence — cycle states manually on button press
                 old = state.current['state']
                 idx = list(state.STATES).index(old)
                 new = state.STATES[(idx + 1) % len(state.STATES)]
@@ -196,12 +190,8 @@ async def flash_task():
         if (state.current['mode'] == 'flash'
                 and not state.current['show_middle_finger']
                 and not gif_player.active
-                and not image_loader.active):
-
-            # Wait for any active transition to finish before flashing
-            if state.transition['active']:
-                await asyncio.sleep_ms(33)
-                continue
+                and not image_loader.active
+                and not state.transition['active']):
 
             t0      = time.ticks_ms()
             cur_st  = state.current['state']
@@ -214,7 +204,7 @@ async def flash_task():
                 last_state = state_key
                 step = 0
 
-            # Sine pulse value
+            # Sine pulse value 0..1
             t    = (math.sin(step * SPEED) + 1) / 2
             step += 1
 
@@ -324,20 +314,19 @@ async def scheduler_task():
     import time
     while True:
         try:
-            old = state.current['state']          # capture BEFORE check_jobs updates it
+            old   = state.current['state']          # capture BEFORE check_jobs mutates it
             fired = scheduler.check_jobs(state.current)
             if fired:
-                # Clear any active media so the scheduled state actually shows
+                # Clear any active media
                 gif_player.clear()
                 image_loader.image_data = None
                 image_loader.active     = False
                 mem.collect()
-
-                # Stop any transition in progress
+                # Kill any in-progress transition
                 state.transition['active']   = False
                 state.transition['progress'] = 1.0
-
-                new = state.current['state']      # already updated by check_jobs
+                new = state.current['state']         # already updated by check_jobs
+                print(f"Scheduler rendering: {old} -> {new}, mode={state.current['mode']}")
                 if old != new:
                     state.start_transition(old, new)
                 else:

@@ -80,33 +80,46 @@ async def auth_guard(request):
         return {'error': 'Forbidden'}, 403, CORS_HEADERS
     return None
 
-SLOT_PATH = '/static/sequence_slots/seq_slot_{}.bin'
+SLOT_DIR  = '/static/sequence_slots'
+SLOT_PATH = SLOT_DIR + '/seq_slot_{}.bin'
 
-def _slot_path(slot):
-    return SLOT_PATH.format(slot)
+def _slot_path(name):
+    # Sanitise: alphanumeric, hyphens, underscores only
+    safe = ''.join(c for c in str(name) if c.isalnum() or c in '-_')
+    return SLOT_PATH.format(safe or 'unnamed')
 
-def _save_slot_to_flash(slot, data):
+def _slot_name_from_path(path):
+    # Extract name from '/static/sequence_slots/seq_slot_NAME.bin'
+    base = path.split('/')[-1]          # 'seq_slot_NAME.bin'
+    if base.startswith('seq_slot_') and base.endswith('.bin'):
+        return base[9:-4]
+    return base
+
+def _list_slots():
+    """Return list of slot names currently stored on flash."""
+    import os
+    names = []
+    try:
+        for f in os.listdir(SLOT_DIR):
+            if f.startswith('seq_slot_') and f.endswith('.bin'):
+                names.append(f[9:-4])
+    except OSError:
+        pass
+    return names
+
+def _save_slot_to_flash(name, data):
     """Write raw RGB565 bytearray to flash."""
-    path = _slot_path(slot)
+    path = _slot_path(name)
     with open(path, 'wb') as f:
         f.write(data)
-    print(f"Slot {slot} saved to {path} ({len(data)} bytes)")
-
-def _load_slot_from_flash(slot):
-    """Read raw RGB565 from flash. Returns bytearray or None."""
-    path = _slot_path(slot)
-    try:
-        with open(path, 'rb') as f:
-            return f.read()
-    except OSError:
-        return None
+    print(f"Slot '{name}' saved to {path} ({len(data)} bytes)")
 
 def _clear_all_slots():
     """Delete all slot files from flash."""
     import os
-    for i in range(20):
+    for name in _list_slots():
         try:
-            os.remove(_slot_path(i))
+            os.remove(_slot_path(name))
         except OSError:
             pass
     mem.collect()
@@ -183,10 +196,13 @@ async def opt_passwords(request):            return '', 204, CORS_HEADERS
 async def index(request):
     return send_file('/static/templates/index.html', content_type='text/html')
 
-@app.get('/local')
-@app.get('/local-controller.html')
-async def local(request):
-    return send_file('/static/templates/local-controller.html', content_type='text/html')
+@app.get('/static/styles.css')
+async def serve_styles(request):
+    return send_file('/static/templates/styles.css', content_type='text/css')
+
+@app.get('/static/logic.js')
+async def serve_logic(request):
+    return send_file('/static/templates/logic.js', content_type='text/javascript')
 
 @app.get('/login')
 @app.get('/login.html')
@@ -253,10 +269,7 @@ async def health(request):
 # ── State ──
 @app.get('/state')
 async def get_state(request):
-    d = dict(state.current)
-    d['image_active'] = image_loader.active
-    d['gif_active']   = gif_player.active
-    return d
+    return dict(state.current)
 
 @app.post('/state')
 async def set_state(request):
@@ -520,11 +533,12 @@ async def upload_chunk(request):
 
         if slot is not None:
             import os
-            slot_path = _slot_path(slot)
+            slot_path = _slot_path(str(slot))
             try:
                 os.rename(_TMP_PATH, slot_path)
-                print(f"Slot {slot} saved to {slot_path} ({_upload_pos} bytes)")
-                return {'status': 'ok', 'slot': slot, 'free_ram': mem.free()}
+                slot_name = _slot_name_from_path(slot_path)
+                print(f"Slot '{slot_name}' saved to {slot_path} ({_upload_pos} bytes)")
+                return {'status': 'ok', 'slot': slot_name, 'free_ram': mem.free()}
             except Exception as e:
                 return {'error': f'Slot save: {e}'}, 500
         else:
@@ -540,7 +554,48 @@ async def upload_chunk(request):
                 return {'error': str(e)}, 500
 
     return {'status': 'chunk_received', 'index': index, 'free_ram': mem.free()}
-# ── Scheduler ──
+
+# ── Slot management ──
+@app.route('/slots', methods=['OPTIONS'])
+async def opt_slots(request): return '', 204, CORS_HEADERS
+
+@app.get('/slots')
+async def list_slots(request):
+    """Return list of slot names stored on flash."""
+    return {'slots': _list_slots()}
+
+@app.route('/slot_image/<name>', methods=['OPTIONS'])
+async def opt_slot_image(request, name): return '', 204, CORS_HEADERS
+
+@app.get('/slot_image/<name>')
+async def get_slot_image(request, name):
+    """
+    Stream a stored RGB565 slot file back as base64 for the frontend to decode.
+    Returns JSON: {data: '<base64>', width: 240, height: 240}
+    Reads in small chunks to avoid large RAM allocation.
+    """
+    import binascii as _b
+    path = _slot_path(name)
+    try:
+        # Read in 480-byte chunks (one row at a time), encode each, concatenate
+        row_bytes = 480          # 240 pixels * 2 bytes
+        out_parts = []
+        with open(path, 'rb') as f:
+            while True:
+                chunk = f.read(row_bytes * 4)   # 4 rows per read
+                if not chunk:
+                    break
+                out_parts.append(_b.b2a_base64(chunk).decode().strip())
+                chunk = None
+                mem.collect()
+        return {'data': ''.join(out_parts), 'width': 240, 'height': 240, 'name': name}
+    except OSError:
+        return {'error': f"Slot '{name}' not found"}, 404, CORS_HEADERS
+    except Exception as e:
+        mem.collect()
+        return {'error': str(e)}, 500, CORS_HEADERS
+
+
 @app.get('/schedule')
 async def get_schedule(request):
     return {'jobs': scheduler.get_jobs()}
@@ -776,220 +831,6 @@ async def set_passwords(request):
 
     return {'status': 'ok', 'changed': changed}
 
-# ── Drop-in replacements for the /image and /gif POST handlers in api.py ──
-# Replace the existing @app.post('/image') and @app.post('/gif') handlers
-# with these two. Everything else in api.py stays the same.
-
-@app.post('/image')
-async def set_image(request):
-    mem.collect()
-    body = request.json
-    if body is None:
-        return {'error': 'JSON body required'}, 400
-
-    url = body.get('url')
-    del body
-    mem.collect()
-
-    if not url:
-        return {'error': 'url required'}, 400
-
-    if url == 'clear':
-        _clear_media()
-        state.current['gif_url'] = None
-        state.render_state()
-        return {'status': 'cleared'}
-
-    try:
-        _clear_media()
-        state.current['gif_url']            = None
-        state.current['show_middle_finger'] = False
-        state.current['message']            = None
-        mem.collect()
-
-        # load_from_url now streams download to flash then
-        # streams flash to display — never holds full image in RAM
-        image_loader.load_from_url(url)
-        image_loader.active = True
-        return {'status': 'ok', 'free_ram': mem.free()}
-
-    except Exception as e:
-        mem.collect()
-        return {'error': str(e)}, 500
-
-
-@app.post('/gif')
-async def set_gif(request):
-    mem.collect()
-    body = request.json
-    if body is None:
-        return {'error': 'JSON body required'}, 400
-
-    url  = body.get('url')
-    path = body.get('path')   # optional: where to save on flash
-    del body
-    mem.collect()
-
-    if not url:
-        return {'error': 'url required'}, 400
-
-    if url == 'clear':
-        _clear_media()
-        state.current['gif_url'] = None
-        state.render_state()
-        return {'status': 'cleared'}
-
-    try:
-        _clear_media()
-        mem.collect()
-
-        # Download .gif565 from URL and save to flash, then play
-        dest = path or '/tmp_dl.gif565'
-        count, delay = gif_player.load_from_url(url, dest_path=dest)
-
-        state.current['gif_url']            = url
-        state.current['show_middle_finger'] = False
-        state.current['message']            = None
-
-        return {
-            'status':   'ok',
-            'frames':   count,
-            'delay_ms': delay,
-            'saved_to': dest,
-            'free_ram': mem.free(),
-        }
-
-    except Exception as e:
-        mem.collect()
-        return {'error': str(e)}, 500
-    
-_GIF_UPLOAD_PATH  = '/tmp_upload.gif565'
-_gif_upload_file  = None
-_gif_upload_pos   = 0
-_gif_b64_leftover = ''
- 
-@app.route('/upload_gif565_chunk', methods=['OPTIONS'])
-async def opt_gif565_chunk(request):
-    return '', 204, CORS_HEADERS
- 
-@app.post('/upload_gif565_chunk')
-async def upload_gif565_chunk(request):
-    global _gif_upload_file, _gif_upload_pos, _gif_b64_leftover
- 
-    mem.collect()
-    body = request.json
-    if body is None:
-        return {'error': 'JSON body required'}, 400
- 
-    chunk = body.get('chunk')
-    index = body.get('index')
-    total = body.get('total')
-    del body
-    mem.collect()
- 
-    if chunk is None or index is None or total is None:
-        return {'error': 'chunk, index, total required'}, 400
- 
-    if index == 0:
-        # Close any previous upload
-        if _gif_upload_file is not None:
-            try:
-                _gif_upload_file.close()
-            except Exception:
-                pass
-            _gif_upload_file = None
- 
-        _gif_b64_leftover = ''
-        _gif_upload_pos   = 0
- 
-        # Clear existing gif player
-        try:
-            gif_player.clear()
-        except Exception:
-            pass
-        mem.collect()
- 
-        import os
-        try:
-            os.remove(_GIF_UPLOAD_PATH)
-        except OSError:
-            pass
-        try:
-            _gif_upload_file = open(_GIF_UPLOAD_PATH, 'wb')
-        except Exception as e:
-            return {'error': f'Cannot open file: {e}'}, 500
- 
-    if _gif_upload_file is None:
-        return {'error': 'Send chunk 0 first'}, 400
- 
-    # Decode and write
-    b64_data          = _gif_b64_leftover + chunk
-    chunk             = None
-    mem.collect()
- 
-    complete          = (len(b64_data) // 4) * 4
-    _gif_b64_leftover = b64_data[complete:]
-    to_decode         = b64_data[:complete]
-    b64_data          = None
-    mem.collect()
- 
-    if to_decode:
-        try:
-            decoded   = binascii.a2b_base64(to_decode)
-            to_decode = None
-            _gif_upload_file.write(decoded)
-            _gif_upload_pos += len(decoded)
-            decoded   = None
-            mem.collect()
-        except Exception as e:
-            to_decode = None
-            mem.collect()
-            return {'error': f'Decode: {e}'}, 500
-    else:
-        to_decode = None
- 
-    # Last chunk — flush leftover and start playing
-    if index == total - 1:
-        if _gif_b64_leftover:
-            try:
-                pad = len(_gif_b64_leftover) % 4
-                if pad:
-                    _gif_b64_leftover += '=' * (4 - pad)
-                decoded            = binascii.a2b_base64(_gif_b64_leftover)
-                _gif_upload_file.write(decoded)
-                _gif_upload_pos   += len(decoded)
-                decoded            = None
-                _gif_b64_leftover  = ''
-                mem.collect()
-            except Exception as e:
-                return {'error': f'Final decode: {e}'}, 500
- 
-        _gif_upload_file.close()
-        _gif_upload_file = None
-        mem.collect()
- 
-        print(f"GIF565 received: {_gif_upload_pos} bytes → {_GIF_UPLOAD_PATH}")
- 
-        # Load and play
-        try:
-            _clear_media()
-            mem.collect()
-            count, delay = gif_player.load_from_file(_GIF_UPLOAD_PATH)
-            state.current['gif_url']            = _GIF_UPLOAD_PATH
-            state.current['show_middle_finger'] = False
-            state.current['message']            = None
-            return {
-                'status':   'ok',
-                'frames':   count,
-                'delay_ms': delay,
-                'bytes':    _gif_upload_pos,
-                'free_ram': mem.free(),
-            }
-        except Exception as e:
-            mem.collect()
-            return {'error': str(e)}, 500
- 
-    return {'status': 'chunk_received', 'index': index, 'free_ram': mem.free()}
 
 # ── Error handlers ──
 @app.errorhandler(404)

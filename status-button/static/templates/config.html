@@ -76,7 +76,7 @@ input[type=color]{width:44px;height:32px;cursor:pointer;border:1px solid var(--b
 </header>
 
 <!-- Device Info -->
-<div class="card">
+<div class="card" id="adminDeviceInfo">
   <div class="ctitle">DEVICE INFO</div>
   <div class="info-grid">
     <div class="info-row"><span class="info-key">STATUS</span><span class="info-val" id="infoStatus">CHECKING...</span></div>
@@ -135,7 +135,7 @@ input[type=color]{width:44px;height:32px;cursor:pointer;border:1px solid var(--b
 </div>
 
 <!-- Network -->
-<div class="card">
+<div class="card" id="adminNetwork">
   <div class="ctitle">NETWORK</div>
   <div class="fgrp">
     <label class="flbl">HOSTNAME</label>
@@ -158,7 +158,7 @@ input[type=color]{width:44px;height:32px;cursor:pointer;border:1px solid var(--b
 </div>
 
 <!-- Access Codes -->
-<div class="card">
+<div class="card" id="adminPasswords">
   <div class="ctitle">ACCESS CODES</div>
   <div class="fgrp">
     <label class="flbl">NEW ADMIN PASSWORD</label>
@@ -177,7 +177,7 @@ input[type=color]{width:44px;height:32px;cursor:pointer;border:1px solid var(--b
 </div>
 
 <!-- System -->
-<div class="card">
+<div class="card" id="adminSystem">
   <div class="ctitle">SYSTEM</div>
   <div class="brow">
     <button class="btn danger" onclick="doReboot()"><span>REBOOT</span></button>
@@ -285,8 +285,18 @@ input[type=color]{width:44px;height:32px;cursor:pointer;border:1px solid var(--b
 })();
 
 const _auth=(function(){try{return JSON.parse(sessionStorage.getItem('pico_auth')||'null');}catch{return null;}})();
-if(!_auth||_auth.role!=='admin'){window.location.href='/login?next=/settings';throw new Error('unauthenticated');}
-document.getElementById('userBadge').textContent=(_auth.name||'').toUpperCase()+' · ADMIN';
+if(!_auth||!_auth.token){window.location.href='/login?next=/settings';throw new Error('unauthenticated');}
+const _isAdmin = _auth.role === 'admin';
+document.getElementById('userBadge').textContent=(_auth.name||'').toUpperCase()+' · '+(_auth.role||'').toUpperCase();
+
+// Hide admin-only cards from viewers
+if(!_isAdmin){
+  ['adminDeviceInfo','adminNetwork','adminPasswords','adminSystem'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el)el.style.display='none';
+  });
+}
+
 function hdrs(){return{'Content-Type':'application/json','Authorization':'Bearer '+_auth.token};}
 function navBack(){window.history.length>1?window.history.back():window.location.href='/';}
 async function doLogout(){try{await fetch('/logout',{method:'POST',headers:hdrs(),body:'{}',signal:AbortSignal.timeout(3000)});}catch{}sessionStorage.removeItem('pico_auth');window.location.href='/login';}
@@ -331,17 +341,17 @@ function resetTheme(){
 }
 
 // ── Device info ──
-async function loadDeviceInfo(){try{const r=await fetch('/health',{signal:AbortSignal.timeout(3000)});const d=await r.json();document.getElementById('infoStatus').textContent='ONLINE';document.getElementById('infoUptime').textContent=(d.uptime_ms/1000).toFixed(0)+'s';document.getElementById('infoRam').textContent=(d.free_ram||'?')+' B';}catch{document.getElementById('infoStatus').textContent='OFFLINE';}}
+async function loadDeviceInfo(){if(!_isAdmin)return;try{const r=await fetch('/health',{signal:AbortSignal.timeout(3000)});const d=await r.json();document.getElementById('infoStatus').textContent='ONLINE';document.getElementById('infoUptime').textContent=(d.uptime_ms/1000).toFixed(0)+'s';document.getElementById('infoRam').textContent=(d.free_ram||'?')+' B';}catch{document.getElementById('infoStatus').textContent='OFFLINE';}}
 
 // ── Network ──
-async function loadNetwork(){const st=document.getElementById('netSt');st.className='sline inf';st.textContent='LOADING...';try{const r=await fetch('/config/device',{signal:AbortSignal.timeout(3000)});const d=await r.json();document.getElementById('cfgHostname').value=d.hostname||'';document.getElementById('cfgSsid').value=d.wifi_ssid||'';document.getElementById('cfgWifi').value='';document.getElementById('infoHost').textContent=(d.hostname||'?')+'.local';st.className='sline ok';st.textContent='✓ LOADED';}catch(e){st.className='sline err';st.textContent='✗ '+e.message;}}
-async function saveNetwork(){const st=document.getElementById('netSt');const hostname=document.getElementById('cfgHostname').value.trim().toLowerCase();const ssid=document.getElementById('cfgSsid').value.trim();const wpass=document.getElementById('cfgWifi').value;if(!hostname){st.className='sline err';st.textContent='Hostname required';return;}const body={hostname};if(ssid)body.wifi_ssid=ssid;if(wpass)body.wifi_password=wpass;st.className='sline inf';st.textContent='SAVING...';try{const r=await fetch('/config/device',{method:'POST',headers:hdrs(),body:JSON.stringify(body),signal:AbortSignal.timeout(5000)});const d=await r.json();if(!r.ok)throw new Error(d.error);document.getElementById('infoHost').textContent=d.hostname+'.local';st.className='sline ok';st.textContent='✓ SAVED · REBOOT TO APPLY WIFI CHANGES';}catch(e){st.className='sline err';st.textContent='✗ '+e.message;}}
+async function loadNetwork(){if(!_isAdmin)return;const st=document.getElementById('netSt');st.className='sline inf';st.textContent='LOADING...';try{const r=await fetch('/config/device',{signal:AbortSignal.timeout(3000)});const d=await r.json();document.getElementById('cfgHostname').value=d.hostname||'';document.getElementById('cfgSsid').value=d.wifi_ssid||'';document.getElementById('cfgWifi').value='';document.getElementById('infoHost').textContent=(d.hostname||'?')+'.local';st.className='sline ok';st.textContent='✓ LOADED';}catch(e){st.className='sline err';st.textContent='✗ '+e.message;}}
+async function saveNetwork(){if(!_isAdmin)return;const st=document.getElementById('netSt');const hostname=document.getElementById('cfgHostname').value.trim().toLowerCase();const ssid=document.getElementById('cfgSsid').value.trim();const wpass=document.getElementById('cfgWifi').value;if(!hostname){st.className='sline err';st.textContent='Hostname required';return;}const body={hostname};if(ssid)body.wifi_ssid=ssid;if(wpass)body.wifi_password=wpass;st.className='sline inf';st.textContent='SAVING...';try{const r=await fetch('/config/device',{method:'POST',headers:hdrs(),body:JSON.stringify(body),signal:AbortSignal.timeout(5000)});const d=await r.json();if(!r.ok)throw new Error(d.error);document.getElementById('infoHost').textContent=d.hostname+'.local';st.className='sline ok';st.textContent='✓ SAVED · REBOOT TO APPLY WIFI CHANGES';}catch(e){st.className='sline err';st.textContent='✗ '+e.message;}}
 
 // ── Passwords ──
-async function savePasswords(){const st=document.getElementById('passSt');const newAdmin=document.getElementById('newAdmin').value;const newViewer=document.getElementById('newViewer').value;const curAdmin=document.getElementById('curAdmin').value;if(!curAdmin){st.className='sline err';st.textContent='Current admin password required';return;}if(!newAdmin&&!newViewer){st.className='sline err';st.textContent='Enter at least one new password';return;}const body={current_admin:curAdmin};if(newAdmin)body.admin_pass=newAdmin;if(newViewer)body.viewer_pass=newViewer;st.className='sline inf';st.textContent='UPDATING...';try{const r=await fetch('/config/passwords',{method:'POST',headers:hdrs(),body:JSON.stringify(body),signal:AbortSignal.timeout(5000)});const d=await r.json();if(!r.ok)throw new Error(d.error);st.className='sline ok';st.textContent='✓ CODES UPDATED';document.getElementById('newAdmin').value='';document.getElementById('newViewer').value='';document.getElementById('curAdmin').value='';if(newAdmin){st.textContent+=' · RE-LOGIN REQUIRED';setTimeout(()=>{sessionStorage.removeItem('pico_auth');window.location.href='/login';},2000);}}catch(e){st.className='sline err';st.textContent='✗ '+e.message;}}
+async function savePasswords(){if(!_isAdmin)return;const st=document.getElementById('passSt');const newAdmin=document.getElementById('newAdmin').value;const newViewer=document.getElementById('newViewer').value;const curAdmin=document.getElementById('curAdmin').value;if(!curAdmin){st.className='sline err';st.textContent='Current admin password required';return;}if(!newAdmin&&!newViewer){st.className='sline err';st.textContent='Enter at least one new password';return;}const body={current_admin:curAdmin};if(newAdmin)body.admin_pass=newAdmin;if(newViewer)body.viewer_pass=newViewer;st.className='sline inf';st.textContent='UPDATING...';try{const r=await fetch('/config/passwords',{method:'POST',headers:hdrs(),body:JSON.stringify(body),signal:AbortSignal.timeout(5000)});const d=await r.json();if(!r.ok)throw new Error(d.error);st.className='sline ok';st.textContent='✓ CODES UPDATED';document.getElementById('newAdmin').value='';document.getElementById('newViewer').value='';document.getElementById('curAdmin').value='';if(newAdmin){st.textContent+=' · RE-LOGIN REQUIRED';setTimeout(()=>{sessionStorage.removeItem('pico_auth');window.location.href='/login';},2000);}}catch(e){st.className='sline err';st.textContent='✗ '+e.message;}}
 
 // ── Reboot ──
-async function doReboot(){if(!confirm('Reboot the Pico?'))return;const st=document.getElementById('sysSt');try{await fetch('/reboot',{method:'POST',headers:hdrs(),body:'{}',signal:AbortSignal.timeout(3000)});}catch{}st.className='sline inf';st.textContent='REBOOTING — RECONNECTING IN 10s...';setTimeout(()=>{st.textContent='';loadDeviceInfo();},10000);}
+async function doReboot(){if(!_isAdmin)return;if(!confirm('Reboot the Pico?'))return;const st=document.getElementById('sysSt');try{await fetch('/reboot',{method:'POST',headers:hdrs(),body:'{}',signal:AbortSignal.timeout(3000)});}catch{}st.className='sline inf';st.textContent='REBOOTING — RECONNECTING IN 10s...';setTimeout(()=>{st.textContent='';loadDeviceInfo();},10000);}
 
 loadDeviceInfo();loadNetwork();
 </script>
