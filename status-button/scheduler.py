@@ -67,6 +67,8 @@ def check_jobs(current_state):
             if _last_fired.get(job['id']) == (hour, minute):
                 continue
 
+            print(job, current_state)
+
             _last_fired[job['id']] = (hour, minute)
             prev = current_state['state']
             current_state['state']              = job['state']

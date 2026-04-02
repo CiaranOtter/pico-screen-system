@@ -85,7 +85,7 @@ SLOT_PATH = SLOT_DIR + '/seq_slot_{}.bin'
 
 def _slot_path(name):
     # Sanitise: alphanumeric, hyphens, underscores only
-    safe = ''.join(c for c in str(name) if c.isalnum() or c in '-_')
+    safe = "".join(c for c in str(name) if ('a' <= c <= 'z') or ('A' <= c <= 'Z') or ('0' <= c <= '9') or c in '-_')
     return SLOT_PATH.format(safe or 'unnamed')
 
 def _slot_name_from_path(path):
@@ -289,6 +289,7 @@ async def set_state(request):
 
     if show_middle_finger and message:
         return {'error': 'cannot set both'}, 400
+    mode =body.get('mode', state.current['mode'])
 
     del body
     mem.collect()
@@ -297,6 +298,7 @@ async def set_state(request):
     state.current['state']              = new_state
     state.current['show_middle_finger'] = bool(show_middle_finger)
     state.current['message']            = str(message) if message else None
+    state.current['mode']               = mode
 
     _clear_media()
     state.current['gif_url'] = None

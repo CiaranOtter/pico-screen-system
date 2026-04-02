@@ -1,6 +1,6 @@
 {
-    "wifi_password": "R73C7P8LAT", 
-    "wifi_ssid": "ZyXEL_C26D", 
+    "wifi_ssid": "KAZANG-GUEST", 
+    "wifi_password": "K@zangGr33n2022!", 
     "hostname": "pico_ctrl",
     "wifi_timeout": 20
 }

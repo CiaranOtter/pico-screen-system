@@ -155,7 +155,7 @@ async def button_task():
                     state.current['show_middle_finger'] = item.get('type') == 'finger'
                     state.current['message']            = item.get('message')
                     state.finger_no_text                = item.get('type') == 'finger'
-                    if old != new:
+                    if old != new and state.current['mode'] != 'flash':
                         state.start_transition(old, new)
                     else:
                         state.render_state()
@@ -191,7 +191,8 @@ async def flash_task():
                 and not state.current['show_middle_finger']
                 and not gif_player.active
                 and not image_loader.active
-                and not state.transition['active']):
+                and not state.transition['active']
+        ):
 
             t0      = time.ticks_ms()
             cur_st  = state.current['state']
@@ -224,7 +225,7 @@ async def flash_task():
 async def transition_task():
     while True:
         if (state.transition['active']
-                and state.current['mode'] != 'flash'):  # ← add this guard
+                and state.current['mode'] != 'flash'):
             state.render_transition_frame()
             await asyncio.sleep_ms(16)
         else:
@@ -327,9 +328,11 @@ async def scheduler_task():
                 state.transition['progress'] = 1.0
                 new = state.current['state']         # already updated by check_jobs
                 print(f"Scheduler rendering: {old} -> {new}, mode={state.current['mode']}")
-                if old != new:
-                    state.start_transition(old, new)
+                if old != new and state.current['mode'] != 'flash':
+                   print("starting transition")
+                   state.start_transition(old, new)
                 else:
+                    print("rendering state without transition")
                     state.render_state()
         except Exception as e:
             print(f"Scheduler error: {e}")

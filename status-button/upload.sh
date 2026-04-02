@@ -11,7 +11,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-VENV="/home/ciaran-otter/tools-env"
+# VENV="/home/ciaran-otter/tools-env"
+VENV="tools-venv"
 
 source "$VENV/bin/activate"
 python3 "$SCRIPT_DIR/upload.py" "$@"
